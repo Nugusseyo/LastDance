@@ -1,0 +1,32 @@
+.waveform-section {
+    margin-top: 10px;
+}
+
+.section-title {
+    -unity-font-style: bold;
+    margin-bottom: 4px;
+}
+
+.waveform-slot {
+    height: 80px;
+}
+
+.time-row {
+    flex-direction: row;
+    margin-top: 4px;
+}
+
+.time-label {
+    width: 110px;
+}
+
+.button-row {
+    flex-direction: row;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.play-button {
+    width: 90px;
+    height: 24px;
+}

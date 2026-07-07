@@ -1,0 +1,6 @@
+.top-bar {
+    flex-basis: 60px;
+    justify-content: center;
+    padding-right: 30px;
+    padding-left: 30px;
+}

@@ -1,0 +1,16 @@
+{
+    "name": "DevLib.PolyNavMesh",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d80c6f192861519408d558611f4dc5ad"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
