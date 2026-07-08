@@ -25,7 +25,7 @@ namespace DevLib.PolyNavMesh
     /// navMeshData의 런타임 딕셔너리는 베이킹 이후 읽기 전용이므로 백그라운드 스레드에서
     /// 안전하게 읽을 수 있다.
     /// </summary>
-    public class PolyNavAgent : Module
+    public class PolyNavAgent : AbstractModule
     {
         [SerializeField] private NavMeshData navMeshData;
 
