@@ -2,7 +2,7 @@
 
 namespace DevLib.ModuleSystem
 {
-    public abstract class Module : MonoBehaviour
+    public abstract class AbstractModule : MonoBehaviour, IModule
     {
         protected ModuleOwner _owner;
         public virtual void Initialize(ModuleOwner owner)
