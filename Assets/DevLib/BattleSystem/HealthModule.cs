@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DevLib.BattleSystem
 {
-    public class HealthModule : Module
+    public class HealthModule : AbstractModule
     {
         [field: SerializeField] public float MaxHealth { get; private set;} = 50f;
         public delegate void HealthChange(float before, float current, float max);

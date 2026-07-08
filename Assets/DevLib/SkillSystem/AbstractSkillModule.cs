@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace DevLib.SkillSystem
 {
-    public abstract class AbstractSkillModule : Module, ISkillModule
+    public abstract class AbstractSkillModule : AbstractModule, ISkillModule
     {
         public event Action OnSkillEnd;
         public ModuleOwner Owner => _owner;
