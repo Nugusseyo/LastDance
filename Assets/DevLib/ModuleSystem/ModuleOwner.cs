@@ -7,46 +7,44 @@ namespace DevLib.ModuleSystem
 {
     public class ModuleOwner : MonoBehaviour
     {
-        protected Dictionary<Type, Module> _moduleDict;
+        protected Dictionary<Type, IModule> _moduleDict = new Dictionary<Type, IModule>();
 
         protected virtual void Awake()
         {
-            _moduleDict = GetComponentsInChildren<Module>().ToDictionary(module => module.GetType());
-            InitializeModules();
-            AfterInitializeModules();
+            _moduleDict = GetComponentsInChildren<IModule>().ToDictionary(module => module.GetType());
+            InitializeComponents();
+            AfterInitializeComponents();
         }
-        protected virtual void Start(){}
-        
-        protected virtual void InitializeModules()
+
+        protected virtual void InitializeComponents()
         {
-            foreach (Module module in _moduleDict.Values)
+            foreach (IModule module in _moduleDict.Values)
             {
                 module.Initialize(this);
             }
         }
-        
-        protected virtual void AfterInitializeModules()
+
+        protected virtual void AfterInitializeComponents()
         {
             foreach (IAfterInitModule module in _moduleDict.Values.OfType<IAfterInitModule>())
             {
-                module.AfterInit();
+                module.AfterInitialize();
             }
         }
-        
-        public T GetModule<T>() 
+
+        public T GetModule<T>()
         {
-            if (_moduleDict.TryGetValue(typeof(T), out Module module))
+            if (_moduleDict.TryGetValue(typeof(T), out IModule module))
             {
-                return (T)(object)module;
+                return (T)module;
             }
 
-            Module findModule = _moduleDict.Values.FirstOrDefault(moduleType => moduleType is T);
-            
-            if(findModule is T castedModule)
+            IModule findModule = _moduleDict.Values.FirstOrDefault(moduleType => moduleType is T);
+
+            if (findModule != null && findModule is T castedModule)
                 return castedModule;
 
             return default;
         }
-
     }
 }
