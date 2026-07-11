@@ -1,15 +1,9 @@
+using JJH._02_Scripts.Agents;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+namespace _Works.CJW.Scripts.Player
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
+    public class PlayerController : Agent
     {
         
     }
