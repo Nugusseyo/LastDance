@@ -13,18 +13,22 @@ namespace JJH._02_Scripts.Agents.Enemies.BT.Actions
         [SerializeReference] public BlackboardVariable<GameObject> Target;
         [SerializeReference] public BlackboardVariable<AbstractEnemy> Enemy;
 
+        private ISensor _sensor;
+
         protected override Status OnStart()
         {
-            return Status.Running;
-        }
+            if (Enemy.Value == null || Enemy.Value.Sensor == null)
+                return Status.Failure;
 
-        protected override Status OnUpdate()
-        {
-            return Status.Success;
-        }
+            _sensor = Enemy.Value.Sensor;
 
-        protected override void OnEnd()
-        {
+            if (_sensor.IsTargetInViewRadius(10, out Collider hitCollider))
+            {
+                Target.Value = hitCollider.gameObject;
+                return Status.Success;
+            }
+
+            return Status.Failure;
         }
     }
 }

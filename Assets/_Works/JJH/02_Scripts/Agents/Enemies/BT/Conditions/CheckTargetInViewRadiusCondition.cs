@@ -13,15 +13,9 @@ namespace JJH._02_Scripts.Agents.Enemies.BT.Conditions
 
         public override bool IsTrue()
         {
-            return true;
-        }
-
-        public override void OnStart()
-        {
-        }
-
-        public override void OnEnd()
-        {
+            if (Enemy.Value == null || Enemy.Value.Sensor == null)
+                return false;
+            return Enemy.Value.Sensor.IsTargetInViewRadius(10, out Collider hitCollider);
         }
     }
 }
