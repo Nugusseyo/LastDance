@@ -72,6 +72,7 @@ namespace _Works.CJW.Scripts.Player
             if(context.performed)
                 OnScrollWheelPressed?.Invoke(context.ReadValue<int>());
         }
+
         #region Helper Methods
         
         public Vector3 GetMovementDirection()

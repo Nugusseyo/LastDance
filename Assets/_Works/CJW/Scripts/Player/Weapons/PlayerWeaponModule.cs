@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DevLib.ModuleSystem;
-using DevLib.SkillSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -25,20 +24,6 @@ namespace _Works.CJW.Scripts.Player.Weapons
             _owner = owner;
             CurrentWeapon = _weaponDict[0];
         }
-        private void Update()
-        {
-            if (Mouse.current.scroll.up.IsPressed())
-            {
-                Debug.Log("asd");
-                ChangeWeapon(1);
-            }
-            if (Mouse.current.scroll.down.IsPressed())
-            {
-                ChangeWeapon(-1);
-            }
-            
-        }
-
         public void UseWeapon()
         {
             if(CurrentWeapon.CanUseWeapon())
