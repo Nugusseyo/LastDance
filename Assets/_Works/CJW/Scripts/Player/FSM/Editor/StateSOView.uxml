@@ -1,0 +1,8 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement name="Container" style="flex-grow: 0;">
+        <ui:TextField label="State Name" placeholder-text="스테이트의 이름을 대문자로 입력" name="StateNameField" binding-path="stateName" />
+        <ui:DropdownField label="Class Name" name="ClassNameDropdown" binding-path="className" />
+        <ui:IntegerField label="Asset Index&#10;" value="0" name="AssetIndexField" binding-path="assetIndex" />
+        <uie:ObjectField label="Anim Param" name="StateParamField" type="JWLib.AnimationSystem.AnimParamSo, Assembly-CSharp" binding-path="stateParam" />
+    </ui:VisualElement>
+</ui:UXML>
