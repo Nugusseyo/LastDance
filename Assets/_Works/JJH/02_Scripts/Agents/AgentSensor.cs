@@ -24,8 +24,8 @@ namespace JJH._02_Scripts.Agents
             _colliderResults = new Collider[maxColliderCount];
         }
 
-        //시야각 안에 있는가
-        public bool IsTargetInViewAngle(Transform targetTrm, float viewAngle)
+        //시야각 안에 있는가(타겟)
+        public bool IsTargetInSight(Transform targetTrm, float viewAngle)
         {
             _debugViewAngle = viewAngle;
 
@@ -35,21 +35,32 @@ namespace JJH._02_Scripts.Agents
             return angle <= viewAngle * 0.5f;
         }
 
-        //시야각 안에 있는가(벽 감지)
-        public bool IsTargetInSight(Transform targetTrm)
+        //시야각 안에 있는가(타겟X)
+        public bool IsTargetInSight(float viewAngle, float checkDistance, out Collider collid)
         {
-            Vector3 targetPosition = targetTrm.position;
-            Vector3 direction = targetPosition - transform.position;
-            direction.y = 0;
-            float distance = direction.magnitude;
-            if (Physics.Raycast(transform.position, direction.normalized,
-                    out RaycastHit hit, distance, whatIsObstacle))
+            collid = null;
+
+            Collider[] targets = Physics.OverlapSphere(transform.position,
+                                                                              checkDistance, whatIsTarget);
+
+            foreach (Collider target in targets)
             {
-                Debug.Log($"장애물 감지: {hit.collider.gameObject.name}");
-                return false;
+                Vector3 direction = target.transform.position - transform.position;
+                float angle = Vector3.Angle(transform.forward, direction);
+
+                if (angle > viewAngle * 0.5f)
+                    continue;
+
+                float distance = direction.magnitude;
+                if (Physics.Raycast(transform.position, direction.normalized,
+                                              distance, whatIsObstacle))
+                    continue;
+
+                collid = target;
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         //사거리 안에 있는가(원형 감지)
