@@ -7,7 +7,7 @@ namespace _Works.CJW.Scripts.Player
     public class PlayerController : Agent
     {
         [SerializeField] private InputReader input;
-        [SerializeField] private StateListSO[] stateLayers;
+        [SerializeField] private StateMachineSO[] stateLayers;
 
         public InputReader Input => input;
         public LayeredStateMachine Fsm { get; private set; }

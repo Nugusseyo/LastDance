@@ -1,0 +1,7 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement name="Container" style="flex-grow: 0;">
+        <ui:DropdownField label="Machine Class" name="ClassNameDropdown" binding-path="className" tooltip="런타임에 생성할 StateMachine 파생 클래스를 선택하세요" />
+        <ui:IntegerField label="Layer" value="0" name="LayerField" binding-path="layer" tooltip="이 StateMachine 이 담당할 레이어 인덱스" />
+        <uie:ObjectField label="State List" name="StateListField" type="_Works.CJW.Scripts.Player.FSM.StateListSO, Assembly-CSharp" binding-path="stateList" tooltip="이 StateMachine 이 사용할 State 목록 SO" />
+    </ui:VisualElement>
+</ui:UXML>
