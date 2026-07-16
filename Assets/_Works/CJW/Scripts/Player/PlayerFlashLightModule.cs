@@ -8,15 +8,18 @@ namespace _Works.CJW.Scripts.Player
         [SerializeField] private Light flashLight;
         private ModuleOwner _owner;
 
+        public bool IsActive { get; private set; }
         public void Initialize(ModuleOwner owner)
         {
             _owner = owner;
         }
 
+
         public void ActiveFlashLight(bool enable)
         {
             Debug.Assert(flashLight != null, "flashLight == null");
             flashLight.enabled = enable;
+            IsActive = enable;  
         }
 
         public void SetIntensify(float intensify)
