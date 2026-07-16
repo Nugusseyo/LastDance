@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddd6e80c4a37419b8f83513558b5c01d, type: 3}
   m_Name: LowerStateMachine
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Player.FSM.StateMachineSO
-  className: _Works.CJW.Scripts.Player.FSM.States.StateMachines.LowerStateMachine
+  className: _Works.CJW.Scripts.Player.FSM.States.StateMachines.PlayerLowerStateMachine
   layer: 0
   stateList: {fileID: 11400000, guid: d93b495358a853240ac7788e8b22a09a, type: 2}

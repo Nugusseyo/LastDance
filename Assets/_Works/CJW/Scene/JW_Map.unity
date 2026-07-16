@@ -247,7 +247,7 @@ Transform:
   m_GameObject: {fileID: 28794956}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.42558795, y: 2.4770143, z: 16.979221}
+  m_LocalPosition: {x: -0.42558795, y: 1.5570142, z: 16.979221}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -807,8 +807,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Player.PlayerController
   input: {fileID: 11400000, guid: 3c1dd3ef02205f1439f336e9ea94e488, type: 2}
   stateLayers:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: c7cf6e22a70c2634fb2e9e9b1d0bbb5b, type: 2}
+  - {fileID: 11400000, guid: f8ae4b3feebea7a40882c700c82e1101, type: 2}
 --- !u!4 &74812232
 Transform:
   m_ObjectHideFlags: 0
@@ -819,8 +819,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.50000066, y: 1.838, z: 11.39}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 0.6, y: 1, z: 0.6}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1436620369}
   - {fileID: 2115536545}
@@ -20246,7 +20246,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6152360557449118684, guid: 71ffedefe97723246a1bd17b391ad729, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -1.59
       objectReference: {fileID: 0}
     - target: {fileID: 6152360557449118684, guid: 71ffedefe97723246a1bd17b391ad729, type: 3}
       propertyPath: m_LocalPosition.z
@@ -20605,7 +20605,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7762056973422419922, guid: 4897b81b040a99c42a069ff54abf11f9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.18
+      value: 1.59
       objectReference: {fileID: 0}
     - target: {fileID: 7762056973422419922, guid: 4897b81b040a99c42a069ff54abf11f9, type: 3}
       propertyPath: m_LocalPosition.z

@@ -141,10 +141,19 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": ""ChangeWeapon"",
                     ""type"": ""Value"",
                     ""id"": ""1193ef93-901d-439a-9b0a-b3eeacf53170"",
-                    ""expectedControlType"": ""Integer"",
+                    ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""FlashLight"",
+                    ""type"": ""Button"",
+                    ""id"": ""bd392bd0-187a-4849-9716-3cd8f4ff077f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -305,7 +314,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""1b08d635-9c3d-4bcb-b76d-ce25938c4bce"",
-                    ""path"": ""<Mouse>/scroll/up"",
+                    ""path"": ""<Mouse>/scroll"",
                     ""interactions"": """",
                     ""processors"": ""Scale"",
                     ""groups"": """",
@@ -315,12 +324,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""1b7d364f-76c0-4446-b73b-a32e59fc25ce"",
-                    ""path"": ""<Mouse>/scroll/down"",
+                    ""id"": ""7eca4b1e-ecb5-4a69-a2a6-b13bd4f84616"",
+                    ""path"": ""<Keyboard>/t"",
                     ""interactions"": """",
-                    ""processors"": ""Scale(factor=-1)"",
+                    ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""ChangeWeapon"",
+                    ""action"": ""FlashLight"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -914,6 +923,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_ChangeWeapon = m_Player.FindAction("ChangeWeapon", throwIfNotFound: true);
+        m_Player_FlashLight = m_Player.FindAction("FlashLight", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1013,6 +1023,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Crouch;
     private readonly InputAction m_Player_Interact;
     private readonly InputAction m_Player_ChangeWeapon;
+    private readonly InputAction m_Player_FlashLight;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1048,6 +1059,10 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/ChangeWeapon".
         /// </summary>
         public InputAction @ChangeWeapon => m_Wrapper.m_Player_ChangeWeapon;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/FlashLight".
+        /// </summary>
+        public InputAction @FlashLight => m_Wrapper.m_Player_FlashLight;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1092,6 +1107,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @ChangeWeapon.started += instance.OnChangeWeapon;
             @ChangeWeapon.performed += instance.OnChangeWeapon;
             @ChangeWeapon.canceled += instance.OnChangeWeapon;
+            @FlashLight.started += instance.OnFlashLight;
+            @FlashLight.performed += instance.OnFlashLight;
+            @FlashLight.canceled += instance.OnFlashLight;
         }
 
         /// <summary>
@@ -1121,6 +1139,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @ChangeWeapon.started -= instance.OnChangeWeapon;
             @ChangeWeapon.performed -= instance.OnChangeWeapon;
             @ChangeWeapon.canceled -= instance.OnChangeWeapon;
+            @FlashLight.started -= instance.OnFlashLight;
+            @FlashLight.performed -= instance.OnFlashLight;
+            @FlashLight.canceled -= instance.OnFlashLight;
         }
 
         /// <summary>
@@ -1463,6 +1484,13 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnChangeWeapon(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "FlashLight" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFlashLight(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

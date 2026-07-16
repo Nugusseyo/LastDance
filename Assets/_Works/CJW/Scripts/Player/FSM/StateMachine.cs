@@ -12,9 +12,11 @@ namespace _Works.CJW.Scripts.Player.FSM
         public AgentState CurrentState { get; private set; }
 
         private readonly Dictionary<int, AgentState> _states;
+        protected Agent _agent;
 
         public StateMachine(Agent agent, StateListSO listSO)
         {
+            _agent = agent;
             LayerIndex = listSO.layer;
             _states = BuildStates(agent, listSO.states);
         }

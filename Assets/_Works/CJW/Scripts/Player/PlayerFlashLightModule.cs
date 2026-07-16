@@ -15,7 +15,7 @@ namespace _Works.CJW.Scripts.Player
 
         public void ActiveFlashLight(bool enable)
         {
-            Debug.Assert(flashLight == null, "flashLight == null");
+            Debug.Assert(flashLight != null, "flashLight == null");
             flashLight.enabled = enable;
         }
 
