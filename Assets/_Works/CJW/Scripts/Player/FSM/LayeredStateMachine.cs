@@ -1,3 +1,4 @@
+using System;
 using JJH._02_Scripts.Agents;
 using UnityEngine;
 
@@ -7,19 +8,20 @@ namespace _Works.CJW.Scripts.Player.FSM
     {
         private readonly StateMachine[] _layers;
 
-        public LayeredStateMachine(StateListSO[] layers, Agent owner)
+        public LayeredStateMachine(StateMachineSO[] layers, Agent owner)
         {
             int layerCount = 0;
-            foreach (StateListSO so in layers)
+            foreach (var so in layers)
             {
                 layerCount = Mathf.Max(layerCount, so.layer + 1);
             }
 
             _layers = new StateMachine[layerCount];
-            foreach (StateListSO so in layers)
+            foreach (var so in layers)
             {
                 Debug.Assert(_layers[so.layer] == null, $"레이어 {so.layer} 가 중복 정의됨");
-                _layers[so.layer] = new StateMachine(owner, so);
+                Type t = Type.GetType(so.className);
+                _layers[so.layer] = (StateMachine)Activator.CreateInstance(t, owner, so.stateList);
             }
         }
 

@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2272f8f3311d41f8af93f42629b2fd1a, type: 3}
   m_Name: PlayerInputReader
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Player.InputReader
+  scrollInterval: 0.05

@@ -1,7 +1,7 @@
 using JJH._02_Scripts.Agents;
 using UnityEngine;
 
-namespace _Works.CJW.Scripts.Player.FSM
+namespace _Works.CJW.Scripts.Player.FSM.States
 {
     // Base 레이어 : 정지 상태. 이동 입력이 들어오면 Move 로 전이한다.
     public class PlayerIdleState : AbstractPlayerAgentState

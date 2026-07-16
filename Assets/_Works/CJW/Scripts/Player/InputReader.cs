@@ -13,9 +13,12 @@ namespace _Works.CJW.Scripts.Player
         public event Action OnAttackKeyPressed;
         public event Action OnCrouchKeyPressed;
         public event Action OnSprintKeyPressed;
+        public event Action OnFlashLightKeyPressed;
 
         public Vector2 LastMoveDir { get; private set; }
         public Vector2 CurrentMoveDir { get; private set; }
+        [SerializeField] private float scrollInterval = 0.1f;
+        private float _lastScrollTime;
 
         private Controls _control;
         private void OnEnable()
@@ -24,6 +27,8 @@ namespace _Works.CJW.Scripts.Player
             
             _control.Player.SetCallbacks(this);
             _control.Enable();
+
+            _lastScrollTime = -999;
         }
 
         public void OnMove(InputAction.CallbackContext context)
@@ -44,7 +49,6 @@ namespace _Works.CJW.Scripts.Player
         {
             if (context.performed)
             {
-                Debug.Log("ATTACK KEY");
                 OnAttackKeyPressed?.Invoke();
             }
         }
@@ -69,8 +73,19 @@ namespace _Works.CJW.Scripts.Player
 
         public void OnChangeWeapon(InputAction.CallbackContext context)
         {
+            if (context.performed && Time.time - _lastScrollTime > scrollInterval)
+            {
+                _lastScrollTime = Time.time;
+                var scrollValue = context.ReadValue<Vector2>();
+                int value = scrollValue.y > 0 ? 1 : -1;
+                OnScrollWheelPressed?.Invoke(value);
+            }
+        }
+
+        public void OnFlashLight(InputAction.CallbackContext context)
+        {
             if(context.performed)
-                OnScrollWheelPressed?.Invoke(context.ReadValue<int>());
+                OnFlashLightKeyPressed?.Invoke();
         }
 
         #region Helper Methods

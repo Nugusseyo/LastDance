@@ -55,10 +55,19 @@
                     "name": "ChangeWeapon",
                     "type": "Value",
                     "id": "1193ef93-901d-439a-9b0a-b3eeacf53170",
-                    "expectedControlType": "Integer",
+                    "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "FlashLight",
+                    "type": "Button",
+                    "id": "bd392bd0-187a-4849-9716-3cd8f4ff077f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -219,7 +228,7 @@
                 {
                     "name": "",
                     "id": "1b08d635-9c3d-4bcb-b76d-ce25938c4bce",
-                    "path": "<Mouse>/scroll/up",
+                    "path": "<Mouse>/scroll",
                     "interactions": "",
                     "processors": "Scale",
                     "groups": "",
@@ -229,12 +238,12 @@
                 },
                 {
                     "name": "",
-                    "id": "1b7d364f-76c0-4446-b73b-a32e59fc25ce",
-                    "path": "<Mouse>/scroll/down",
+                    "id": "7eca4b1e-ecb5-4a69-a2a6-b13bd4f84616",
+                    "path": "<Keyboard>/t",
                     "interactions": "",
-                    "processors": "Scale(factor=-1)",
+                    "processors": "",
                     "groups": "",
-                    "action": "ChangeWeapon",
+                    "action": "FlashLight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -6,15 +6,17 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.Player.FSM
 {
-    public class StateMachine
+    public abstract class StateMachine
     {
         public int LayerIndex { get; }
         public AgentState CurrentState { get; private set; }
 
         private readonly Dictionary<int, AgentState> _states;
+        protected Agent _agent;
 
         public StateMachine(Agent agent, StateListSO listSO)
         {
+            _agent = agent;
             LayerIndex = listSO.layer;
             _states = BuildStates(agent, listSO.states);
         }
@@ -30,7 +32,7 @@ namespace _Works.CJW.Scripts.Player.FSM
             CurrentState.Enter(transitionDuration, LayerIndex);
         }
 
-        public void UpdateMachine() => CurrentState?.Update();
+        public virtual void UpdateMachine() => CurrentState?.Update();
 
         private static Dictionary<int, AgentState> BuildStates(Agent agent, StateSO[] stateList)
         {
