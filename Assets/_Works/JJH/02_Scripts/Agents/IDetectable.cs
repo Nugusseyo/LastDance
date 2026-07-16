@@ -2,6 +2,6 @@
 {
     public interface IDetectable
     {
-        void OnDetected(bool isDetected);
+        void IsDetected(bool isDetected);
     }
 }

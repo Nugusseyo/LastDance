@@ -17,6 +17,7 @@ namespace JJH._02_Scripts.Agents
 
         protected float _debugViewRadius = 0;
         protected float _debugViewAngle = 0;
+        protected float _debugCheckDistance = 0;
 
         public override void Initialize(ModuleOwner owner)
         {
@@ -55,6 +56,7 @@ namespace JJH._02_Scripts.Agents
             ClearColliderResults();
 
             _debugViewAngle = viewAngle;
+            _debugCheckDistance = checkDistance;
 
             Collider[] targets = Physics.OverlapSphere(transform.position, checkDistance, whatIsTarget);
 
@@ -120,27 +122,21 @@ namespace JJH._02_Scripts.Agents
             forward.y = 0f;
             forward.Normalize();
 
-            Vector3 previousDirection = Quaternion.AngleAxis(-_debugViewAngle * 0.5f, Vector3.up)
-                                                         * forward;
-            Gizmos.DrawLine(transform.position,
-                                         transform.position + previousDirection * _debugViewRadius);
+            Vector3 previousDirection = Quaternion.AngleAxis(-_debugViewAngle * 0.5f, Vector3.up) * forward;
+            Gizmos.DrawLine(transform.position, transform.position + previousDirection * _debugCheckDistance);
 
             Gizmos.color = Color.red;
             for (int i = 1; i <= 30; i++)
             {
-                float angle = Mathf.Lerp(-_debugViewAngle * 0.5f, _debugViewAngle * 0.5f,
-                                                       i / 30f);
+                float angle = Mathf.Lerp(-_debugViewAngle * 0.5f, _debugViewAngle * 0.5f, i / 30f);
+                Vector3 currentDirection = Quaternion.AngleAxis(angle, Vector3.up) * forward;
 
-                Vector3 currentDirection = Quaternion.AngleAxis(angle, Vector3.up)
-                                                           * forward;
-                Gizmos.DrawLine(transform.position + previousDirection * _debugViewRadius,
-                                             transform.position + currentDirection * _debugViewRadius);
+                Gizmos.DrawLine(transform.position + previousDirection * _debugCheckDistance, transform.position + currentDirection * _debugCheckDistance);
 
                 previousDirection = currentDirection;
             }
 
-            Gizmos.DrawLine(transform.position,
-                                         transform.position + previousDirection * _debugViewRadius);
+            Gizmos.DrawLine(transform.position, transform.position + previousDirection * _debugCheckDistance);
         }
     }
 }
