@@ -1,4 +1,5 @@
 ﻿using DevLib.ModuleSystem;
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -11,10 +12,12 @@ namespace JJH._02_Scripts.Agents
         [SerializeField] private int maxColliderCount = 5;
 
         public Collider[] ColliderResults => _colliderResults;
+
         private Collider[] _colliderResults;
 
-        private float _debugViewRadius;
-        private float _debugViewAngle;
+        protected float _debugViewRadius = 0;
+        protected float _debugViewAngle = 0;
+        protected float _debugCheckDistance = 0;
 
         public override void Initialize(ModuleOwner owner)
         {
@@ -24,32 +27,61 @@ namespace JJH._02_Scripts.Agents
             _colliderResults = new Collider[maxColliderCount];
         }
 
-        //시야각 안에 있는가
-        public bool IsTargetInViewAngle(Transform targetTrm, float viewAngle)
+
+
+        //시야각 안에 있는가(타겟)
+        public bool IsTargetInSight(Transform targetTrm, float viewAngle)
         {
+            ClearColliderResults();
+
             _debugViewAngle = viewAngle;
 
             Vector3 direction = targetTrm.position - transform.position;
             direction.y = 0;
             float angle = Vector3.Angle(transform.forward, direction);
-            return angle <= viewAngle * 0.5f;
-        }
 
-        //시야각 안에 있는가(벽 감지)
-        public bool IsTargetInSight(Transform targetTrm)
-        {
-            Vector3 targetPosition = targetTrm.position;
-            Vector3 direction = targetPosition - transform.position;
-            direction.y = 0;
-            float distance = direction.magnitude;
-            if (Physics.Raycast(transform.position, direction.normalized,
-                    out RaycastHit hit, distance, whatIsObstacle))
-            {
-                Debug.Log($"장애물 감지: {hit.collider.gameObject.name}");
+            if (angle > viewAngle * 0.5f)
                 return false;
-            }
+
+            Collider targetCollider = targetTrm.GetComponent<Collider>();
+            if (targetCollider != null)
+                ColliderResults[0] = targetCollider;
 
             return true;
+        }
+
+        //시야각 안에 있는가(타겟X)
+        public bool IsTargetInSight(float viewAngle, float checkDistance)
+        {
+            ClearColliderResults();
+
+            _debugViewAngle = viewAngle;
+            _debugCheckDistance = checkDistance;
+
+            Collider[] targets = Physics.OverlapSphere(transform.position, checkDistance, whatIsTarget);
+
+            int resultIndex = 0;
+            foreach (Collider target in targets)
+            {
+                Vector3 direction = target.transform.position - transform.position;
+                float angle = Vector3.Angle(transform.forward, direction);
+
+                if (angle > viewAngle * 0.5f)
+                    continue;
+
+                float distance = direction.magnitude;
+                if (Physics.Raycast(transform.position, direction.normalized,
+                                              distance, whatIsObstacle))
+                    continue;
+
+                if (resultIndex >= ColliderResults.Length)
+                    break;
+
+                ColliderResults[resultIndex] = target;
+                resultIndex++;
+            }
+
+            return resultIndex > 0;
         }
 
         //사거리 안에 있는가(원형 감지)
@@ -71,43 +103,40 @@ namespace JJH._02_Scripts.Agents
                                                                          _colliderResults, whatIsTarget);
         }
 
-        private void OnDrawGizmosSelected()
+        private void ClearColliderResults()
         {
-            if (_debugViewRadius <= 0f)
+            if (ColliderResults == null)
                 return;
 
+            Array.Clear(ColliderResults, 0, ColliderResults.Length);
+        }
+
+        private void OnDrawGizmosSelected()
+        {
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, _debugViewRadius);
 
-            if (_debugViewAngle <= 0f)
-                return;
-
-            Gizmos.color = Color.cyan;
+            Gizmos.color = Color.blue;
 
             Vector3 forward = transform.forward;
             forward.y = 0f;
             forward.Normalize();
 
-            Vector3 previousDirection = Quaternion.AngleAxis(-_debugViewAngle * 0.5f, Vector3.up)
-                                                         * forward;
-            Gizmos.DrawLine(transform.position,
-                                         transform.position + previousDirection * _debugViewRadius);
+            Vector3 previousDirection = Quaternion.AngleAxis(-_debugViewAngle * 0.5f, Vector3.up) * forward;
+            Gizmos.DrawLine(transform.position, transform.position + previousDirection * _debugCheckDistance);
 
+            Gizmos.color = Color.red;
             for (int i = 1; i <= 30; i++)
             {
-                float angle = Mathf.Lerp(-_debugViewAngle * 0.5f, _debugViewAngle * 0.5f,
-                                                       i / 30f);
+                float angle = Mathf.Lerp(-_debugViewAngle * 0.5f, _debugViewAngle * 0.5f, i / 30f);
+                Vector3 currentDirection = Quaternion.AngleAxis(angle, Vector3.up) * forward;
 
-                Vector3 currentDirection = Quaternion.AngleAxis(angle, Vector3.up)
-                                                           * forward;
-                Gizmos.DrawLine(transform.position + previousDirection * _debugViewRadius,
-                                             transform.position + currentDirection * _debugViewRadius);
+                Gizmos.DrawLine(transform.position + previousDirection * _debugCheckDistance, transform.position + currentDirection * _debugCheckDistance);
 
                 previousDirection = currentDirection;
             }
 
-            Gizmos.DrawLine(transform.position,
-                                         transform.position + previousDirection * _debugViewRadius);
+            Gizmos.DrawLine(transform.position, transform.position + previousDirection * _debugCheckDistance);
         }
     }
 }

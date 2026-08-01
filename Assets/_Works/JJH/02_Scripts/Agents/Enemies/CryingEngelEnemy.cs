@@ -4,7 +4,7 @@ namespace JJH._02_Scripts.Agents.Enemies
 {
     public class CryingEngelEnemy : AbstractEnemy, IDetectable
     {
-        public void OnDetected(bool isDetected)
+        public void IsDetected(bool isDetected)
         {
             if (isDetected)
                 BehaviorAgent.SetVariableValue("State", EnemyState.STUNNED);
