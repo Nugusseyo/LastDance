@@ -20,7 +20,6 @@ namespace Assets._Works.JJH._02_Scripts.Agents.Enemies
             _navMeshAgent = GetComponentInParent<NavMeshAgent>();
             _navMeshAgent.speed = 7f;
             _navMeshAgent.acceleration = 1000f;
-            _navMeshAgent.updateRotation = false;
             _navMeshAgent.autoBraking = false;
         }
 
