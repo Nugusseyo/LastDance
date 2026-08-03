@@ -19,6 +19,7 @@ namespace JJH._02_Scripts.Agents.Enemies.BT.Actions
             if (Enemy.Value == null || Enemy.Value.Renderer == null || Clip.Value == null)
                 return Status.Failure;
 
+            Enemy.Value.Renderer.Animator.speed = 1f;
             Enemy.Value.Renderer.PlayClip(Clip.Value.HashValue, 0.5f, 0.2f, 0);
 
             return Status.Success;

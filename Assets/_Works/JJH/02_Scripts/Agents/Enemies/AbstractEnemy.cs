@@ -8,6 +8,8 @@ namespace JJH._02_Scripts.Agents.Enemies
         public INavMeshAgent EnemyNavMeshAgent { get; private set; }
         public BehaviorGraphAgent BehaviorAgent { get; private set; }
 
+        public bool IsStunned { get; set; } = false;
+
         protected override void InitializeComponents()
         {
             base.InitializeComponents();

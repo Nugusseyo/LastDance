@@ -7,12 +7,11 @@ using Action = Unity.Behavior.Action;
 namespace JJH._02_Scripts.Agents.Enemies.BT.Actions
 {
     [Serializable, GeneratePropertyBag]
-    [NodeDescription(name: "ChaseTarget", story: "[Enemy] chase [Target]", category: "Action/Navigation", id: "75a14125fe2bdeb7a86ba4b65b837b0b")]
+    [NodeDescription(name: "EnemyChaseTarget", story: "[Enemy] chase [Target]", category: "Action/Navigation", id: "75a14125fe2bdeb7a86ba4b65b837b0b")]
     public partial class ChaseTargetAction : Action
     {
-        [SerializeReference] public BlackboardVariable<AbstractEnemy> Enemy;
-        [SerializeReference] public BlackboardVariable<GameObject> Target;
-
+    [SerializeReference] public BlackboardVariable<AbstractEnemy> Enemy;
+    [SerializeReference] public BlackboardVariable<GameObject> Target;
         [Header("Chase Setting")]
         [SerializeField] private float viewRadius = 10f;
         [SerializeField] private float destinationUpdateDistance = 0.2f;
@@ -49,11 +48,15 @@ namespace JJH._02_Scripts.Agents.Enemies.BT.Actions
 
             if (!isInRadius)
             {
-                _navMeshAgent.StopImmediately();
                 return Status.Failure;
             }
 
             _targetPos = Target.Value.transform.position;
+
+            if (Vector3.Distance(Enemy.Value.transform.position, _targetPos) <= 0.5f)
+            {
+                return Status.Success;
+            }
 
             if (Vector3.Distance(_lastTargetPos, _targetPos) >= destinationUpdateDistance)
             {
