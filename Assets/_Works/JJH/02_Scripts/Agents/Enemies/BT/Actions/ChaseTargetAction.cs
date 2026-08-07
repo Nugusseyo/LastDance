@@ -7,7 +7,7 @@ using Action = Unity.Behavior.Action;
 namespace JJH._02_Scripts.Agents.Enemies.BT.Actions
 {
     [Serializable, GeneratePropertyBag]
-    [NodeDescription(name: "ChaseTarget", story: "[Enemy] chase [Target]", category: "Action", id: "75a14125fe2bdeb7a86ba4b65b837b0b")]
+    [NodeDescription(name: "ChaseTarget", story: "[Enemy] chase [Target]", category: "Action/Navigation", id: "75a14125fe2bdeb7a86ba4b65b837b0b")]
     public partial class ChaseTargetAction : Action
     {
         [SerializeReference] public BlackboardVariable<AbstractEnemy> Enemy;
@@ -42,7 +42,7 @@ namespace JJH._02_Scripts.Agents.Enemies.BT.Actions
 
         protected override Status OnUpdate()
         {
-            if (Enemy.Value == null || Target.Value == null)
+            if (Target.Value == null)
                 return Status.Failure;
 
             bool isInRadius = _sensor.IsTargetInViewRadius(viewRadius, out Collider hitCollider);

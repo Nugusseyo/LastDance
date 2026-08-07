@@ -14,6 +14,11 @@ namespace JJH._02_Scripts.Agents
             Animator = GetComponent<Animator>();
         }
 
+        public void SetVisualPos(Vector3 fixedPos)
+        {
+            gameObject.transform.position = transform.parent.position + fixedPos;
+        }
+
         public void PlayClip(int clipHash, float normalizedTime, float crossFadeDuration, int layerIndex = 0)
         {
             Animator.CrossFadeInFixedTime(clipHash, crossFadeDuration, layerIndex, normalizedTime);
