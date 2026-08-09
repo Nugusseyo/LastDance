@@ -11,12 +11,12 @@ namespace DevLib.BattleSystem
         
         [SerializeField] private CastType castType;
         [SerializeField] private float radius; //circle only
-        [SerializeField] private Vector2 boxSize; //box only
+        [SerializeField] private Vector3 boxSize; //box only
         
         public void SetRadius(float value) => radius = value;
-        public void SetBoxSize(Vector2 value) => boxSize = value;
+        public void SetBoxSize(Vector3 value) => boxSize = value;
         
-        public override bool CastDamage(float damage, Vector2 direction, float kbForce)
+        public override bool CastDamage(float damage, Vector3 direction, float kbForce)
         {
             int cnt = castType switch
             {

@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a2d23771f3343c58acd3a1ddd25bb18, type: 3}
-  m_Name: k
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Player.Weapons.WeaponDataSO
-  Id: 0
-  Cooldown: 0
+  m_Script: {fileID: 11500000, guid: 862382d3b2da47a8a7bb8b1d0367f47d, type: 3}
+  m_Name: Idle
+  m_EditorClassIdentifier: AnimatorSystem_assembly::DevLib.AnimatorSystem.HashDataSO
+  <HashName>k__BackingField: Idle
+  <HashValue>k__BackingField: 2081823275

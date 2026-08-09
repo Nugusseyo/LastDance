@@ -5,12 +5,12 @@ namespace _Works.CJW.Scripts.Player.FSM
 {
     public class PlayerCombatState : AbstractPlayerAgentState
     {
-        private readonly IWeaponModule _weapon;
+        private readonly ICleanerModule _cleaner;
         private bool _attackRequested;
 
         public PlayerCombatState(Agent agent, int stateClipHash) : base(agent, stateClipHash)
         {
-            _weapon = _player.GetModule<IWeaponModule>();
+            _cleaner = _player.GetModule<ICleanerModule>();
         }
 
         public override void Enter(float transitionDuration, int layerIndex = 0)
@@ -24,6 +24,6 @@ namespace _Works.CJW.Scripts.Player.FSM
             _input.OnAttackKeyPressed -= HandleAttack;
         }
 
-        private void HandleAttack() => _weapon.UseWeapon();
+        private void HandleAttack() => _cleaner.UseCleaner();
     }
 }
