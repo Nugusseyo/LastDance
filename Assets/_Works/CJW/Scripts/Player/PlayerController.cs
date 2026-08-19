@@ -24,6 +24,11 @@ namespace _Works.CJW.Scripts.Player
             Fsm.ChangeState((int)PlayerLayers.Upper, (int)UpperStates.Combat);
         }
 
+        public void RequestChangeState(int layer, int state)
+        {
+            Fsm.ChangeState(layer, state);
+        }
+        
         private void Update()
         {
             Fsm?.Update();

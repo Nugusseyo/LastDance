@@ -5,23 +5,23 @@ namespace _Works.CJW.Scripts.Player.FSM
 {
     public class PlayerAttackState : AbstractPlayerAgentState
     {
-        private readonly IWeaponModule _weapon;
+        private readonly ICleanerModule _cleaner;
 
         public PlayerAttackState(Agent agent, int stateClipHash) : base(agent, stateClipHash)
         {
-            _weapon = _player.GetModule<IWeaponModule>();
+            _cleaner = _player.GetModule<ICleanerModule>();
         }
 
         public override void Enter(float transitionDuration, int layerIndex = 0)
         {
             base.Enter(transitionDuration, layerIndex); 
-            _weapon.UseWeapon();
+            _cleaner.UseCleaner();
         }
 
         public override void Update()
         {
-            IWeapon weapon = _weapon.CurrentWeapon;
-            if (weapon == null || weapon.NormalizedCooldown >= 1f)
+            ICleaner cleaner = _cleaner.CurrentCleaner;
+            if (cleaner == null || cleaner.NormalizedCooldown >= 1f)
             {
                 _player.Fsm.ChangeState((int)PlayerLayers.Upper, (int)UpperStates.Combat);
             }

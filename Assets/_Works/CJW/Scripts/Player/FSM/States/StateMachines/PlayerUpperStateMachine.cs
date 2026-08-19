@@ -8,14 +8,14 @@ namespace _Works.CJW.Scripts.Player.FSM.States.StateMachines
     public class PlayerUpperStateMachine : StateMachine
     {
         private IFlashLightModule _flashLight;
-        private IWeaponModule _weaponModule;
+        private ICleanerModule _cleanerModule;
         private PlayerController _player;
         private bool _isActiveLight = false;
         
         public PlayerUpperStateMachine(Agent agent, StateListSO listSO) : base(agent, listSO)
         {
             _player = agent as PlayerController;
-            _weaponModule = _player.GetModule<IWeaponModule>();
+            _cleanerModule = _player.GetModule<ICleanerModule>();
             _flashLight = _player.GetModule<IFlashLightModule>();
             _player.Input.OnFlashLightKeyPressed += HandleFlashLightActive;
             _player.Input.OnScrollWheelPressed += HandleChangeEquipment;
@@ -23,7 +23,7 @@ namespace _Works.CJW.Scripts.Player.FSM.States.StateMachines
 
         private void HandleChangeEquipment(int scrollValue)
         {
-            _weaponModule.ChangeWeapon(scrollValue);
+            _cleanerModule.ChangeWeapon(scrollValue);
             Debug.Log($"{scrollValue} + time: {Time.time}");
         }
 
