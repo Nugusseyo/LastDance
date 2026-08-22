@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
 using JJH._02_Scripts.Agents;
-using Unity.VisualScripting;
-using UnityEngine;
 
 namespace _Works.CJW.Scripts.Player
 {
     public class PlayerSensor : AgentSensor
     {
+        /*
         [SerializeField] private float detectAngle;
         [SerializeField] private float detectRadius;
         
@@ -81,5 +78,6 @@ namespace _Works.CJW.Scripts.Player
                 }
             }
         }
+        */
     }
 }
