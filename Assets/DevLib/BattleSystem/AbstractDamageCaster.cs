@@ -18,6 +18,6 @@ namespace DevLib.BattleSystem
             _hitResults = new Collider2D[maxHitCount];
         }
 
-        public abstract bool CastDamage(float damage, Vector2 direction, float kbForce);
+        public abstract bool CastDamage(float damage, Vector3 direction, float kbForce);
     }
 }
