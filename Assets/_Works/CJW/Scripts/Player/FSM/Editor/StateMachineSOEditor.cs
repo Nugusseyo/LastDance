@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using _Works.CJW.Scripts.Player.FSM;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Agents.FSM.Editor
+namespace _Works.CJW.Scripts.Player.FSM.Editor
 {
     [CustomEditor(typeof(StateMachineSO))]
     public class StateMachineSOEditor : UnityEditor.Editor
