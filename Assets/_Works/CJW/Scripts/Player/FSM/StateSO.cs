@@ -1,7 +1,7 @@
 using DevLib.AnimatorSystem;
 using UnityEngine;
 
-namespace Agents.FSM
+namespace _Works.CJW.Scripts.Player.FSM
 {
     [CreateAssetMenu(fileName = "State data", menuName = "JW/Agent/State data", order = 0)]
     public class StateSO : ScriptableObject

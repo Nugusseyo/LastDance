@@ -1,13 +1,11 @@
 using System.IO;
 using System.Linq;
-using _Works.CJW.Scripts.Player.FSM;
-using _Works.CJW.Scripts.Player.FSM.Editor;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Agents.FSM.Editor
+namespace _Works.CJW.Scripts.Player.FSM.Editor
 {
     [CustomEditor(typeof(StateListSO))]
     public class StateListSOEditor : UnityEditor.Editor
