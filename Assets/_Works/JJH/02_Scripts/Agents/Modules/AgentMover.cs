@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Modules
 {
-    [RequireComponent(typeof(Rigidbody))]
     public class AgentMover : AbstractModule, IMover
     {
         [SerializeField] private float moveSpeed = 3f;
@@ -15,7 +14,7 @@ namespace _Works.JJH._02_Scripts.Agents.Modules
         {
             base.Initialize(owner);
 
-            _rigidbody = GetComponent<Rigidbody>();
+            _rigidbody = GetComponentInParent<Rigidbody>();
         }
 
         public void Move(Vector3 direction)
@@ -40,6 +39,7 @@ namespace _Works.JJH._02_Scripts.Agents.Modules
         private void SetVelocity(Vector3 direction, float speed)
         {
             direction.y = 0f;
+            direction = _rigidbody.transform.TransformDirection(direction);
 
             if (direction.sqrMagnitude > 1f)
                 direction.Normalize();

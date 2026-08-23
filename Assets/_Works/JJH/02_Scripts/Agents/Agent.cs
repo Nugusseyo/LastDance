@@ -11,11 +11,11 @@ namespace _Works.JJH._02_Scripts.Agents
 
         protected override void InitializeComponents()
         {
-            base.InitializeComponents();
-
             Sensor = GetModule<ISensor>();
             Renderer = GetModule<IRenderer>();
             Mover = GetModule<IMover>();
+
+            base.InitializeComponents();
         }
     }
 }
