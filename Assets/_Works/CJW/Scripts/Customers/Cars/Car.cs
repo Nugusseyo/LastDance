@@ -14,6 +14,9 @@ namespace _Works.CJW.Scripts.Customers.Cars
         [SerializeField] private Transform[] seats;
         [SerializeField] private Transform dropOffPoint;
 
+        [Tooltip("정차 자리 방향으로 돌아설 때의 각속도(도/초).")]
+        [SerializeField] private float parkingTurnSpeed = 180f;
+
         [Tooltip("차체 색을 덮어쓸 렌더러. 비워두면 색 변형을 쓰지 않는다.")]
         [SerializeField] private Renderer[] bodyRenderers;
 
@@ -160,6 +163,19 @@ namespace _Works.CJW.Scripts.Customers.Cars
         {
             _moveModule?.Stop();
         }
+
+        /// <summary>
+        /// 정차 자리 방향으로 조금씩 돌린다. 회전이 다 맞으면 true.
+        /// NavMesh가 회전을 다시 가져가지 않도록 Stop() 뒤에 불러야 한다.
+        /// </summary>
+        public bool AlignTo(Quaternion target, float dt)
+        {
+            float step = Mathf.Max(parkingTurnSpeed, 1f) * dt;
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, target, step);
+
+            return Quaternion.Angle(transform.rotation, target) <= 0.1f;
+        }
+
 
         public virtual void ResetItem()
         {
