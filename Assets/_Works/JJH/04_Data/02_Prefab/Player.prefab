@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.PlayerCamera
   player: {fileID: 6958752427220179990}
   playerCamera: {fileID: 5470938385425031513}
-  sensitivity: 75
+  sensitivity: 70
   minVertical: -80
   maxVertical: 80
 --- !u!1 &6001374792040720217
@@ -191,7 +191,7 @@ GameObject:
   - component: {fileID: 2862130161205382096}
   m_Layer: 0
   m_Name: Visual
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -338,7 +338,7 @@ GameObject:
   - component: {fileID: 6395170746583526091}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -537,7 +537,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 409346355070250935, guid: 1fef1a3e1b92f7e4a849c6ba052e535f, type: 3}
       propertyPath: m_Name
-      value: AgentMover
+      value: PlayerMover
       objectReference: {fileID: 0}
     - target: {fileID: 6686501588712134723, guid: 1fef1a3e1b92f7e4a849c6ba052e535f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -579,13 +579,39 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1654646819682806169, guid: 1fef1a3e1b92f7e4a849c6ba052e535f, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 409346355070250935, guid: 1fef1a3e1b92f7e4a849c6ba052e535f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5507746942280658515}
   m_SourcePrefab: {fileID: 100100000, guid: 1fef1a3e1b92f7e4a849c6ba052e535f, type: 3}
 --- !u!4 &2540419488404096737 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6686501588712134723, guid: 1fef1a3e1b92f7e4a849c6ba052e535f, type: 3}
   m_PrefabInstance: {fileID: 9190258956022046370}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8801178827328581909 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 409346355070250935, guid: 1fef1a3e1b92f7e4a849c6ba052e535f, type: 3}
+  m_PrefabInstance: {fileID: 9190258956022046370}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5507746942280658515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8801178827328581909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3399037ff3167e4f87965cab6ba8c7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.PlayerMover
+  moveSpeed: 3
+  runSpeed: 8
+  staminaDrainRate: 0.3
+  staminaRecoveryRate: 0.15
+  stamina: 1
