@@ -1,4 +1,6 @@
 ﻿using _Works.JJH._02_Scripts.Agents.Modules;
+using _Works.JYG._Scripts.Events;
+using DevLib.EventChannelSystem;
 using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players
@@ -10,7 +12,18 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         [SerializeField] private float staminaRecoveryRate = 0.15f;
         [SerializeField, Range(0f, 1f)] private float stamina = 1f;
 
-        public float Stamina => stamina;
+        [Header("Data")]
+        [SerializeField] private EventChannelSO uiChannel;
+
+        public float Stamina
+        {
+            get { return stamina; }
+            set
+            {
+                stamina = Mathf.Clamp01(value);
+                uiChannel.RaiseEvent(UIEvents.GaugeEvent.Init(stamina));
+            }
+        }
         public bool CanRun => stamina > 0f && _sprintReleased;
 
         private bool _sprintReleased = true;
