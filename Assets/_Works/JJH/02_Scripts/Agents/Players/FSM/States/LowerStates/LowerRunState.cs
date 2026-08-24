@@ -21,13 +21,16 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
 
         public override void Update()
         {
+            PlayerMover playerMover = (PlayerMover)Agent.Mover;
+            playerMover.UpdateSprintState(Input.IsSprinting);
+
             if (Input.MoveDirection.sqrMagnitude <= 0.01f)
             {
                 ((LowerBodyStateMachine)StateMachine).Idle();
                 return;
             }
 
-            if (!Input.IsSprinting)
+            if (!Input.IsSprinting || !playerMover.CanRun)
             {
                 ((LowerBodyStateMachine)StateMachine).Move();
                 return;

@@ -5,6 +5,7 @@ namespace _Works.JJH._02_Scripts.Agents.Modules
 {
     public class AgentMover : AbstractModule, IMover
     {
+        [Header("Speed")]
         [SerializeField] private float moveSpeed = 3f;
         [SerializeField] private float runSpeed = 6f;
 
@@ -22,7 +23,7 @@ namespace _Works.JJH._02_Scripts.Agents.Modules
             SetVelocity(direction, moveSpeed);
         }
 
-        public void Run(Vector3 direction)
+        public virtual void Run(Vector3 direction)
         {
             SetVelocity(direction, runSpeed);
         }
