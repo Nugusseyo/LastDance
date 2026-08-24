@@ -4,23 +4,29 @@ public class CubeTeleportDetector : MonoBehaviour
 {
     [SerializeField] private Transform teleportTarget;
     [SerializeField] private float detectRadius = 5f;
-    [SerializeField] private LayerMask detectLayers = ~0;
-    [SerializeField] private string[] detectTags = { "Player", "Car" };
+    [SerializeField] private string[] tags = { "Player", "Car" };
     [SerializeField] private float teleportCooldown = 0.5f;
+    [SerializeField] private float scanInterval = 0.2f;
 
     private float lastTeleportTime = -999f;
+    private float lastScanTime = -999f;
 
     private void Update()
     {
         if (teleportTarget == null) return;
         if (Time.time - lastTeleportTime < teleportCooldown) return;
+        if (Time.time - lastScanTime < scanInterval) return;
+        lastScanTime = Time.time;
 
-        Collider[] hits = Physics.OverlapSphere(transform.position, detectRadius, detectLayers);
-        foreach (var hit in hits)
+        foreach (var t in tags)
         {
-            if (IsDetectableTag(hit.tag))
+            GameObject[] candidates = GameObject.FindGameObjectsWithTag(t);
+            foreach (var candidate in candidates)
             {
-                Rigidbody rb = hit.attachedRigidbody;
+                float sqrDist = (candidate.transform.position - transform.position).sqrMagnitude;
+                if (sqrDist > detectRadius * detectRadius) continue;
+
+                Rigidbody rb = candidate.GetComponent<Rigidbody>();
                 if (rb != null)
                 {
                     rb.linearVelocity = Vector3.zero;
@@ -29,22 +35,13 @@ public class CubeTeleportDetector : MonoBehaviour
                 }
                 else
                 {
-                    hit.transform.position = teleportTarget.position;
+                    candidate.transform.position = teleportTarget.position;
                 }
 
                 lastTeleportTime = Time.time;
-                break;
+                return;
             }
         }
-    }
-
-    private bool IsDetectableTag(string colliderTag)
-    {
-        foreach (var t in detectTags)
-        {
-            if (colliderTag == t) return true;
-        }
-        return false;
     }
 
     private void OnDrawGizmos()
