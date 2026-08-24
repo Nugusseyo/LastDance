@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using _Works.CJW.Scripts.Customers.Cars;
 using _Works.CJW.Scripts.Customers.Data;
+
+using DevLib.EventChannelSystem;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -17,12 +19,16 @@ namespace _Works.CJW.Scripts.Customers.Visit
         private sealed class ActiveVisit
         {
             public VisitSession Session;
+            public ParkingSlot Slot;
             public float WaitTimer;
         }
 
         [Header("참조")]
-        [SerializeField] private AgentManager agentManager;
+        [Tooltip("틱 등록/해제 요청을 보낼 이벤트 채널. AgentManager가 이걸 구독한다.")]
+        [SerializeField] private EventChannelSO agentChannel;
         [SerializeField] private PoolManagerSO poolManager;
+        [Tooltip("주차 자리 같은 맵 자원을 빌려주는 에셋. 씬에 무엇이 있는지는 이걸 통해서만 안다.")]
+        [SerializeField] private MapDataSo mapData;
 
         [Header("데이터")]
         [Tooltip("스폰할 차 종류. 인원·간격·속도 같은 개별 수치는 각 CarDataSO 안에 있다.")]
@@ -33,8 +39,8 @@ namespace _Works.CJW.Scripts.Customers.Visit
         [Header("경로")]
         [Tooltip("차량이 처음 나타나는 위치.")]
         [SerializeField] private Transform spawnPoint;
-        [Tooltip("차량이 정차해 손님을 내리는 위치.")]
-        [SerializeField] private Transform arrivalPoint;
+
+
         [Tooltip("하차한 손님이 향할 가게 안 위치.")]
         [SerializeField] private Transform shopPoint;
         [Tooltip("방문이 끝난 차량이 빠져나갈 위치.")]
@@ -68,15 +74,30 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
 
             _spawnTimer = 0f;
-            agentManager.Register(this);
+            RegisterAgent(this);
         }
 
         private void OnDisable()
         {
-            if (agentManager != null)
-            {
-                agentManager.UnRegister(this);
-            }
+            UnRegisterAgent(this);
+        }
+
+        /// <summary>틱 대상 등록을 이벤트 채널로 요청한다.</summary>
+        private void RegisterAgent(object target)
+        {
+            if (agentChannel == null || target == null)
+                return;
+
+            agentChannel.RaiseEvent(AgentEvents.RegisterAgentEvent.Init(target));
+        }
+
+        /// <summary>틱 대상 해제를 이벤트 채널로 요청한다.</summary>
+        private void UnRegisterAgent(object target)
+        {
+            if (agentChannel == null || target == null)
+                return;
+
+            agentChannel.RaiseEvent(AgentEvents.UnRegisterAgentEvent.Init(target));
         }
 
         public void OnUpdate(float dt)
@@ -85,6 +106,10 @@ namespace _Works.CJW.Scripts.Customers.Visit
             TickAutoDeparture(dt);
         }
 
+        /// <summary>
+        /// 틱마다 스폰을 할 수 있는지 확인하는 메서드
+        /// </summary>
+        /// <param name="dt"></param>
         /// <summary>
         /// 틱마다 스폰을 할 수 있는지 확인하는 메서드
         /// </summary>
@@ -98,6 +123,10 @@ namespace _Works.CJW.Scripts.Customers.Visit
             // 스폰 타이머를 점점 줄임
             _spawnTimer -= dt;
             if (_spawnTimer > 0f)
+                return;
+
+            // 자리가 없으면 타이머를 소모하지 않는다. 자리가 나는 순간 바로 스폰된다.
+            if (!mapData.HasFreeParkingSlot)
                 return;
 
             _spawnTimer = spawnInterval;
@@ -128,12 +157,21 @@ namespace _Works.CJW.Scripts.Customers.Visit
         }
 
         /// <summary>차 한 대와 손님 몇 명을 꺼내 방문을 시작한다.</summary>
+        /// <summary>주차 자리를 하나 빌리고, 차 한 대와 손님 몇 명을 꺼내 방문을 시작한다.</summary>
         public VisitSession BeginVisit()
         {
+            // 자리부터 잡는다. 풀에서 차를 꺼낸 뒤에 실패하면 되돌릴 것이 늘어난다.
+            if (!mapData.TryRentParkingSlot(out ParkingSlot slot))
+            {
+                Debug.LogWarning("[VisitDirector] 빈 주차 자리가 없어 방문을 시작하지 못했습니다.", this);
+                return null;
+            }
+
             CarDataSO carData = WeightedPicker.Pick(carDataList, data => data.SpawnWeight);
             if (carData == null || carData.PoolItem == null)
             {
                 Debug.LogError("[VisitDirector] 뽑을 수 있는 차 데이터가 없습니다. CarDataSO의 풀 항목과 가중치를 확인하세요.", this);
+                mapData.ReleaseParkingSlot(slot);
                 return null;
             }
 
@@ -141,6 +179,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             if (car == null)
             {
                 Debug.LogError($"[VisitDirector] 차량을 꺼내지 못했습니다. PoolManager에 {carData.PoolItem.name} 항목이 등록되어 있는지 확인하세요.", this);
+                mapData.ReleaseParkingSlot(slot);
                 return null;
             }
 
@@ -150,23 +189,25 @@ namespace _Works.CJW.Scripts.Customers.Visit
             if (!TrySpawnCustomers(car, carData))
             {
                 poolManager.Push(car);
+                mapData.ReleaseParkingSlot(slot);
                 return null;
             }
 
             VisitSession session = RentSession();
             session.Completed += OnVisitCompleted;
 
-            agentManager.Register(car);
+            RegisterAgent(car);
             for (int i = 0; i < _spawnBuffer.Count; i++)
             {
-                agentManager.Register(_spawnBuffer[i]);
+                RegisterAgent(_spawnBuffer[i]);
             }
-            agentManager.Register(session);
+            RegisterAgent(session);
 
-            _activeVisits.Add(new ActiveVisit { Session = session });
+            _activeVisits.Add(new ActiveVisit { Session = session, Slot = slot });
 
             session.Begin(car, _spawnBuffer,
-                          arrivalPoint.position, shopPoint.position, exitPoint.position);
+                          slot.Position, slot.Rotation,
+                          shopPoint.position, exitPoint.position);
 
             VisitStarted?.Invoke(session);
 
@@ -239,13 +280,13 @@ namespace _Works.CJW.Scripts.Customers.Visit
             session.Completed -= OnVisitCompleted;
 
             // ReturnToPool이 목록을 비우므로 등록 해제를 먼저 끝낸다.
-            agentManager.UnRegister(session);
-            agentManager.UnRegister(session.Car);
+            UnRegisterAgent(session);
+            UnRegisterAgent(session.Car);
 
             IReadOnlyList<AbstractCustomer> customers = session.Customers;
             for (int i = 0; i < customers.Count; i++)
             {
-                agentManager.UnRegister(customers[i]);
+                UnRegisterAgent(customers[i]);
             }
 
             session.ReturnToPool(poolManager);
@@ -257,6 +298,8 @@ namespace _Works.CJW.Scripts.Customers.Visit
                     continue;
                 }
 
+                // 빌린 자리는 반드시 짝을 맞춰 돌려준다.
+                mapData.ReleaseParkingSlot(_activeVisits[i].Slot);
                 _activeVisits.RemoveAt(i);
                 break;
             }
@@ -268,9 +311,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
         private bool HasValidReferences()
         {
-            if (agentManager == null || poolManager == null)
+            if (agentChannel == null || poolManager == null || mapData == null)
             {
-                Debug.LogError("[VisitDirector] AgentManager와 PoolManager를 지정해야 합니다.", this);
+                Debug.LogError("[VisitDirector] 이벤트 채널(EventChannelSO)과 PoolManager, MapData를 모두 지정해야 합니다.", this);
                 return false;
             }
 
@@ -280,9 +323,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return false;
             }
 
-            if (spawnPoint == null || arrivalPoint == null || shopPoint == null || exitPoint == null)
+            if (spawnPoint == null || shopPoint == null || exitPoint == null)
             {
-                Debug.LogError("[VisitDirector] 스폰·정차·가게·퇴장 지점을 모두 지정해야 합니다.", this);
+                Debug.LogError("[VisitDirector] 스폰·가게·퇴장 지점을 모두 지정해야 합니다. 정차 위치는 ParkingSlot이 대신합니다.", this);
                 return false;
             }
 

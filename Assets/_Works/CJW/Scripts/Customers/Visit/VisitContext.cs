@@ -13,6 +13,8 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
         public Car Car;
         public Vector3 ArrivalPoint;
+        /// <summary>정차했을 때 차가 바라볼 방향. 주차 자리의 회전이 그대로 들어온다.</summary>
+        public Quaternion ArrivalRotation = Quaternion.identity;
         public Vector3 ShopPoint;
         public Vector3 ExitPoint;
         public float Interval;

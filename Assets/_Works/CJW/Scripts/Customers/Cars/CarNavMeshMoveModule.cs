@@ -14,6 +14,9 @@ namespace _Works.CJW.Scripts.Customers.Cars
         [Tooltip("stoppingDistance가 이보다 작으면 이 값을 도착 판정에 쓴다.")]
         [SerializeField] private float _arriveThreshold = 0.5f;
 
+        [Tooltip("회피 우선순위. 낮을수록 먼저다. 손님(기본 50)보다 낮게 두어야 차가 손님을 피하지 않는다.")]
+        [SerializeField] private int _avoidancePriority;
+
         private bool _hasDestination;
 
         public bool IsArrived
@@ -41,6 +44,11 @@ namespace _Works.CJW.Scripts.Customers.Cars
             if (_agent == null)
             {
                 _agent = GetComponent<NavMeshAgent>();
+            }
+
+            if (_agent != null)
+            {
+                _agent.avoidancePriority = _avoidancePriority;
             }
         }
 
@@ -71,6 +79,15 @@ namespace _Works.CJW.Scripts.Customers.Cars
                 return;
             }
 
+            // 정차 중에 끊어둔 위치·회전 갱신을 되살린다.
+            // 그 사이에 AlignTo가 transform을 직접 돌렸으므로 에이전트 내부 위치를 먼저 맞춰준다.
+            if (!_agent.updatePosition)
+            {
+                _agent.updatePosition = true;
+                _agent.updateRotation = true;
+                _agent.Warp(transform.position);
+            }
+
             _agent.isStopped = false;
             _hasDestination = _agent.SetDestination(destination);
 
@@ -91,6 +108,13 @@ namespace _Works.CJW.Scripts.Customers.Cars
 
             _agent.isStopped = true;
             _agent.ResetPath();
+            _agent.velocity = Vector3.zero;
+
+            // 정차한 동안은 크라우드 시뮬레이션이 transform을 건드리지 못하게 한다.
+            // 손님이 바로 옆에서 내려도 차가 밀리지 않는다.
+            // 에이전트 자체는 켜 둔 채라 손님들은 여전히 차를 피해 간다.
+            _agent.updatePosition = false;
+            _agent.updateRotation = false;
         }
     }
 }
