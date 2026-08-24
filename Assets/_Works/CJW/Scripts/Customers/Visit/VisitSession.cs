@@ -37,17 +37,19 @@ namespace _Works.CJW.Scripts.Customers.Visit
             AddState(new BoardingState());
             AddState(new LeavingState());
         }
-
         /// <param name="arrivalPoint">차량이 정차할 위치.</param>
+        /// <param name="arrivalRotation">정차했을 때 차가 바라볼 방향.</param>
         /// <param name="shopPoint">하차한 손님이 향할 가게 안 위치.</param>
         /// <param name="exitPoint">방문이 끝난 차량이 빠져나갈 위치.</param>
         /// <remarks>손님 한 명씩 처리할 때의 간격은 차의 CarDataSO에서 온다.</remarks>
         public void Begin(Car car, IReadOnlyList<AbstractCustomer> customers,
-                          Vector3 arrivalPoint, Vector3 shopPoint, Vector3 exitPoint)
+                          Vector3 arrivalPoint, Quaternion arrivalRotation,
+                          Vector3 shopPoint, Vector3 exitPoint)
         {
             _context.Clear();
             _context.Car = car;
             _context.ArrivalPoint = arrivalPoint;
+            _context.ArrivalRotation = arrivalRotation;
             _context.ShopPoint = shopPoint;
             _context.ExitPoint = exitPoint;
             _context.Interval = car.BoardingInterval;

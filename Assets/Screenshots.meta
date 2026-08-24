@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/_Works/CJW/Scripts/Map.meta
+guid: 33ac6d7d5e2745f48857404c16938f7c
+========
 guid: f5afc4e1b7cab524f95d2051c2e7a9a7
+>>>>>>>> Base:Assets/Screenshots.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
