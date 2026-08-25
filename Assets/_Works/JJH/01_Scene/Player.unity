@@ -642,6 +642,10 @@ PrefabInstance:
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 5507746942280658515, guid: 1433869bc41ad2f43b7d52603a6a251f, type: 3}
+      propertyPath: uiChannel
+      value: 
+      objectReference: {fileID: 11400000, guid: 48de6d3688cded849a436f36b9079ff6, type: 2}
+    - target: {fileID: 5507746942280658515, guid: 1433869bc41ad2f43b7d52603a6a251f, type: 3}
       propertyPath: staminaDrainRate
       value: 0.3
       objectReference: {fileID: 0}
