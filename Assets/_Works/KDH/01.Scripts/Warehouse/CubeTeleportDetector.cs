@@ -38,6 +38,12 @@ public class CubeTeleportDetector : MonoBehaviour
                     candidate.transform.position = teleportTarget.position;
                 }
 
+                CarStraightMover mover = candidate.GetComponent<CarStraightMover>();
+                if (mover != null)
+                {
+                    mover.Stop();
+                }
+
                 lastTeleportTime = Time.time;
                 return;
             }
