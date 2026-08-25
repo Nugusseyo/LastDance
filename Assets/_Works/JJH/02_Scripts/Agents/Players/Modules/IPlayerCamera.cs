@@ -2,6 +2,6 @@
 {
     public interface IPlayerCamera
     {
-        void CameraShake();
+        void SetCameraShake(bool isRunning);
     }
 }
