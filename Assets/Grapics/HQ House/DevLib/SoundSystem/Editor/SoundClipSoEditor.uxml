@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML
+    xmlns:ui="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    editor-extension-mode="True">
+
+    <Style src="SoundClipSoEditor.uss" />
+
+    <uie:PropertyField binding-path="audioType" />
+    <uie:PropertyField name="clip-field" binding-path="clip" />
+    <uie:PropertyField binding-path="loop" />
+    <uie:PropertyField binding-path="randomizePitch" />
+    <uie:PropertyField binding-path="randomPitchModifier" />
+    <uie:PropertyField binding-path="volume" />
+    <uie:PropertyField binding-path="pitch" />
+    <uie:PropertyField binding-path="startTime" />
+    <uie:PropertyField binding-path="endTime" />
+
+    <ui:VisualElement name="waveform-section" class="waveform-section">
+        <ui:Label text="Clip Visualizer" class="section-title" />
+        <ui:VisualElement name="waveform-slot" class="waveform-slot" />
+        <ui:VisualElement class="time-row">
+            <ui:Label name="start-label" text="Start: 0.000 s" class="time-label" />
+            <ui:VisualElement style="flex-grow: 1;" />
+            <ui:Label name="end-label" text="End: 0.000 s" class="time-label" />
+        </ui:VisualElement>
+        <ui:VisualElement class="button-row">
+            <ui:VisualElement style="flex-grow: 1;" />
+            <ui:Button name="play-btn" text="▶  Play" class="play-button" />
+            <ui:VisualElement style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+
+</ui:UXML>
