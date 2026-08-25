@@ -1,7 +1,7 @@
 using DevLib.ModuleSystem;
 using UnityEngine;
 
-namespace _Works.CJW.Scripts.Customers.Cars
+namespace _Works.CJW.Scripts.Cars
 {
     /// <summary>
     /// 차량의 이동 수단. NavMesh, 스플라인 등 구현은 모듈이 정한다.

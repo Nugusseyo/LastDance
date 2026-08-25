@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
-using _Works.CJW.Scripts.Customers.Cars;
+using _Works.CJW.Scripts.Cars;
 using UnityEngine;
 using UnityEngine.AI;
 

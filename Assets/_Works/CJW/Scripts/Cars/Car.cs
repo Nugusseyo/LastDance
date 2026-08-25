@@ -1,9 +1,10 @@
 using System;
+using _Works.CJW.Scripts.Customers;
 using _Works.CJW.Scripts.Customers.Data;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
 
-namespace _Works.CJW.Scripts.Customers.Cars
+namespace _Works.CJW.Scripts.Cars
 {
     public abstract class Car : ManagingAgent, IPoolable
     {

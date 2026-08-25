@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using _Works.CJW.Scripts.Customers.Cars;
+using _Works.CJW.Scripts.Cars;
 using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit
