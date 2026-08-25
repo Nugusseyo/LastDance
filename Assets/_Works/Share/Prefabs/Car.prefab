@@ -372,7 +372,7 @@ MonoBehaviour:
   - {fileID: 8962722614246329617}
   - {fileID: 1774772620037930216}
   dropOffPoint: {fileID: 4856318237269258848}
-  parkingTurnSpeed: 720
+  parkingTurnSpeed: 180
   bodyRenderers:
   - {fileID: 2171761606320563786}
 --- !u!114 &471449907095769015
@@ -390,16 +390,19 @@ MonoBehaviour:
   _agent: {fileID: 4426528510196855596}
   _arriveThreshold: 0.5
   _avoidancePriority: 0
-  _wheelBase: 1.8
-  _maxSteerAngle: 70
-  _steerRate: 120
+  _wheelBase: 2
+  _maxSteerAngle: 45
+  _steerRate: 140
   _accel: 6
-  _brakeAccel: 10
+  _brakeAccel: 7
   _maxLateralAccel: 5
-  _lookaheadGain: 0
-  _lookaheadMin: 5
-  _lookaheadMax: 9
+  _lookaheadGain: 1
+  _lookaheadMin: 3
+  _lookaheadMax: 8
   _pathRefreshInterval: 0.4
+  _viaSwitchDistance: 4
+  _finalLegLookahead: 2.5
+  _finalLegSpeed: 3.5
 --- !u!1 &3443648458402252513
 GameObject:
   m_ObjectHideFlags: 0
@@ -636,7 +639,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 1, z: 1.8}
+  m_LocalScale: {x: 6.667453, y: 1, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 414716400684570717}

@@ -64,11 +64,35 @@ namespace _Works.CJW.Scripts.Customers.Cars
         [Tooltip("경로를 다시 읽는 주기(초). NavMesh가 경로를 갈아끼워도 이 주기 안에 따라잡는다.")]
         [SerializeField, Min(0.05f)] private float _pathRefreshInterval = 0.4f;
 
+        [Tooltip("경유지에 이만큼 가까워지면 목적지를 바로 잡는다(m). 룩어헤드보다 크게 두어야 되돌아가지 않는다.")]
+        [SerializeField, Min(0.5f)] private float _viaSwitchDistance = 4f;
+
+        [Header("마지막 직선 구간")]
+        [Tooltip("정차 자리로 들어갈 때의 Lookahead 상한(m). 짧을수록 선에 밀착해 좌우 오차가 줄어든다. " +
+                 "짧게 하고 싶으면 Final Leg Speed도 같이 낮춰야 흔들리지 않는다.")]
+        [SerializeField, Min(0.5f)] private float _finalLegLookahead = 2.5f;
+
+        [Tooltip("정차 자리로 들어갈 때의 최고 속도(m/s). 주차는 천천히 해야 자연스럽고 자리도 정확하게 들어간다.")]
+        [SerializeField, Min(0.2f)] private float _finalLegSpeed = 2.5f;
+
         private readonly Vector3[] _corners = new Vector3[MaxCorners];
         private int _cornerCount;
         private int _segIndex;
 
         private bool _hasDestination;
+
+        /// <summary>경로 끝에 붙일 추가 지점. 진입점을 거쳤다가 슬롯으로 곱게 들어올 때 쓴다.</summary>
+        private bool _hasFinalPoint;
+        private Vector3 _finalPoint;
+
+        /// <summary>경유지. 이것보다 가까워지면 목적지를 바로 잡아 되돌아가는 경로가 생기지 않게 한다.</summary>
+        private Vector3 _viaPoint;
+
+        /// <summary>
+        /// 마지막 직선 구간을 달리는 중인지. 이때는 에이전트 경로 대신
+        /// 진입점→목적지 직선을 그대로 추종한다. 그래야 도착 방향이 자리 방향과 같아진다.
+        /// </summary>
+        private bool _onFinalLeg;
         private float _refreshTimer;
 
         private float _speed;
@@ -151,6 +175,24 @@ namespace _Works.CJW.Scripts.Customers.Cars
 
         public void MoveTo(Vector3 destination)
         {
+            _hasFinalPoint = false;
+            MoveToInternal(destination);
+        }
+
+        /// <summary>
+        /// approachFrom을 먼저 지나 destination에 닿는다. 둘은 하나의 연속된 경로라
+        /// 중간에서 멈추지 않고, 마지막 구간이 직선이라 달리는 동안 방향이 저절로 맞는다.
+        /// </summary>
+        public void MoveTo(Vector3 destination, Vector3 approachFrom)
+        {
+            _finalPoint = destination;
+            _viaPoint = approachFrom;
+            _hasFinalPoint = true;
+            MoveToInternal(approachFrom);
+        }
+
+        private void MoveToInternal(Vector3 destination)
+        {
             if (_agent == null)
             {
                 return;
@@ -168,6 +210,7 @@ namespace _Works.CJW.Scripts.Customers.Cars
             _agent.Warp(transform.position);
 
             _agent.isStopped = false;
+            _onFinalLeg = false;
             _hasDestination = _agent.SetDestination(destination);
 
             if (!_hasDestination)
@@ -189,6 +232,8 @@ namespace _Works.CJW.Scripts.Customers.Cars
             _segIndex = 0;
             _speed = 0f;
             _steer = 0f;
+            _hasFinalPoint = false;
+            _onFinalLeg = false;
             _remaining = float.PositiveInfinity;
 
             if (_agent == null || !_agent.isOnNavMesh)
@@ -211,10 +256,14 @@ namespace _Works.CJW.Scripts.Customers.Cars
                 return;
             }
 
+            TrySwitchToFinalPoint();
             RefreshCornersIfNeeded(dt);
 
+            // 목적지에 붙으면 경로가 코너 하나로 줄어든다. 그대로 return하면
+                        // 조향이 남은 채로 얼어붙는다. 핸들을 풀면서 세워야 한다.
             if (_cornerCount < 2)
             {
+                Settle(dt);
                 return;
             }
 
@@ -222,18 +271,47 @@ namespace _Works.CJW.Scripts.Customers.Cars
             Vector3 position = transform.position;
             Vector3 cursor = AdvanceAlongPath(position, out _remaining);
 
-            if (_remaining <= ArriveDistance && _speed <= 0.01f)
+            if (_remaining <= ArriveDistance)
             {
-                _speed = 0f;
+                Settle(dt);
                 return;
             }
 
             // 2. Pure Pursuit — Lookahead는 속도에 연동한다. 빠를수록 멀리 본다.
             float lookahead = Mathf.Clamp(_lookaheadGain * _speed, _lookaheadMin, _lookaheadMax);
+
+            // 마지막 직선 구간은 코너를 자를 일이 없고 자리에 정확히 들어가는 게 전부다.
+            // Ld가 길면 차가 선으로 다 모이기 전에 끝점에 닿아, 좌우로 밀린 채 서버린다.
+            // 아래 sin α 보정이 그대로 살아 있으므로 짧게 잡아도 맴돌 위험은 없다.
+            if (_onFinalLeg)
+            {
+                lookahead = Mathf.Min(lookahead, _finalLegLookahead);
+            }
+
+            // Pure Pursuit이 그리는 원의 반경은 Ld / (2·sin α)라, 목표점이 옆으로 붙을수록 작아진다.
+            // 그 원이 최소 회전 반경보다 작아지면 차는 따라갈 수 없어 최대 조향에 물린 채
+            // 목표점 주위를 빙빙 돌게 된다. Ld를 회전원의 지름 아래로는 내리지 않아 아예 막는다.
+            // 여기 값은 잠정치다. 목표점을 고른 뒤 각도를 보고 모자라면 아래에서 다시 고른다.
+
             Vector3 goal = FindGoalPoint(cursor, lookahead);
 
             Vector3 local = transform.InverseTransformPoint(goal);
             local.y = 0f;
+
+            // Pure Pursuit이 그리는 원의 반경은 Ld / (2·sin α)라, 목표점이 옆으로 붙을수록 작아진다.
+            // 그 원이 최소 회전 반경보다 작아지면 차는 따라갈 수 없어 목표점 주위를 빙빙 돌게 된다.
+            // 그런 경우에만 Ld를 필요한 만큼 늘려 다시 고른다.
+            // 직선 구간에서는 짧게 유지되어 경로에 밀착하게 붙는다. 정차 각도가 여기서 맞는다.
+            float sinAlpha = Mathf.Abs(local.x) / Mathf.Max(local.magnitude, 1e-4f);
+            float requiredLookahead = 2f * MinTurnRadius * sinAlpha;
+
+            if (lookahead < requiredLookahead)
+            {
+                lookahead = requiredLookahead;
+                goal = FindGoalPoint(cursor, lookahead);
+                local = transform.InverseTransformPoint(goal);
+                local.y = 0f;
+            }
 
             float maxCurv = MaxCurvature;
             float curvTarget;
@@ -245,13 +323,26 @@ namespace _Works.CJW.Scripts.Customers.Cars
             }
             else
             {
-                // κ = 2·x / Ld²  — 지금 방향에 접하면서 목표점을 지나는 원의 곡률
+                            // kappa = 2*x / Ld^2  -- 지금 방향에 접하면서 목표점을 지나는 원의 curvature
                 curvTarget = 2f * local.x / Mathf.Max(local.sqrMagnitude, 1e-4f);
                 curvTarget = Mathf.Clamp(curvTarget, -maxCurv, maxCurv);
             }
 
-            // 3. 자전거 모델 — 곡률을 조향각으로 바꿔서 변화율까지 제한한다.
-            //    이걸 해야 코너 진입에서 곡률이 계단처럼 튀지 않고 완화곡선을 그린다.
+            // 목표점이 최소 회전원 안에 들어오면 어떤 조향으로도 닿을 수 없다.
+            // 그대로 꿾면 그 자리를 영원히 맴도는다. 조향을 풀고 직진해 원 밖으로 빠져나온 뒤 다시 붙는다.
+            if (curvTarget != 0f)
+            {
+                float turnRadius = MinTurnRadius;
+                Vector3 turnCenter = new Vector3(Mathf.Sign(curvTarget) * turnRadius, 0f, 0f);
+
+                if ((local - turnCenter).magnitude < turnRadius)
+                {
+                    curvTarget = 0f;
+                }
+            }
+
+                        // 3. 자전거 모델 -- curvature를 조향각으로 바꿔서 변화율까지 제한한다.
+                        //    이걸 해야 코너 진입에서 curvature가 계단처럼 튀지 않고 부드럽게 이어진다.
             float steerTarget = Mathf.Atan(_wheelBase * curvTarget);
             _steer = Mathf.MoveTowards(_steer, steerTarget, _steerRate * Mathf.Deg2Rad * dt);
 
@@ -261,6 +352,13 @@ namespace _Works.CJW.Scripts.Customers.Cars
             float vCurve = Mathf.Sqrt(_maxLateralAccel / Mathf.Max(Mathf.Abs(curv), 1e-4f));
             float vStop = Mathf.Sqrt(2f * _brakeAccel * Mathf.Max(_remaining - ArriveDistance, 0f));
             float vTarget = Mathf.Min(_agent.speed, Mathf.Min(vCurve, vStop));
+
+            // 자리로 들어가는 구간은 천천히. 보기에도 자연스럽고,
+            // 짧은 Lookahead와 짝지어야 흔들리지 않고 선에 밀착해 들어간다.
+            if (_onFinalLeg)
+            {
+                vTarget = Mathf.Min(vTarget, _finalLegSpeed);
+            }
 
             _speed = Mathf.MoveTowards(_speed, vTarget, (vTarget > _speed ? _accel : _brakeAccel) * dt);
 
@@ -276,8 +374,38 @@ namespace _Works.CJW.Scripts.Customers.Cars
             _agent.nextPosition = transform.position;
         }
 
+        /// <summary>
+        /// 더 따라갈 경로가 없을 때 핸들을 중앙으로 되돌리면서 제동해 세운다.
+                /// 그냥 멈춰버리면 조향각이 남아 다음 출발 첫 프레임에 차가 튄다.
+        /// </summary>
+        private void Settle(float dt)
+        {
+            _steer = Mathf.MoveTowards(_steer, 0f, _steerRate * Mathf.Deg2Rad * dt);
+            _speed = Mathf.MoveTowards(_speed, 0f, _brakeAccel * dt);
+
+            if (_speed <= 0.001f)
+            {
+                _speed = 0f;
+                return;
+            }
+
+            transform.position += transform.forward * (_speed * dt);
+
+            if (_agent != null && _agent.isOnNavMesh)
+            {
+                _agent.nextPosition = transform.position;
+            }
+        }
+
+
         private void RefreshCornersIfNeeded(float dt)
         {
+            // 마지막 직선 구간은 직접 박아둔 경로다. 에이전트 경로로 덮어쓰지 않는다.
+            if (_onFinalLeg)
+            {
+                return;
+            }
+
             _refreshTimer -= dt;
 
             if (_cornerCount >= 2 && _refreshTimer > 0f)
@@ -300,6 +428,15 @@ namespace _Works.CJW.Scripts.Customers.Cars
             }
 
             _cornerCount = path.GetCornersNonAlloc(_corners);
+
+            // 진입점까지의 경로 뒤에 실제 목적지를 붙인다.
+            // 두 번에 나눠 MoveTo하면 진입점에서 한 번 서버리며 오버슈트하지만,
+            // 한 경로로 이어붙이면 속도를 유지한 채 매끄럽게 통과한다.
+            if (_hasFinalPoint && _cornerCount > 0 && _cornerCount < MaxCorners)
+            {
+                _corners[_cornerCount] = _finalPoint;
+                _cornerCount++;
+            }
             _segIndex = 0;
         }
 
@@ -332,6 +469,13 @@ namespace _Works.CJW.Scripts.Customers.Cars
         }
 
         /// <summary>경로를 따라 lookahead만큼 앞선 점. 경로 끝을 넘으면 마지막 코너를 준다.</summary>
+/// <summary>
+        /// 경로를 따라 lookahead만큼 앞선 점.
+        /// 경로 끝을 넘으면 마지막 구간 방향으로 더 뻗은 가상의 점을 돌려준다.
+        /// 끝점 자체를 결눈면 차가 그 점으로 빨려들면서 방향이 틀어진 채 도착하고,
+        /// 그 오차를 정차 뒤에 제자리 회전으로 메꾸게 된다.
+        /// 선을 따라가게 두면 도착할 때 방향까지 맞는다.
+        /// </summary>
         private Vector3 FindGoalPoint(Vector3 cursor, float lookahead)
         {
             float left = lookahead;
@@ -351,6 +495,15 @@ namespace _Works.CJW.Scripts.Customers.Cars
                 left -= d;
                 from = to;
                 goal = to;
+            }
+
+            // 경로를 다 쓰고도 lookahead가 남았다. 마지막 구간 방향으로 그만큼 더 뻗는다.
+            Vector3 tail = _corners[_cornerCount - 1] - _corners[Mathf.Max(_cornerCount - 2, 0)];
+            tail.y = 0f;
+
+            if (tail.sqrMagnitude > 1e-6f)
+            {
+                goal = _corners[_cornerCount - 1] + tail.normalized * left;
             }
 
             return goal;
@@ -415,7 +568,7 @@ namespace _Works.CJW.Scripts.Customers.Cars
             // Pure Pursuit이 그리는 원의 반경은 Ld / (2·sin α)라, 목표점이 옆으로 붙을수록 작아진다.
             // 그 원이 최소 회전 반경보다 작아지면 차는 따라갈 수 없어 최대 조향에 물린 채
             // 목표점 주위를 빙빙 돌게 된다. Ld를 회전원의 지름 아래로는 내리지 않아 아예 막는다.
-            lookahead = Mathf.Max(lookahead, 2f * MinTurnRadius);
+            // 이 시점의 Ld는 가지증이다. 목표점을 고른 뒤 각도를 보고 모자라면 아래에서 다시 고른다.
             Vector3 goal = FindGoalPoint(cursor, lookahead);
 
             Gizmos.color = Color.red;
@@ -423,5 +576,38 @@ namespace _Works.CJW.Scripts.Customers.Cars
             Gizmos.DrawWireSphere(goal, 0.3f);
         }
 #endif
-    }
+    
+
+        /// <summary>
+        /// 경유지에 충분히 가까워지면 목적지를 직접 잡는다.
+        /// 차는 룩어헤드 때문에 경유지를 살짝 지나치기 마련인데,
+        /// 그때까지 경유지를 목적지로 두면 경로가 되돌아갔다 다시 가는 헤어핀이 된다.
+        /// 그 꾺이는 지점이 최소 회전원 안에 들어가면 차는 그 자리를 영원히 맴돌게 된다.
+        /// </summary>
+        private void TrySwitchToFinalPoint()
+        {
+            if (!_hasFinalPoint || _agent == null || !_agent.isOnNavMesh)
+            {
+                return;
+            }
+
+            if (HorizontalDistance(transform.position, _viaPoint) > _viaSwitchDistance)
+            {
+                return;
+            }
+
+            _hasFinalPoint = false;
+            _agent.SetDestination(_finalPoint);
+
+            _onFinalLeg = true;
+
+            // 에이전트 경로는 항상 "현재 위치 → 목적지"라 진입 방향이 사라진다.
+            // 진입점→목적지 직선을 직접 경로로 박아넣어 그 선을 추종하게 한다.
+            // 도착 방향이 자리 방향과 같아져서 정차 뒤 제자리 회전이 사라진다.
+            _corners[0] = _viaPoint;
+            _corners[1] = _finalPoint;
+            _cornerCount = 2;
+            _segIndex = 0;
+        }
+}
 }

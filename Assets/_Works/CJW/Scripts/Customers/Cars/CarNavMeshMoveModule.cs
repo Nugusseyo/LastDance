@@ -70,6 +70,12 @@ namespace _Works.CJW.Scripts.Customers.Cars
             }
         }
 
+        /// <summary>이 모듈은 진입 방향을 다루지 않는다. 진입점은 무시하고 목적지로 곱바로 간다.</summary>
+        public void MoveTo(Vector3 destination, Vector3 approachFrom)
+        {
+            MoveTo(destination);
+        }
+
         public void MoveTo(Vector3 destination)
         {
             if (!_agent.isOnNavMesh)

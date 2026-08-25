@@ -381,6 +381,52 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!1 &206790677
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 206790678}
+  - component: {fileID: 206790679}
+  m_Layer: 0
+  m_Name: Slot (4)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &206790678
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206790677}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 4.68, y: 0, z: 7.53}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 538182192}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &206790679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206790677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
+  gizmoSize: {x: 2, y: 0.1, z: 4.5}
 --- !u!1 &336491503
 GameObject:
   m_ObjectHideFlags: 0
@@ -504,9 +550,12 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 28105992}
+  - {fileID: 206790678}
   - {fileID: 1820375807}
+  - {fileID: 1775278943}
   - {fileID: 1722761557}
   - {fileID: 166488015}
+  - {fileID: 1304488403}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &709238838
@@ -643,7 +692,7 @@ Transform:
   m_GameObject: {fileID: 792902777}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.05, y: 1.17, z: -1.37}
+  m_LocalPosition: {x: 7.29, y: 1.17, z: -2.34}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -973,6 +1022,52 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineHardLockToTarget
   Damping: 0
+--- !u!1 &1304488402
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1304488403}
+  - component: {fileID: 1304488404}
+  m_Layer: 0
+  m_Name: Slot (7)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1304488403
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1304488402}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 7.540001, y: 0, z: 7.53}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 538182192}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1304488404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1304488402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
+  gizmoSize: {x: 2, y: 0.1, z: 4.5}
 --- !u!1 &1722761556
 GameObject:
   m_ObjectHideFlags: 0
@@ -1012,6 +1107,52 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1722761556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
+  gizmoSize: {x: 2, y: 0.1, z: 4.5}
+--- !u!1 &1775278942
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1775278943}
+  - component: {fileID: 1775278944}
+  m_Layer: 0
+  m_Name: Slot (5)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1775278943
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1775278942}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.9000006, y: 0, z: 7.53}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 538182192}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1775278944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1775278942}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
@@ -1105,7 +1246,7 @@ MonoBehaviour:
   shopPoint: {fileID: 336491504}
   exitPoint: {fileID: 432048088}
   spawnInterval: 8
-  maxConcurrentVisits: 3
+  maxConcurrentVisits: 6
   autoDepartSeconds: 0
 --- !u!4 &1863309875
 Transform:

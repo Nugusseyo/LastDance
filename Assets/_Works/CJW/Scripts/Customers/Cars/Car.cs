@@ -159,6 +159,12 @@ namespace _Works.CJW.Scripts.Customers.Cars
             _moveModule?.MoveTo(destination);
         }
 
+        /// <summary>진입점을 거쳐 목적지로 들어간다. 마지막 구간이 직선이라 도착 방향이 거의 맞추어진다.</summary>
+        public void MoveTo(Vector3 destination, Vector3 approachFrom)
+        {
+            _moveModule?.MoveTo(destination, approachFrom);
+        }
+
         public void Stop()
         {
             _moveModule?.Stop();
