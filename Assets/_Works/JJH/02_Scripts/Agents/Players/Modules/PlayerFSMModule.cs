@@ -1,10 +1,11 @@
-﻿using DevLib.AnimatorSystem;
+﻿using _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines;
+using DevLib.AnimatorSystem;
 using DevLib.ModuleSystem;
 using UnityEngine;
 
-namespace _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines
+namespace _Works.JJH._02_Scripts.Agents.Players.Modules
 {
-    public class PlayerFSMModule : AbstractModule
+    public class PlayerFSMModule : AbstractModule, IPlayerFSM
     {
         [Header("Animation Hash")]
         [SerializeField] private HashDataSO idleHash;

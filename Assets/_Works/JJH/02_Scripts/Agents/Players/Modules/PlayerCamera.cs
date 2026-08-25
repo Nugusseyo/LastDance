@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using DevLib.ModuleSystem;
+using UnityEngine;
 
-namespace _Works.JJH._02_Scripts.Agents.Players
+namespace _Works.JJH._02_Scripts.Agents.Players.Modules
 {
-    public class PlayerCamera : MonoBehaviour
+    public class PlayerCamera : AbstractModule, IPlayerCamera
     {
         [Header("Objects")]
         [SerializeField] private Transform player;
@@ -40,6 +41,11 @@ namespace _Works.JJH._02_Scripts.Agents.Players
 
             player.rotation = Quaternion.Euler(0f, _horizontal, 0f);
             playerCamera.localRotation = Quaternion.Euler(_vertical, 0f, 0f);
+        }
+
+        public void CameraShake()
+        {
+
         }
     }
 }

@@ -3,7 +3,7 @@ using _Works.JYG._Scripts.Events;
 using DevLib.EventChannelSystem;
 using UnityEngine;
 
-namespace _Works.JJH._02_Scripts.Agents.Players
+namespace _Works.JJH._02_Scripts.Agents.Players.Modules
 {
     public class PlayerMover : AgentMover
     {
