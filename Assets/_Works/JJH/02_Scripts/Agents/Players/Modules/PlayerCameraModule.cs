@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.Modules
 {
-    public class PlayerCamera : AbstractModule, IPlayerCamera
+    public class PlayerCameraModule : AbstractModule, IPlayerCamera
     {
         [Header("Objects")]
         [SerializeField] private Transform player;
