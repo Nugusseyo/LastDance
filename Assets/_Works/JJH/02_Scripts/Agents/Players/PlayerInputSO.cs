@@ -9,6 +9,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players
     {
         public event Action<Vector2> OnMovementChange;
         public event Action OnAttackKeyPressed;
+        public event Action OnThrowAttackKeyPressed;
         public event Action OnInteractKeyPressed;
         public event Action OnChangeWeaponKeyPressed;
 
@@ -51,6 +52,12 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         {
             if (context.performed)
                 OnAttackKeyPressed?.Invoke();
+        }
+
+        public void OnThrowAttack(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+                OnThrowAttackKeyPressed?.Invoke();
         }
 
         public void OnSprint(InputAction.CallbackContext context)
