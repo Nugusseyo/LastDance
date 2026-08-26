@@ -21,7 +21,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
         public override void Enter()
         {
             _playerMover = (PlayerMover)Agent.Mover;
-            _playerCamera = ((Player)Agent).PlayerCamera;
+            _playerCamera = ((Player)Agent).Camera;
 
             _playerCamera.SetCameraShake(true);
             Agent.Renderer.PlayClip(_runHash.HashValue, 0f, 0.1f);

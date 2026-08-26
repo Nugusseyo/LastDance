@@ -3,7 +3,7 @@ using DevLib.AnimatorSystem;
 using DevLib.ModuleSystem;
 using UnityEngine;
 
-namespace _Works.JJH._02_Scripts.Agents.Players.Modules
+namespace _Works.JJH._02_Scripts.Agents.Players.FSM
 {
     public class PlayerFSMModule : AbstractModule, IPlayerFSM
     {
@@ -31,6 +31,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
             UpperBody.Initialize();
 
             _player.PlayerInput.OnAttackKeyPressed += UpperBody.Attack;
+            _player.PlayerInput.OnThrowAttackKeyPressed += UpperBody.Attack;
         }
 
         private void Update()
@@ -42,7 +43,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
         private void OnDestroy()
         {
             if (_player != null)
+            {
                 _player.PlayerInput.OnAttackKeyPressed -= UpperBody.Attack;
+                _player.PlayerInput.OnThrowAttackKeyPressed -= UpperBody.Attack;
+            }
         }
     }
 }

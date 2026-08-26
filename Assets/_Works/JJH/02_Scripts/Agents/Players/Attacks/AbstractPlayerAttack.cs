@@ -1,17 +1,16 @@
-﻿using _Works.JJH._02_Scripts.Agents.Players.Modules;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
 {
     public abstract class AbstractPlayerAttack : MonoBehaviour
     {
-        protected PlayerAttackModule _attackModule;
+        protected PlayerAttackSkillModule _attackModule;
 
-        public virtual void Initialize(PlayerAttackModule attackModule)
+        public virtual void Initialize(PlayerAttackSkillModule attackModule)
         {
             _attackModule = attackModule;
         }
 
-        public abstract void Execute();
+        public abstract void Attack();
     }
 }
