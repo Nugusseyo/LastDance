@@ -6,7 +6,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
     public class PlayerCameraModule : AbstractModule, IPlayerCamera
     {
         [Header("Objects")]
-        [SerializeField] private Transform playerCamera;
+        [field: SerializeField] public Transform CameraTrans { get; private set; }
 
         [Header("Camera Value")]
         [SerializeField] private float sensitivity = 100f;
@@ -29,7 +29,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
         public override void Initialize(ModuleOwner owner)
         {
             base.Initialize(owner);
-            
+
             _player = (Player)_owner;
 
             Cursor.lockState = CursorLockMode.Locked;
@@ -51,7 +51,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
             _vertical = Mathf.Clamp(_vertical, minVertical, maxVertical);
 
             _player.transform.rotation = Quaternion.Euler(0f, _horizontal, 0f);
-            playerCamera.localRotation = Quaternion.Euler(_vertical, 0f, 0f);
+            CameraTrans.localRotation = Quaternion.Euler(_vertical, 0f, 0f);
         }
 
         private void ShakeCamera()
@@ -60,7 +60,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
             _shakeWeight = Mathf.MoveTowards(_shakeWeight, 1f, Time.deltaTime * 5f);
 
             float shake = Mathf.Sin(Time.time * shakeSpeed) * shakeAmount * _shakeWeight;
-            playerCamera.localRotation = Quaternion.Euler(_vertical + shake, 0f, 0f);
+            CameraTrans.localRotation = Quaternion.Euler(_vertical + shake, 0f, 0f);
         }
 
         public void SetCameraShake(bool isRunning)
@@ -74,7 +74,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
             else
             {
                 _shakeWeight = 0f;
-                playerCamera.localRotation = Quaternion.Euler(_vertical, 0f, 0f);
+                CameraTrans.localRotation = Quaternion.Euler(_vertical, 0f, 0f);
             }
         }
     }

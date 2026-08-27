@@ -29,15 +29,21 @@ namespace _Works.JJH._02_Scripts.Agents.Players
             Weapon = GetModule<IPlayerWeapon>();
             Debug.Assert(Weapon != null, $"{gameObject.name}에는 IPlayerWeapon 모듈이 필요합니다.");
 
+            PlayerInput.OnInteractKeyPressed += HandleFindWeapon;
             PlayerInput.OnAttackKeyPressed += HandleAttackKeyPressed;
             PlayerInput.OnThrowAttackKeyPressed += HandleThrowAttackKeyPressed;
         }
 
         private void OnDestroy()
         {
-
+            PlayerInput.OnInteractKeyPressed -= HandleFindWeapon;
+            PlayerInput.OnAttackKeyPressed -= HandleAttackKeyPressed;
+            PlayerInput.OnThrowAttackKeyPressed -= HandleThrowAttackKeyPressed;
         }
 
+
+        private void HandleFindWeapon()
+            => Weapon.PickupWeapon();
         private void HandleAttackKeyPressed()
             => AttackSkill.Attack<AttackSkill>();
         private void HandleThrowAttackKeyPressed()

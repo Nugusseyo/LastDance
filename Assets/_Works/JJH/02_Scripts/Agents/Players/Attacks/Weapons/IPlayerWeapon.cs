@@ -4,10 +4,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
 {
     public interface IPlayerWeapon
     {
+        Weapon CurrentWeapon { get; }
         GameObject CurrentWeaponObject { get; }
-        WeaponDataSO CurrentWeaponData { get; }
 
-        void PickupWeapon(GameObject weaponObject, WeaponDataSO weaponData);
+        void PickupWeapon();
         void ClearCurrentWeapon();
     }
 }
