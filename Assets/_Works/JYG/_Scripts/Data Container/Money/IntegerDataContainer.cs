@@ -41,7 +41,7 @@ namespace _Works.JYG._Scripts.Data_Container.Money
         {
             IntegerDataForJson saveData = new IntegerDataForJson(_value);
             Debug.Log($"IntValue : {saveData.value}");
-            string value = JsonUtility.ToJson(saveData.value);
+            string value = JsonUtility.ToJson(saveData);
             
             DataSaveSystem.SetSaveData(key, value);
         }

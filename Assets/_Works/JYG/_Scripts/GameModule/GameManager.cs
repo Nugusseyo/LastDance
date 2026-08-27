@@ -28,8 +28,8 @@ namespace _Works.JYG._Scripts.GameModule
             foreach (InitDataWrap wrap in initDatas)
             {
                 ISavableData savable = wrap.data.GetInterface();
-                Debug.Log($"{wrap.key} : {DataSaveSystem.GetSaveData<IntegerDataForJson>(wrap.key).value}");
                 savable.SaveData(wrap.key);
+                Debug.Log($"{wrap.key} : {DataSaveSystem.GetSaveData<IntegerDataForJson>(wrap.key).value}");
             }
         }
     }
