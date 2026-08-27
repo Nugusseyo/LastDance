@@ -6,7 +6,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
     public class PlayerCameraModule : AbstractModule, IPlayerCamera
     {
         [Header("Objects")]
-        [SerializeField] private Transform player;
         [SerializeField] private Transform playerCamera;
 
         [Header("Camera Value")]
@@ -29,7 +28,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
 
         private void Awake()
         {
-            _player = player.GetComponent<Player>();
+            _player = (Player)_owner;
 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
@@ -49,7 +48,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
             _vertical -= lookDirection.y * sensitivity * Time.deltaTime;
             _vertical = Mathf.Clamp(_vertical, minVertical, maxVertical);
 
-            player.rotation = Quaternion.Euler(0f, _horizontal, 0f);
+            _player.transform.rotation = Quaternion.Euler(0f, _horizontal, 0f);
             playerCamera.localRotation = Quaternion.Euler(_vertical, 0f, 0f);
         }
 
