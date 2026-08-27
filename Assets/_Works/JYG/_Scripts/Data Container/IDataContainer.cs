@@ -10,7 +10,6 @@ namespace _Works.JYG._Scripts.Data_Container
         delegate void OnValueChangedEvent(T newValue, T oldValue);  //데이터(Value)변경 시 동작하는 이벤트
 
         event OnValueChangedEvent OnValueChanged;
-        void InitializeData(T value);                               //DataController에서 사전에 저장된 값을 읽고 불러들이기 위한 함수
     }
 
     public interface IDataContainer : ISerializableInterface

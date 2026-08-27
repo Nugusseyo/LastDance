@@ -54,6 +54,5 @@ namespace _Works.JYG._Scripts.UI
     {
         public SerializableInterface<IDataContainer> targetData;
         public TextMeshProUGUI targetTextField;
-        public string key;
     }
 }

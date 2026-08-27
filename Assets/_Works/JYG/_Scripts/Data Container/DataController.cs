@@ -1,16 +1,16 @@
+using System;
+using _Works.JYG._Scripts.Data_Container.Money;
+using _Works.JYG._Scripts.SaveSystem;
 using UnityEngine;
 
-public class DataController : MonoBehaviour
+namespace _Works.JYG._Scripts.Data_Container
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class DataController : MonoBehaviour
     {
         
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        private void Awake()
+        {
+            
+        }
     }
 }
