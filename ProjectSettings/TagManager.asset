@@ -14,13 +14,13 @@ TagManager:
   - UI
   - Obstacle
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Door
+  - Glass
+  - Wheel
+  - Trunk
+  - RearBumper
+  - FrontBumper
+  - Hood
   - 
   - 
   - 

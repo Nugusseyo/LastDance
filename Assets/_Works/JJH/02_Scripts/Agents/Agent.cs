@@ -1,5 +1,6 @@
 ﻿using _Works.JJH._02_Scripts.Agents.Modules;
 using DevLib.ModuleSystem;
+using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents
 {
@@ -11,9 +12,12 @@ namespace _Works.JJH._02_Scripts.Agents
 
         protected override void InitializeComponents()
         {
-            Sensor = GetModule<ISensor>();
             Renderer = GetModule<IRenderer>();
+            Debug.Assert(Renderer != null, $"{gameObject.name}에는 IRenderer 모듈이 필요합니다.");
+            Sensor = GetModule<ISensor>();
+            Debug.Assert(Sensor != null, $"{gameObject.name}에는 ISensor 모듈이 필요합니다.");
             Mover = GetModule<IMover>();
+            Debug.Assert(Mover != null, $"{gameObject.name}에는 IMover 모듈이 필요합니다.");
 
             base.InitializeComponents();
         }

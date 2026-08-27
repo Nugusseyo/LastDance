@@ -18,48 +18,31 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
 
         public VisitPhase Phase => VisitPhase.Arriving;
 
-        /// <summary>자리 정면으로 들어오는 마지막 구간에 접어들기 전인지.</summary>
-        private bool _approaching;
-
         /// <summary>도착해서 멈춘 뒤, 남은 각도를 마저 맞추는 중인지.</summary>
         private bool _aligning;
 
-        public void Enter(VisitContext context)
+public void Enter(VisitContext context)
         {
             _aligning = false;
-            _approaching = false;
 
-            // 자리 정면으로 ApproachDistance만큼 물러난 지점.
+            // 자리 정면으로 ApproachDistance만큼 물러난 지점을 경유지로 넘긴다.
+            // 목적지를 따로 끊어 주지 않으므로 차는 중간에서 멈추지 않고,
+            // 마지막 직선 구간을 달리는 동안 방향이 저절로 맞는다.
             Vector3 forward = context.ArrivalRotation * Vector3.forward;
             Vector3 approach = context.ArrivalPoint - forward * ApproachDistance;
 
             if (NavMesh.SamplePosition(approach, out NavMeshHit hit, ApproachSampleRadius, NavMesh.AllAreas))
             {
-                _approaching = true;
-                context.Car.MoveTo(hit.position);
+                context.Car.MoveTo(context.ArrivalPoint, hit.position);
                 return;
             }
 
-            // 진입점을 못 잡으면 예전처럼 곧장 자리로 간다. 방향은 AlignTo가 마저 맞춘다.
+            // 진입점을 못 잡으면 곧장 자리로 간다. 방향은 AlignTo가 마저 맞춘다.
             context.Car.MoveTo(context.ArrivalPoint);
         }
 
-        public VisitPhase Tick(VisitContext context, float dt)
+public VisitPhase Tick(VisitContext context, float dt)
         {
-            if (_approaching)
-            {
-                if (!context.Car.IsArrived)
-                {
-                    return VisitPhase.Arriving;
-                }
-
-                // 진입점에 닿았다. 여기서부터 자리까지는 직선이라 달리는 동안 방향이 저절로 맞는다.
-                _approaching = false;
-                context.Car.MoveTo(context.ArrivalPoint);
-
-                return VisitPhase.Arriving;
-            }
-
             if (!_aligning)
             {
                 if (!context.Car.IsArrived)
