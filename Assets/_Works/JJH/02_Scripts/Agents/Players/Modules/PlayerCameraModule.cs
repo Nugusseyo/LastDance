@@ -26,8 +26,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
         private float _shakeWeight;
         private bool _isShake = false;
 
-        private void Awake()
+        public override void Initialize(ModuleOwner owner)
         {
+            base.Initialize(owner);
+            
             _player = (Player)_owner;
 
             Cursor.lockState = CursorLockMode.Locked;
