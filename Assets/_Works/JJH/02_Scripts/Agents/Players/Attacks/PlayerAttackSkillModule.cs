@@ -20,13 +20,15 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
 
             foreach (AbstractPlayerAttack attack in _attacks)
             {
-                attack.Initialize(this);
+                attack.Initialize(this, _player.Weapon);
             }
         }
 
-        public void Attack(AbstractPlayerAttack attack)
+        public void Attack<T>() where T : AbstractPlayerAttack
         {
-            if (Attacks.Contains(attack))
+            T attack = Attacks.OfType<T>().FirstOrDefault();
+
+            if (attack != null)
                 attack.Attack();
         }
     }

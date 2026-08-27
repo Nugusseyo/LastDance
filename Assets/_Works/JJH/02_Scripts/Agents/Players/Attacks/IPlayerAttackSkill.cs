@@ -2,6 +2,6 @@
 {
     public interface IPlayerAttackSkill
     {
-        void Attack(AbstractPlayerAttack attack);
+        void Attack<T>() where T : AbstractPlayerAttack;
     }
 }

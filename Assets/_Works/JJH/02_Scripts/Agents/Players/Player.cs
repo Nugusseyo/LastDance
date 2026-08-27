@@ -28,6 +28,19 @@ namespace _Works.JJH._02_Scripts.Agents.Players
             Debug.Assert(AttackSkill != null, $"{gameObject.name}에는 IPlayerAttackSkill 모듈이 필요합니다.");
             Weapon = GetModule<IPlayerWeapon>();
             Debug.Assert(Weapon != null, $"{gameObject.name}에는 IPlayerWeapon 모듈이 필요합니다.");
+
+            PlayerInput.OnAttackKeyPressed += HandleAttackKeyPressed;
+            PlayerInput.OnThrowAttackKeyPressed += HandleThrowAttackKeyPressed;
         }
+
+        private void OnDestroy()
+        {
+
+        }
+
+        private void HandleAttackKeyPressed()
+            => AttackSkill.Attack<AttackSkill>();
+        private void HandleThrowAttackKeyPressed()
+            => AttackSkill.Attack<ThrowAttackSkill>();
     }
 }

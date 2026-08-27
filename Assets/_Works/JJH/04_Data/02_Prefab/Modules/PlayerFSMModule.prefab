@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2048338774414995662
+--- !u!1 &3384591282492468092
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,8 +8,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1661327778920499119}
-  - component: {fileID: 7194943632311378921}
+  - component: {fileID: 3045339342622844074}
+  - component: {fileID: 2613636474688445561}
   m_Layer: 0
   m_Name: PlayerFSMModule
   m_TagString: Untagged
@@ -17,13 +17,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1661327778920499119
+--- !u!4 &3045339342622844074
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2048338774414995662}
+  m_GameObject: {fileID: 3384591282492468092}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -32,19 +32,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7194943632311378921
+--- !u!114 &2613636474688445561
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2048338774414995662}
+  m_GameObject: {fileID: 3384591282492468092}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec6402b42c48e664fbf4e5ed89be25b6, type: 3}
+  m_Script: {fileID: 11500000, guid: 143e039e7cbb06b4b854c2195e24db3e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines.PlayerFSMModule
-  playerInput: {fileID: 11400000, guid: c737956186e8597409da6f6fa68d02e2, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.FSM.PlayerFSMModule
   idleHash: {fileID: 11400000, guid: 52427c781a7a85e42ae271f9ce99e467, type: 2}
   moveHash: {fileID: 11400000, guid: e5ed06aa4fc6161459132af56b0b1ddc, type: 2}
   runHash: {fileID: 11400000, guid: 8491754b775b6754db95a4921d4178c5, type: 2}
