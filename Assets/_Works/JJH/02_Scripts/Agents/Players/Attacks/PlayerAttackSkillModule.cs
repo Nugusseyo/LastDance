@@ -10,6 +10,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
         private List<AbstractPlayerAttack> _attacks = new();
 
         private Player _player;
+        private AbstractPlayerAttack _currentAttack;
 
         public override void Initialize(ModuleOwner owner)
         {
@@ -20,16 +21,18 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
 
             foreach (AbstractPlayerAttack attack in _attacks)
             {
-                attack.Initialize(this, _player.Weapon);
+                attack.Initialize(_player);
             }
         }
 
-        public void Attack<T>() where T : AbstractPlayerAttack
+        public void Attack()
         {
-            T attack = Attacks.OfType<T>().FirstOrDefault();
+            _currentAttack?.Attack();
+        }
 
-            if (attack != null)
-                attack.Attack();
+        public void ChangeCurrentAttack<T>() where T : AbstractPlayerAttack
+        {
+            _currentAttack = Attacks.FirstOrDefault(x => x is T);
         }
     }
 }

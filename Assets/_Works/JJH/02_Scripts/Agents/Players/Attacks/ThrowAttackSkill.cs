@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons;
+using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
 {
@@ -8,23 +9,23 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
 
         public override void Attack()
         {
-            if (_weapon == null)
+            if (player.Weapon == null || player.Weapon.CurrentWeapon == null)
                 return;
 
-            GameObject weaponObject = _weapon.CurrentWeaponObject;
+            Weapon weapon = player.Weapon.CurrentWeapon;
+            GameObject weaponObject = player.Weapon.CurrentWeaponObject;
 
             if (weaponObject == null)
                 return;
 
-            weaponObject.transform.SetParent(null);
-            Rigidbody rigidbody = weaponObject.GetComponent<Rigidbody>();
-            if (rigidbody != null)
-            {
-                rigidbody.isKinematic = false;
-                rigidbody.AddForce(transform.forward * throwForce, ForceMode.Impulse);
-            }
+            Vector3 throwDirection = player.Camera.CameraTrans.forward;
 
-            _weapon.ClearCurrentWeapon();
+            weaponObject.transform.SetParent(null);
+            weapon.Collider.isTrigger = false;
+            weapon.Rigidbody.isKinematic = false;
+            weapon.Rigidbody.AddForce(throwDirection * throwForce, ForceMode.Impulse);
+
+            player.Weapon.ClearCurrentWeapon();
         }
     }
 }
