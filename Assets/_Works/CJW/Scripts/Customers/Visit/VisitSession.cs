@@ -1,7 +1,11 @@
-using System;
+using System;using System.Threading;
+using Cysharp.Threading.Tasks;
+using _Works.CJW.Scripts.Customers.Visit.CustomerFSM;
+
 using System.Collections.Generic;
 using _Works.CJW.Scripts.Cars;
 using _Works.CJW.Scripts.Customers.Visit.States;
+using _Works.CJW.Scripts.ManagingAgent;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
 
@@ -20,6 +24,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
         private readonly IVisitState[] _states = new IVisitState[PhaseCount];
 
         private IVisitState _current;
+        /// <summary>손님 Phase 실행의 일련번호. 달려온 이전 Phase의 완료를 걸러낸다.</summary>
+        private int _customerPhaseSerial;
+
 
         public VisitPhase Phase { get; private set; } = VisitPhase.None;
         public Car Car => _context.Car;
@@ -27,6 +34,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
         /// <summary>Leaving까지 끝났을 때 발생. 구독자가 <see cref="ReturnToPool"/>을 호출하면 된다.</summary>
         public event Action<VisitSession> Completed;
+        public event Action<VisitPhase> OnStateChanged;
 
         public VisitSession()
         {
@@ -66,7 +74,23 @@ namespace _Works.CJW.Scripts.Customers.Visit
             {
                 AbstractCustomer customer = customers[i];
                 _context.Customers.Add(customer);
-                customer.Board(car.HasSeat(i) ? car.GetSeat(i) : car.transform);
+
+                // 세션이 자기 손님을 이미 알고 있으므로 전역 방송 없이 직접 물려준다.
+                // 이 두 줄은 반드시 ChangeState(Arriving) 보다 앞에 와야 첫 전이를 놓치지 않는다.
+                customer.BindSession(this);
+                customer.Fsm?.Begin(_context, i);
+
+                Transform seat = car.HasSeat(i) ? car.GetSeat(i) : car.transform;
+                if (customer.Boarding != null)
+                {
+                    customer.Boarding.Board(seat);
+                }
+                else
+                {
+                    Debug.LogError(
+                        $"[VisitSession] {customer.name}에 탑승 모듈이 없습니다. " +
+                        "프리팹에 BoardingModule을 붙여야 합니다.", customer);
+                }
             }
 
             ChangeState(VisitPhase.Arriving);
@@ -99,12 +123,18 @@ namespace _Works.CJW.Scripts.Customers.Visit
         }
 
         /// <summary>손님을 먼저, 차를 나중에 반납한다. 순서가 뒤집히면 손님이 허공에 남는다.</summary>
+        /// <summary>손님을 먼저, 차를 나중에 반납한다. 순서가 뒤집히면 손님이 허공에 남는다.</summary>
         public void ReturnToPool(PoolManagerSO pool)
         {
             List<AbstractCustomer> customers = _context.Customers;
             for (int i = 0; i < customers.Count; i++)
             {
                 AbstractCustomer customer = customers[i];
+
+                                // 대기 중인 상태를 먼저 끊는다. 반납 뒤에 끊으면 한 프레임이라도 좀비가 돌 수 있다.
+                customer.Fsm?.Stop();
+                customer.BindSession(null);
+
                 customer.transform.SetParent(null, true);
                 pool.Push(customer);
             }
@@ -122,11 +152,64 @@ namespace _Works.CJW.Scripts.Customers.Visit
             _current = _states[(int)phase];
             _current?.Enter(_context);
 
+            // 세션 단계가 바뀌면 손님들에게 그 단계의 시퀀스를 돌리게 한다.
+            // 세션은 "전원 끝났나"만 보면 되고, 누가 뭐를 했는지는 구별하지 않는다.
+            RunCustomerPhase(phase).Forget();
+
+            OnStateChanged?.Invoke(phase);
+
             if (phase == VisitPhase.Completed)
             {
                 Completed?.Invoke(this);
             }
         }
+
+        /// <summary>
+        /// 해당 Phase에서 손님들이 할 일을 동시에 돌리고 전원 끝날 때까지 기다린다.
+        /// 안 내리는 손님은 즉시 끝나고 난동 부리는 손님은 오래 걸리지만, 세션은 둘을 구별하지 않는다.
+        /// </summary>
+        /// <summary>
+        /// 해당 Phase에서 손님들이 할 일을 동시에 돌리고 전원 끝날 때까지 기다린다.
+        /// 안 내리는 손님은 즉시 끝나고 난동 부리는 손님은 오래 걸리지만, 세션은 둘을 구별하지 않는다.
+        /// </summary>
+        private async UniTaskVoid RunCustomerPhase(VisitPhase phase)
+        {
+            // 이전 Phase의 시퀀스가 취소되면서 닮힐 때, 그 완료가 지금 Phase를
+            // 끝난 것으로 표시해버리지 않도록 일련번호로 묶는다.
+            int serial = ++_customerPhaseSerial;
+            _context.CustomerPhaseDone = false;
+
+            try
+            {
+                List<AbstractCustomer> customers = _context.Customers;
+                UniTask[] running = new UniTask[customers.Count];
+
+                for (int i = 0; i < customers.Count; i++)
+                {
+                    CustomerFSMModule fsm = customers[i].Fsm;
+                    running[i] = fsm != null ? fsm.RunPhase(phase) : UniTask.CompletedTask;
+                }
+
+                await UniTask.WhenAll(running);
+            }
+            catch (OperationCanceledException)
+            {
+                // 방문이 중단됐다. 정상 경로라 로그하지 않는다.
+            }
+            catch (Exception e)
+            {
+                // .Forget()은 예외를 삼키므로 여기서 반드시 남긴다.
+                Debug.LogException(e);
+            }
+            finally
+            {
+                if (serial == _customerPhaseSerial)
+                {
+                    _context.CustomerPhaseDone = true;
+                }
+            }
+        }
+
 
         private void AddState(IVisitState state)
         {

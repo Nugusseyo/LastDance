@@ -1,12 +1,13 @@
 using System;
 using _Works.CJW.Scripts.Customers;
 using _Works.CJW.Scripts.Customers.Data;
+using _Works.CJW.Scripts.MapSystems;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
 
 namespace _Works.CJW.Scripts.Cars
 {
-    public abstract class Car : ManagingAgent, IPoolable
+    public abstract class Car : ManagingAgent.ManagingAgent, IPoolable
     {
         [field: SerializeField] public PoolItemSO PoolItem { get; set; }
         public GameObject GameObject => this != null ? gameObject : null;
