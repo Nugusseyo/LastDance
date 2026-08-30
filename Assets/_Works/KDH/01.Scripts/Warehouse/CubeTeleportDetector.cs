@@ -7,6 +7,7 @@ public class CubeTeleportDetector : MonoBehaviour
     [SerializeField] private string[] tags = { "Player", "Car" };
     [SerializeField] private float teleportCooldown = 0.5f;
     [SerializeField] private float scanInterval = 0.2f;
+    [SerializeField] private Vector3 playerOffset = new Vector3(2f, 0f, 0f);
 
     private float lastTeleportTime = -999f;
     private float lastScanTime = -999f;
@@ -26,16 +27,19 @@ public class CubeTeleportDetector : MonoBehaviour
                 float sqrDist = (candidate.transform.position - transform.position).sqrMagnitude;
                 if (sqrDist > detectRadius * detectRadius) continue;
 
+                Vector3 destination = teleportTarget.position;
+                if (t == "Player") destination += playerOffset;
+
                 Rigidbody rb = candidate.GetComponent<Rigidbody>();
                 if (rb != null)
                 {
                     rb.linearVelocity = Vector3.zero;
                     rb.angularVelocity = Vector3.zero;
-                    rb.position = teleportTarget.position;
+                    rb.position = destination;
                 }
                 else
                 {
-                    candidate.transform.position = teleportTarget.position;
+                    candidate.transform.position = destination;
                 }
 
                 CarStraightMover mover = candidate.GetComponent<CarStraightMover>();

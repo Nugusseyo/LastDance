@@ -1,6 +1,6 @@
-using _Works.JJH._02_Scripts.Agents.Modules;
-using _Works.Shared.Boarding;
+﻿using _Works.JJH._02_Scripts.Agents.Modules;
 using DevLib.ModuleSystem;
+using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents
 {
@@ -10,15 +10,14 @@ namespace _Works.JJH._02_Scripts.Agents
         public ISensor Sensor { get; private set; }
         public IMover Mover { get; private set; }
 
-        /// <summary>탑승 능력. 이 에이전트에 탑승 모듈이 없으면 null이다.</summary>
-        public IBoardable Boarding { get; private set; }
-
         protected override void InitializeComponents()
         {
-            Sensor = GetModule<ISensor>();
             Renderer = GetModule<IRenderer>();
+            Debug.Assert(Renderer != null, $"{gameObject.name}에는 IRenderer 모듈이 필요합니다.");
+            Sensor = GetModule<ISensor>();
+            Debug.Assert(Sensor != null, $"{gameObject.name}에는 ISensor 모듈이 필요합니다.");
             Mover = GetModule<IMover>();
-            Boarding = GetModule<IBoardable>();
+            Debug.Assert(Mover != null, $"{gameObject.name}에는 IMover 모듈이 필요합니다.");
 
             base.InitializeComponents();
         }
