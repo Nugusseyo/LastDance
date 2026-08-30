@@ -17,17 +17,17 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
         {
             Agent.Mover.Stop();
 
-            Agent.Renderer.PlayClip(_idleHash.HashValue, 0f, 0.1f);
+            //Agent.Renderer.PlayClip(_idleHash.HashValue, 0f, 0.1f);
         }
 
         public override void Update()
         {
-            if (Input.MoveDirection.sqrMagnitude <= 0.01f)
+            if (PlayerInput.MoveDirection.sqrMagnitude <= 0.01f)
                 return;
 
             LowerBodyStateMachine stateMachine = (LowerBodyStateMachine)StateMachine;
 
-            if (Input.IsSprinting)
+            if (PlayerInput.IsSprinting)
             {
                 stateMachine.Run();
                 return;

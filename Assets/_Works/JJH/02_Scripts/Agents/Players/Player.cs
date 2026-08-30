@@ -18,6 +18,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players
 
         protected override void InitializeComponents()
         {
+
             FSM = GetModule<IPlayerFSM>();
             Debug.Assert(FSM != null, $"{gameObject.name}에는 IPlayerFSM 모듈이 필요합니다.");
             Camera = GetModule<IPlayerCamera>();
@@ -30,7 +31,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players
             PlayerInput.OnInteractKeyPressed += HandleFindWeapon;
             PlayerInput.OnAttackKeyPressed += HandleAttackKeyPressed;
             PlayerInput.OnThrowAttackKeyPressed += HandleThrowAttackKeyPressed;
-
             base.InitializeComponents();
         }
 

@@ -20,7 +20,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.UpperStates
         {
             _attackTimer = 0f;
 
-            Agent.Renderer.PlayClip(_attackHash.HashValue, 0f, 0.1f, 1);
+            //Agent.Renderer.PlayClip(_attackHash.HashValue, 0f, 0.1f, 1);
             ((Player)Agent).AttackSkill.Attack();
         }
 

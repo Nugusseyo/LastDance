@@ -20,20 +20,20 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
         {
             _playerMover = (PlayerMover)Agent.Mover;
 
-            Agent.Renderer.PlayClip(_moveHash.HashValue, 0f, 0.1f);
+            //Agent.Renderer.PlayClip(_moveHash.HashValue, 0f, 0.1f);
         }
 
         public override void Update()
         {
-            _playerMover.UpdateSprintState(Input.IsSprinting);
+            _playerMover.UpdateSprintState(PlayerInput.IsSprinting);
 
-            if (Input.MoveDirection.sqrMagnitude <= 0.01f)
+            if (PlayerInput.MoveDirection.sqrMagnitude <= 0.01f)
             {
                 ((LowerBodyStateMachine)StateMachine).Idle();
                 return;
             }
 
-            if (Input.IsSprinting && _playerMover.CanRun)
+            if (PlayerInput.IsSprinting && _playerMover.CanRun)
             {
                 ((LowerBodyStateMachine)StateMachine).Run();
                 return;
@@ -41,7 +41,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
 
             _playerMover.RecoverStamina();
 
-            Vector3 direction = new Vector3(Input.MoveDirection.x, 0f, Input.MoveDirection.y);
+            Vector3 direction = new Vector3(PlayerInput.MoveDirection.x, 0f, PlayerInput.MoveDirection.y);
             Agent.Mover.Move(direction);
         }
 

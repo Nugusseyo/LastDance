@@ -7,7 +7,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players
     [CreateAssetMenu(fileName = "Player Input", menuName = "SO/Player Input")]
     public class PlayerInputSO : ScriptableObject, Controls.IPlayerActions
     {
-        public event Action<Vector2> OnMovementChange;
         public event Action OnAttackKeyPressed;
         public event Action OnThrowAttackKeyPressed;
         public event Action OnInteractKeyPressed;
@@ -45,7 +44,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         public void OnMove(InputAction.CallbackContext context)
         {
             MoveDirection = context.ReadValue<Vector2>();
-            OnMovementChange?.Invoke(MoveDirection);
         }
 
         public void OnAttack(InputAction.CallbackContext context)
