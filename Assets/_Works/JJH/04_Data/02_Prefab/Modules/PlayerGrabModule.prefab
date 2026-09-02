@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2800116296563679786}
   - component: {fileID: 2968128457620754085}
   m_Layer: 0
-  m_Name: PlayerWeaponModule
+  m_Name: PlayerGrabModule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,4 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7319a979095f01141967d3e21ba77713, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.PlayerWeaponModule
+  weaponLayer:
+    serializedVersion: 2
+    m_Bits: 0
   weaponHoldPoint: {fileID: 0}
