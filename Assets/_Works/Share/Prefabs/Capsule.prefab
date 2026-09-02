@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 2314230673827454265}
   - component: {fileID: 6198682341420244795}
   - component: {fileID: 1576516382994881372}
+  - component: {fileID: -5519712589566943789}
+  - component: {fileID: 2288414602135475725}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -152,3 +154,69 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &-5519712589566943789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 757970547890689392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efd018942dada864aa9e412d1717bed4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.Shared.Boarding.NavMeshBoardingModule
+  agent: {fileID: 1576516382994881372}
+--- !u!114 &2288414602135475725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 757970547890689392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61f6e73a0f353f54fa2311374097facd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Visit.CustomerFSM.CustomerFSMModule
+  sequences:
+  - Phase: 2
+    States:
+    - rid: 1136881396192641110
+    - rid: 1136881396192641111
+  - Phase: 3
+    States:
+    - rid: 1136881396192641112
+  - Phase: 4
+    States:
+    - rid: 1136881396192641113
+  mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
+  combat:
+    rid: -2
+  flee:
+    rid: -2
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 1136881396192641110
+      type: {class: UnboardState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
+      data:
+        stagger: 0
+        jitter: 0.2
+    - rid: 1136881396192641111
+      type: {class: MoveToNearestPointState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
+      data:
+        targetPoint: 2
+        timeout: 15
+    - rid: 1136881396192641112
+      type: {class: StayState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
+      data:
+        duration: 0
+    - rid: 1136881396192641113
+      type: {class: BoardState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
+      data:
+        stagger: 0
+        jitter: 0.2
+        timeout: 20

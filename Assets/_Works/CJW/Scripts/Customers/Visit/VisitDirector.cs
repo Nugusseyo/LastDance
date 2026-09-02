@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using _Works.CJW.Scripts.Cars;
 using _Works.CJW.Scripts.Customers.Data;
-
+using _Works.CJW.Scripts.ManagingAgents;
+using _Works.CJW.Scripts.MapSystems;
 using DevLib.EventChannelSystem;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
@@ -14,12 +15,12 @@ namespace _Works.CJW.Scripts.Customers.Visit
     /// 방문을 만들고 끝내는 주체. 풀에서 차와 손님을 꺼내 VisitSession에 넘기고,
     /// 끝난 방문의 등록 해제와 반납까지 책임진다.
     /// </summary>
-    public class VisitDirector : MonoBehaviour, IUpdate
+    public class VisitDirector : MonoBehaviour, IUpdate, IVisitDirector
     {
         private sealed class ActiveVisit
         {
             public VisitSession Session;
-            public ParkingSlot Slot;
+            public RentableMapPosition Slot;
             public float WaitTimer;
         }
 
@@ -110,10 +111,6 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// 틱마다 스폰을 할 수 있는지 확인하는 메서드
         /// </summary>
         /// <param name="dt"></param>
-        /// <summary>
-        /// 틱마다 스폰을 할 수 있는지 확인하는 메서드
-        /// </summary>
-        /// <param name="dt"></param>
         private void TickSpawn(float dt)
         {
             // 최대를 넘으면 return
@@ -161,7 +158,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
         public VisitSession BeginVisit()
         {
             // 자리부터 잡는다. 풀에서 차를 꺼낸 뒤에 실패하면 되돌릴 것이 늘어난다.
-            if (!mapData.TryRentParkingSlot(out ParkingSlot slot))
+            if (!mapData.TryRentParkingSlot(spawnPoint.position, out RentableMapPosition slot))
             {
                 Debug.LogWarning("[VisitDirector] 빈 주차 자리가 없어 방문을 시작하지 못했습니다.", this);
                 return null;

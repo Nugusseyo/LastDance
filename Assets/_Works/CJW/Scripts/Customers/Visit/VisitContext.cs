@@ -18,6 +18,13 @@ namespace _Works.CJW.Scripts.Customers.Visit
         public Vector3 ShopPoint;
         public Vector3 ExitPoint;
         public float Interval;
+        /// <summary>
+        /// 현재 Phase의 손님별 시퀀스가 전원 끝났는지.
+        /// 세션 상태는 동기 Tick이고 손님 머신은 비동기라, 둘을 잇는 다리가 이 플래그다.
+        /// IVisitState를 async로 바꾸면 이 플래그는 사라지고 await가 그 자리를 대신한다.
+        /// </summary>
+        public bool CustomerPhaseDone = true;
+
 
         public void Clear()
         {

@@ -1,0 +1,59 @@
+/*
+    조각 선택 드로어의 모양.
+
+    색을 직접 지정하지 않고 에디터 변수(--unity-colors-*)만 쓴다.
+    라이트·다크 테마를 따라가야 인스펙터의 다른 줄과 어긋나지 않는다.
+*/
+
+.mref {
+    margin-bottom: 2px;
+}
+
+.mref__header {
+    flex-direction: row;
+    align-items: center;
+    min-height: 20px;
+}
+
+/* 토글과 라벨은 남는 자리를 나눠 갖고, 드롭다운은 오른쪽 끝에 붙는다. */
+.mref__foldout {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin: 0;
+    overflow: hidden;
+}
+
+.mref__foldout > .unity-foldout__toggle {
+    margin: 0;
+}
+
+.mref__label {
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -unity-text-align: middle-left;
+}
+
+.mref__type-button {
+    flex-shrink: 0;
+    min-width: 130px;
+    max-width: 190px;
+    margin: 0 0 0 4px;
+    -unity-text-align: middle-left;
+}
+
+/* 비어 있는 칸은 "고르라"는 신호가 보여야 한다. */
+.mref__type-button--empty {
+    color: var(--unity-colors-warning-text);
+}
+
+.mref__content {
+    margin-left: 15px;
+    padding-top: 2px;
+}
+
+/* 조각 안의 칸들은 인스펙터 기본 줄 간격을 따른다. */
+.mref__content > .unity-property-field {
+    margin-top: 1px;
+}

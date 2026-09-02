@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <Style src="ManagedReferencePicker.uss" />
+
+    <!--
+        조각 하나를 그리는 틀.
+
+        머리줄(header)에 접기 토글과 종류 드롭다운이 나란히 서고, 고른 조각의 수치 칸은
+        content 아래에 코드가 채운다. 어떤 칸이 열릴지는 조각마다 다르므로 여기에는 담지 않는다.
+
+        비어 있는 요소는 접을 것이 없어 토글 대신 label을 보여 준다.
+        화살표만 있고 눌러도 아무것도 나오지 않는 줄은 고장으로 읽힌다.
+    -->
+    <ui:VisualElement name="root" class="mref">
+        <ui:VisualElement name="header" class="mref__header">
+            <ui:Foldout name="foldout" class="mref__foldout" />
+            <ui:Label name="label" class="mref__label" />
+            <ui:Button name="type-button" class="mref__type-button" text="종류 선택…" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="content" class="mref__content" />
+    </ui:VisualElement>
+</ui:UXML>
