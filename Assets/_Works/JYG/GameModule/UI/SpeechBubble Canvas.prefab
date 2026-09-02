@@ -167,7 +167,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.SpeechBubble.SpeechBubble
   tmp: {fileID: 5550921819500735812}
   rect: {fileID: 3637928449015087646}
-  <PoolItem>k__BackingField: {fileID: 11400000, guid: f83fb2be4847773468a8345edfd42b65, type: 2}
+  poolManager: {fileID: 0}
+  destroyTime: 5
+  <PoolItem>k__BackingField: {fileID: 11400000, guid: 2a00163c0ed52214a828e00935dbf2e5, type: 2}
 --- !u!1 &6647081844569842009
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,7 +11,10 @@ namespace _Works.CJW.Scripts.Customers.Visit
         Unloading,
 
         /// <summary>손님이 가게에 머무는 중. 외부에서 출발을 요청할 때까지 대기.</summary>
-        Waiting,
+        Waiting,   
+        
+        /// <summary>손님이 말풍선을 띄우는 중.</summary>
+        Speeching,
 
         /// <summary>손님이 순차적으로 차로 돌아와 탑승 중.</summary>
         Boarding,

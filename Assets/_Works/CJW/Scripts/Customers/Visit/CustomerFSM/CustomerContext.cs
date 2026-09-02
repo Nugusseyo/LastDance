@@ -1,5 +1,5 @@
 using _Works.CJW.Scripts.Customers.Data;using _Works.CJW.Scripts.MapSystems;
-
+using Resources.DataBase.Human_Data;
 using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
@@ -18,6 +18,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
     /// </summary>
     public sealed class CustomerContext
     {
+        /// <summary> 진상 손님인지 평범한 손님인지 체크 </summary>
+        [field:SerializeField] public HumanType HumanType { get; private set; }
         /// <summary>이 컨텍스트의 주인.</summary>
         public AbstractCustomer Customer { get; private set; }
 

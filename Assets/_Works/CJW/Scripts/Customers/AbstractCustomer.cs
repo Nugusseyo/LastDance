@@ -5,6 +5,7 @@ using _Works.CJW.Scripts.Customers.Data;
 using _Works.CJW.Scripts.ManagingAgents;
 using _Works.Shared.Boarding;
 using DevLib.ObjectPool.Runtime;
+using Resources.DataBase.Human_Data;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -16,6 +17,7 @@ namespace _Works.CJW.Scripts.Customers
     /// </summary>
     public abstract class AbstractCustomer : ManagingAgent, IPoolable
     {
+        [field: SerializeField] public HumanType HumanType { get; private set; }
         [field: SerializeField] public NavMeshAgent Agent { get; private set; }
         [field: SerializeField] public PoolItemSO PoolItem { get; set; }
         
