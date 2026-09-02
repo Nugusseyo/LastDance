@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,7 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
         [SerializeField] private PoolManagerSO poolManager;
         [SerializeField] private float destroyTime = 5f;
         private WaitForSeconds destroyWait;
+        public event Action OnSpeechEnd;
 
         private void Awake()
         {
@@ -77,6 +79,7 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
         private IEnumerator DestroyBubble()
         {
             yield return destroyWait;
+            OnSpeechEnd?.Invoke();
             poolManager.Push(this);
         }
 

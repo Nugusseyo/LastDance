@@ -75,7 +75,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 23.825, y: 2.722}
+  m_AnchoredPosition: {x: 23.825012, y: 2.7219849}
   m_SizeDelta: {x: 3, y: 3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &9031430507462930334
@@ -123,7 +123,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &2212903198647552811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -167,9 +167,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.SpeechBubble.SpeechBubble
   tmp: {fileID: 5550921819500735812}
   rect: {fileID: 3637928449015087646}
-  poolManager: {fileID: 0}
+  poolManager: {fileID: 11400000, guid: 82a79d66fc97ee6499cc178f42fc175f, type: 2}
   destroyTime: 5
-  <PoolItem>k__BackingField: {fileID: 11400000, guid: 2a00163c0ed52214a828e00935dbf2e5, type: 2}
+  <PoolItem>k__BackingField: {fileID: 11400000, guid: f83fb2be4847773468a8345edfd42b65, type: 2}
 --- !u!1 &6647081844569842009
 GameObject:
   m_ObjectHideFlags: 0
