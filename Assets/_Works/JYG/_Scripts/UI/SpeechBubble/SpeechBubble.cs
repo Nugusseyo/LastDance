@@ -83,6 +83,11 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
             poolManager.Push(this);
         }
 
+        private void OnDestroy()
+        {
+            StopAllCoroutines();
+        }
+
         [field:SerializeField] public PoolItemSO PoolItem { get; set; }
         public GameObject GameObject => gameObject;
         public void ResetItem()
