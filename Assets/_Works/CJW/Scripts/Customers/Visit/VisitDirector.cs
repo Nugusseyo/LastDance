@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using _Works.CJW.Scripts.Cars;
 using _Works.CJW.Scripts.Customers.Data;
-using _Works.CJW.Scripts.ManagingAgent;
+using _Works.CJW.Scripts.ManagingAgents;
 using _Works.CJW.Scripts.MapSystems;
 using DevLib.EventChannelSystem;
 using DevLib.ObjectPool.Runtime;

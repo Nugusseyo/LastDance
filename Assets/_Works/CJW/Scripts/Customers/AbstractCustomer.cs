@@ -2,6 +2,8 @@ using System;
 using _Works.CJW.Scripts.Customers.Visit;
 using _Works.CJW.Scripts.Customers.Visit.CustomerFSM;
 using _Works.CJW.Scripts.Customers.Data;
+using _Works.CJW.Scripts.ManagingAgents;
+using _Works.Shared.Boarding;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
 using UnityEngine.AI;
@@ -12,11 +14,12 @@ namespace _Works.CJW.Scripts.Customers
     /// 손님의 데이터와 이동만 소유한다.
     /// 탑승은 <see cref="_Works.Shared.Boarding.IBoardable"/> 모듈이 맡는다.
     /// </summary>
-    public abstract class AbstractCustomer : ManagingAgent.ManagingAgent, IPoolable
+    public abstract class AbstractCustomer : ManagingAgent, IPoolable
     {
         [field: SerializeField] public NavMeshAgent Agent { get; private set; }
         [field: SerializeField] public PoolItemSO PoolItem { get; set; }
-
+        
+        public IBoardable Boarding { get; private set; }
         public GameObject GameObject => this != null ? gameObject : null;
         /// <summary>이 손님이 참여 중인 방문. 방문 밖에서는 null이다.</summary>
         public VisitSession Session { get; private set; }
@@ -26,7 +29,6 @@ namespace _Works.CJW.Scripts.Customers
 
         /// <summary>행동 머신. 프리팹에 CustomerFSMModule이 없으면 null이다.</summary>
         public CustomerFSMModule Fsm { get; private set; }
-
         /// <summary>
         /// 세션이 손님 목록을 순회하며 직접 물려준다.
         /// 전역 방송을 쓰면 수신자마다 "내 세션인가" 필터가 필요하고, 그 필터가 빠지면
@@ -37,7 +39,7 @@ namespace _Works.CJW.Scripts.Customers
             Session = session;
             SessionChanged?.Invoke(session);
         }
-
+        
 
         /// <summary>이 손님의 수치. 스폰될 때 <see cref="Setup"/>으로 주입된다.</summary>
         public CustomerDataSO Data { get; private set; }
@@ -90,15 +92,14 @@ namespace _Works.CJW.Scripts.Customers
 
         public virtual void ResetItem()
         {
-            // 풀링에서는 OnDestroy가 거의 불리지 않으므로 여기가 유일한 정리 지점이다.
             // Stop()을 빼먹으면 대기 중이던 상태가 좀비로 남아 계속 돌고,
-                        // Context.Reset()을 빼먹으면 이전 방문의 Target이 다음 손님에게 샌다.
+            // Context.Reset()을 빼먹으면 이전 방문의 Target이 다음 손님에게 샌다.
             Fsm?.Stop();
             Fsm?.Context?.Reset();
 
             BindSession(null);
 
-                        // 다음 스폰에서 Setup이 다시 넣어준다. 남겨두면 이전 방문의 값이 샌다.
+            // 다음 스폰에서 Setup이 다시 넣어주니까 비워놔야한다.
             Data = null;
             Boarding?.ResetBoarding();
 
@@ -117,8 +118,9 @@ namespace _Works.CJW.Scripts.Customers
         {
             base.InitializeComponents();
 
-            // 모듈은 자식 오브젝트로 붙으므로 비활성 포함해서 찾는다. 없으면 null이다.
-            Fsm = GetComponentInChildren<CustomerFSMModule>(true);
+            
+            Boarding = GetModule<IBoardable>();
+            Fsm = GetModule<CustomerFSMModule>();
         }
 }
 }

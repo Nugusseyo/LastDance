@@ -1,4 +1,4 @@
-namespace _Works.CJW.Scripts.ManagingAgent
+namespace _Works.CJW.Scripts.ManagingAgents
 {
     public interface IUpdate
     {

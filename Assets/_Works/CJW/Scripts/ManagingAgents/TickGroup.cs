@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace _Works.CJW.Scripts.ManagingAgent
+namespace _Works.CJW.Scripts.ManagingAgents
 {
     /// <summary>
     /// IUpdate / IFixedUpdate 대상들을 모아 틱을 전파하는 디스패처.

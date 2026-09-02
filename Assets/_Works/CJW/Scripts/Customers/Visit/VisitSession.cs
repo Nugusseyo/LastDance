@@ -5,7 +5,7 @@ using _Works.CJW.Scripts.Customers.Visit.CustomerFSM;
 using System.Collections.Generic;
 using _Works.CJW.Scripts.Cars;
 using _Works.CJW.Scripts.Customers.Visit.States;
-using _Works.CJW.Scripts.ManagingAgent;
+using _Works.CJW.Scripts.ManagingAgents;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
 

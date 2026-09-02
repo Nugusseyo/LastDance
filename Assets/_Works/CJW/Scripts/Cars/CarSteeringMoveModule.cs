@@ -1,5 +1,5 @@
 using _Works.CJW.Scripts.Customers;
-using _Works.CJW.Scripts.ManagingAgent;
+using _Works.CJW.Scripts.ManagingAgents;
 using DevLib.ModuleSystem;
 using UnityEngine;
 using UnityEngine.AI;

@@ -1,7 +1,7 @@
 using DevLib.EventChannelSystem;
 using UnityEngine;
 
-namespace _Works.CJW.Scripts.ManagingAgent
+namespace _Works.CJW.Scripts.ManagingAgents
 {
     /// <summary>
     /// 씬의 모든 틱 대상을 한 곳에서 돌린다.

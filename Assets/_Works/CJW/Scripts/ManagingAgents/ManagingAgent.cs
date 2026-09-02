@@ -1,9 +1,8 @@
-using _Works.JJH._02_Scripts.Agents;
 using DevLib.ModuleSystem;
 
-namespace _Works.CJW.Scripts.ManagingAgent
+namespace _Works.CJW.Scripts.ManagingAgents
 {
-    public abstract class ManagingAgent : Agent, IUpdate, IFixedUpdate
+    public abstract class ManagingAgent : ModuleOwner, IUpdate, IFixedUpdate
     {
         private readonly TickGroup _tickGroup = new();
 
