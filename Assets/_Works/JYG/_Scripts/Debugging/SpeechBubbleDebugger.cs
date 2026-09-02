@@ -21,11 +21,11 @@ namespace _Works.JYG._Scripts.Debugging
             {
                 SpeechBubble bubble = poolManager.Pop<SpeechBubble>(item);
                 bubble.InitializeBubble(type);
-                StartCoroutine(DestroyBubble(2f, bubble));
+                //StartCoroutine(DestroyBubble(2f, bubble));
             }
         }
 
-        private IEnumerator DestroyBubble(float t, SpeechBubble bubble)
+        private IEnumerator DestroyBubble(float t, SpeechBubble bubble) //InitializeBubble에서 구현해준다.
         {
             yield return new WaitForSeconds(t);
             poolManager.Push(bubble);

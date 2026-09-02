@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DevLib.ObjectPool.Runtime;
@@ -13,11 +14,17 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
         private Dictionary<HumanType, List<(int, HumanData)>> humanDBs;
         [SerializeField] private TextMeshProUGUI tmp;
         [SerializeField] private RectTransform rect;
+        
+        [Header("Pooling")]
+        [SerializeField] private PoolManagerSO poolManager;
+        [SerializeField] private float destroyTime = 5f;
+        private WaitForSeconds destroyWait;
 
         private void Awake()
         {
             humanDB = UnityEngine.Resources.Load<HumanDB>("DataBase/Human Data/HumanDB");
             humanDBs = new Dictionary<HumanType, List<(int, HumanData)>>();
+            destroyWait = new WaitForSeconds(destroyTime);
             if (humanDB == null)
             {
                 Debug.LogError("말풍선 데이터 손상됨. 기존 데이터의 위치 변경이 주요 원인. \"Speech Bubble\" 코드 비활성화.");
@@ -63,6 +70,14 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
             Debug.Log(stringList.Count);
             int randIndex =  UnityEngine.Random.Range(0, stringList.Count);
             tmp.text = stringList[randIndex];
+
+            StartCoroutine(DestroyBubble());
+        }
+
+        private IEnumerator DestroyBubble()
+        {
+            yield return destroyWait;
+            poolManager.Push(this);
         }
 
         [field:SerializeField] public PoolItemSO PoolItem { get; set; }
