@@ -6,7 +6,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
     public class PlayerCameraModule : AbstractModule, IPlayerCamera
     {
         [Header("Objects")]
-        [SerializeField] private Transform playerCamera;
+        [field: SerializeField] public Transform CameraTrans { get; private set; }
 
         [Header("Camera Value")]
         [SerializeField] private float sensitivity = 100f;
@@ -22,14 +22,13 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
         private float _horizontal;
         private float _vertical;
 
-        private float _shakeTime;
         private float _shakeWeight;
         private bool _isShake = false;
 
         public override void Initialize(ModuleOwner owner)
         {
             base.Initialize(owner);
-            
+
             _player = (Player)_owner;
 
             Cursor.lockState = CursorLockMode.Locked;
@@ -51,16 +50,15 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
             _vertical = Mathf.Clamp(_vertical, minVertical, maxVertical);
 
             _player.transform.rotation = Quaternion.Euler(0f, _horizontal, 0f);
-            playerCamera.localRotation = Quaternion.Euler(_vertical, 0f, 0f);
+            CameraTrans.localRotation = Quaternion.Euler(_vertical, 0f, 0f);
         }
 
         private void ShakeCamera()
         {
-            _shakeTime += Time.deltaTime;
             _shakeWeight = Mathf.MoveTowards(_shakeWeight, 1f, Time.deltaTime * 5f);
 
             float shake = Mathf.Sin(Time.time * shakeSpeed) * shakeAmount * _shakeWeight;
-            playerCamera.localRotation = Quaternion.Euler(_vertical + shake, 0f, 0f);
+            CameraTrans.localRotation = Quaternion.Euler(_vertical + shake, 0f, 0f);
         }
 
         public void SetCameraShake(bool isRunning)
@@ -68,13 +66,12 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
             _isShake = isRunning;
             if (isRunning)
             {
-                _shakeTime = 0f;
                 _shakeWeight = 0f;
             }
             else
             {
                 _shakeWeight = 0f;
-                playerCamera.localRotation = Quaternion.Euler(_vertical, 0f, 0f);
+                CameraTrans.localRotation = Quaternion.Euler(_vertical, 0f, 0f);
             }
         }
     }

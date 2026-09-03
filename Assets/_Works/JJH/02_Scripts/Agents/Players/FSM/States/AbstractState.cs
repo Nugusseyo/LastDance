@@ -4,13 +4,13 @@
     {
         protected Agent Agent { get; private set; }
         protected AbstractStateMachine StateMachine { get; private set; }
-        protected PlayerInputSO Input { get; private set; }
+        protected PlayerInputSO PlayerInput { get; private set; }
 
         protected AbstractState(Agent agent, AbstractStateMachine stateMachine, PlayerInputSO input)
         {
             Agent = agent;
             StateMachine = stateMachine;
-            Input = input;
+            PlayerInput = input;
         }
 
         public virtual void Enter() { }

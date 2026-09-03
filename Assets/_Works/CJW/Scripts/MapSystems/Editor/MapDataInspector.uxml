@@ -1,0 +1,26 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement name="root" class="map-root">
+        <ui:VisualElement class="map-header">
+            <ui:Label name="mode-label" class="map-mode" />
+            <ui:Label name="summary-label" class="map-summary" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="map-toolbar">
+            <ui:Button name="refresh-button" class="map-tool-button" />
+            <ui:Button name="select-all-button" class="map-tool-button" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="map-create-row">
+            <ui:EnumField name="create-type-field" class="map-create-field" />
+            <ui:Toggle name="rentable-toggle" class="map-create-toggle" />
+            <ui:Button name="create-button" class="map-tool-button" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="issue-section" class="map-section map-section--issue">
+            <ui:Label name="issue-title" class="map-section-title" />
+            <ui:VisualElement name="issue-list" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="type-list" />
+    </ui:VisualElement>
+</ui:UXML>

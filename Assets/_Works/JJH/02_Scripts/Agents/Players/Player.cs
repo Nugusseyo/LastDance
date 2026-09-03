@@ -14,11 +14,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         public IPlayerFSM FSM { get; private set; }
         public IPlayerCamera Camera { get; private set; }
         public IPlayerAttackSkill AttackSkill { get; private set; }
-        public IPlayerWeapon Weapon { get; private set; }
+        public IPlayerGrab Grab { get; private set; }
 
         protected override void InitializeComponents()
         {
-            base.InitializeComponents();
 
             FSM = GetModule<IPlayerFSM>();
             Debug.Assert(FSM != null, $"{gameObject.name}에는 IPlayerFSM 모듈이 필요합니다.");
@@ -26,8 +25,28 @@ namespace _Works.JJH._02_Scripts.Agents.Players
             Debug.Assert(Camera != null, $"{gameObject.name}에는 IPlayerCamera 모듈이 필요합니다.");
             AttackSkill = GetModule<IPlayerAttackSkill>();
             Debug.Assert(AttackSkill != null, $"{gameObject.name}에는 IPlayerAttackSkill 모듈이 필요합니다.");
-            Weapon = GetModule<IPlayerWeapon>();
-            Debug.Assert(Weapon != null, $"{gameObject.name}에는 IPlayerWeapon 모듈이 필요합니다.");
+            Grab = GetModule<IPlayerGrab>();
+            Debug.Assert(Grab != null, $"{gameObject.name}에는 IPlayerGrab 모듈이 필요합니다.");
+
+            PlayerInput.OnInteractKeyPressed += HandleFindItem;
+            PlayerInput.OnAttackKeyPressed += HandleAttackKeyPressed;
+            PlayerInput.OnThrowAttackKeyPressed += HandleThrowAttackKeyPressed;
+            base.InitializeComponents();
         }
+
+        private void OnDestroy()
+        {
+            PlayerInput.OnInteractKeyPressed -= HandleFindItem;
+            PlayerInput.OnAttackKeyPressed -= HandleAttackKeyPressed;
+            PlayerInput.OnThrowAttackKeyPressed -= HandleThrowAttackKeyPressed;
+        }
+
+
+        private void HandleFindItem()
+            => Grab.PickupWeapon();
+        private void HandleAttackKeyPressed()
+            => AttackSkill.ChangeCurrentAttack<AttackSkill>();
+        private void HandleThrowAttackKeyPressed()
+            => AttackSkill.ChangeCurrentAttack<ThrowAttackSkill>();
     }
 }

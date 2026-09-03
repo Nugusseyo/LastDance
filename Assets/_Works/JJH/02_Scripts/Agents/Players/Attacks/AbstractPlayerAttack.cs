@@ -4,11 +4,11 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
 {
     public abstract class AbstractPlayerAttack : MonoBehaviour
     {
-        protected PlayerAttackSkillModule _attackModule;
+        protected Player player;
 
-        public virtual void Initialize(PlayerAttackSkillModule attackModule)
+        public virtual void Initialize(Player player)
         {
-            _attackModule = attackModule;
+            this.player = player;
         }
 
         public abstract void Attack();

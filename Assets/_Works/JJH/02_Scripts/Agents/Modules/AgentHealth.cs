@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Modules
 {
-    public class AgentHealth : AbstractModule
+    public class AgentHealth : AbstractModule, IHealth
     {
         public float Health
         {
