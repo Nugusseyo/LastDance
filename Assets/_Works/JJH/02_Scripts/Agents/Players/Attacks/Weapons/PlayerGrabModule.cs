@@ -3,10 +3,10 @@ using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
 {
-    public class PlayerWeaponModule : AbstractModule, IPlayerWeapon
+    public class PlayerGrabModule : AbstractModule, IPlayerGrab
     {
-        public Weapon CurrentWeapon { get; private set; }
-        public GameObject CurrentWeaponObject { get; private set; }
+        public GrabItem CurrentWeapon { get; private set; }
+        public GameObject CurrentGrabObject { get; private set; }
 
         [SerializeField] private LayerMask weaponLayer;
         [SerializeField] private Transform weaponHoldPoint;
@@ -26,9 +26,9 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
                 weaponLayer, 5, out Collider weaponCollider) == false)
                 return;
 
-            Weapon findWeapon = weaponCollider.GetComponent<Weapon>();
+            GrabItem findWeapon = weaponCollider.GetComponent<GrabItem>();
 
-            if (CurrentWeaponObject == null)
+            if (CurrentGrabObject == null)
             {
                 EquipWeapon(findWeapon);
                 return;
@@ -37,22 +37,22 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
             SwapWeapon(findWeapon);
         }
 
-        private void EquipWeapon(Weapon findWeapon)
+        private void EquipWeapon(GrabItem findWeapon)
         {
             CurrentWeapon = findWeapon;
-            CurrentWeaponObject = findWeapon.gameObject;
+            CurrentGrabObject = findWeapon.gameObject;
 
             CurrentWeapon.Rigidbody.isKinematic = true;
             CurrentWeapon.Collider.isTrigger = true;
 
-            CurrentWeaponObject.transform.SetParent(weaponHoldPoint);
-            CurrentWeaponObject.transform.SetLocalPositionAndRotation(
+            CurrentGrabObject.transform.SetParent(weaponHoldPoint, true);
+            CurrentGrabObject.transform.SetLocalPositionAndRotation(
                                                                     Vector3.zero, Quaternion.identity);
         }
 
-        private void SwapWeapon(Weapon findWeapon)
+        private void SwapWeapon(GrabItem findWeapon)
         {
-            Transform currentWeaponTransform = CurrentWeaponObject.transform;
+            Transform currentWeaponTransform = CurrentGrabObject.transform;
             Transform newWeaponTransform = findWeapon.transform;
 
             Vector3 newWeaponPosition = newWeaponTransform.position;
@@ -64,12 +64,12 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
 
             CurrentWeapon.Rigidbody.isKinematic = false;
             CurrentWeapon.Collider.isTrigger = false;
-            newWeaponTransform.SetParent(weaponHoldPoint);
+            newWeaponTransform.SetParent(weaponHoldPoint, true);
             newWeaponTransform.SetLocalPositionAndRotation(
                 Vector3.zero, Quaternion.identity);
 
             CurrentWeapon = findWeapon;
-            CurrentWeaponObject = findWeapon.gameObject;
+            CurrentGrabObject = findWeapon.gameObject;
             CurrentWeapon.Rigidbody.isKinematic = true;
             CurrentWeapon.Collider.isTrigger = true;
         }
@@ -83,7 +83,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
             }
 
             CurrentWeapon = null;
-            CurrentWeaponObject = null;
+            CurrentGrabObject = null;
         }
     }
 }

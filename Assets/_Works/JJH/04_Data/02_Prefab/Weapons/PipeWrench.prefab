@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4312758828612840927}
-  - component: {fileID: 9025564918812875415}
+  - component: {fileID: 2436492952916657325}
   - component: {fileID: 2251847248446553244}
   - component: {fileID: 6316519221571150485}
   m_Layer: 15
@@ -35,7 +35,7 @@ Transform:
   - {fileID: 1583991604620471201}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9025564918812875415
+--- !u!114 &2436492952916657325
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -44,9 +44,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8876438061692220578}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e78eae9e2f00e149ba23b186d0e9d02, type: 3}
+  m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.Weapon
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
   <CurrentWeaponData>k__BackingField: {fileID: 11400000, guid: 6b4a1b5a1395bee4e93144745220c8e3, type: 2}
 --- !u!54 &2251847248446553244
 Rigidbody:

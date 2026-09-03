@@ -2,10 +2,10 @@
 
 namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
 {
-    public interface IPlayerWeapon
+    public interface IPlayerGrab
     {
-        Weapon CurrentWeapon { get; }
-        GameObject CurrentWeaponObject { get; }
+        GrabItem CurrentWeapon { get; }
+        GameObject CurrentGrabObject { get; }
 
         void PickupWeapon();
         void ClearCurrentWeapon();

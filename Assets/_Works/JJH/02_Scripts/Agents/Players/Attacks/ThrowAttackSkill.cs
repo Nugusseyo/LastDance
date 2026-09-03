@@ -9,11 +9,11 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
 
         public override void Attack()
         {
-            if (player.Weapon == null || player.Weapon.CurrentWeapon == null)
+            if (player.Grab == null || player.Grab.CurrentWeapon == null)
                 return;
 
-            Weapon weapon = player.Weapon.CurrentWeapon;
-            GameObject weaponObject = player.Weapon.CurrentWeaponObject;
+            GrabItem weapon = player.Grab.CurrentWeapon;
+            GameObject weaponObject = player.Grab.CurrentGrabObject;
 
             if (weaponObject == null)
                 return;
@@ -25,7 +25,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
             weapon.Rigidbody.isKinematic = false;
             weapon.Rigidbody.AddForce(throwDirection * throwForce, ForceMode.Impulse);
 
-            player.Weapon.ClearCurrentWeapon();
+            player.Grab.ClearCurrentWeapon();
         }
     }
 }

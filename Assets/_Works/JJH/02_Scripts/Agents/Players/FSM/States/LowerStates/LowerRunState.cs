@@ -24,7 +24,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
             _playerCamera = ((Player)Agent).Camera;
 
             _playerCamera.SetCameraShake(true);
-            //Agent.Renderer.PlayClip(_runHash.HashValue, 0f, 0.1f);
+            Agent.Renderer.PlayClip(_runHash.HashValue, 0f, 0.1f);
         }
 
         public override void Update()
