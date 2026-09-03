@@ -39,13 +39,20 @@ namespace _Works.JYG._Scripts.UI.StoreUI
         
         [SerializeField] private TextMeshProUGUI itemTmp;
         [SerializeField] private TextMeshProUGUI priceTmp;
-        [SerializeField] private TextMeshProUGUI levelTmp;
+        [Header("Slot")]
+        [SerializeField] private GameObject slotPrefab;
+        [SerializeField] private Transform slotParent;
+        
         public void InitializeItem(StoreItem itemData, Store owner)
         {
             _owner = owner;
             itemTmp.text = itemData.itemName;
             priceTmp.text = itemData.price + "$";
-            levelTmp.text = itemData.level + " Lv";
+
+            for (int i = 0; i < itemData.level; ++i)
+            {
+                Instantiate(slotPrefab, slotParent);
+            }
         }
     }
 }
