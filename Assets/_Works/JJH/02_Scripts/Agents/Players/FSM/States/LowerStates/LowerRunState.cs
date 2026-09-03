@@ -1,56 +1,51 @@
 ﻿using _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines;
 using _Works.JJH._02_Scripts.Agents.Players.Modules;
-using DevLib.AnimatorSystem;
 using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
 {
     public class LowerRunState : AbstractState
     {
-        private readonly HashDataSO _runHash;
-
         private PlayerMover _playerMover;
         private IPlayerCamera _playerCamera;
 
-        public LowerRunState(Agent agent, AbstractStateMachine stateMachine,
-            PlayerInputSO input, HashDataSO runHash) : base(agent, stateMachine, input)
+        public LowerRunState(Player player, AbstractStateMachine stateMachine)
+            : base(player, stateMachine)
         {
-            _runHash = runHash;
+            _playerMover = (PlayerMover)player.Mover;
+            _playerCamera = player.Camera;
         }
 
         public override void Enter()
         {
-            _playerMover = (PlayerMover)Agent.Mover;
-            _playerCamera = ((Player)Agent).Camera;
-
             _playerCamera.SetCameraShake(true);
-            Agent.Renderer.PlayClip(_runHash.HashValue, 0f, 0.1f);
         }
 
         public override void Update()
         {
-            _playerMover.UpdateSprintState(PlayerInput.IsSprinting);
+            _playerMover.UpdateSprintState(Player.PlayerInput.IsSprinting);
 
-            if (PlayerInput.MoveDirection.sqrMagnitude <= 0.01f)
+            if (Player.PlayerInput.MoveDirection.sqrMagnitude <= 0.01f)
             {
                 ((LowerBodyStateMachine)StateMachine).Idle();
                 return;
             }
 
-            if (!PlayerInput.IsSprinting || !_playerMover.CanRun)
+            if (!Player.PlayerInput.IsSprinting || !_playerMover.CanRun)
             {
                 ((LowerBodyStateMachine)StateMachine).Move();
                 return;
             }
 
-            Vector3 direction = new Vector3(PlayerInput.MoveDirection.x, 0f, PlayerInput.MoveDirection.y);
-            Agent.Mover.Run(direction);
+            Vector3 direction = new Vector3(Player.PlayerInput.MoveDirection.x, 0f,
+                                                                Player.PlayerInput.MoveDirection.y);
+            Player.Mover.Run(direction);
         }
 
         public override void Exit()
         {
             _playerCamera.SetCameraShake(false);
-            Agent.Mover.Stop();
+            Player.Mover.Stop();
         }
     }
 }

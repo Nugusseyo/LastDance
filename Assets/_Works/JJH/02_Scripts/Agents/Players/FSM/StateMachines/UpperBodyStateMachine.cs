@@ -1,25 +1,18 @@
 ﻿using _Works.JJH._02_Scripts.Agents.Players.FSM.States.UpperStates;
-using DevLib.AnimatorSystem;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines
 {
     public class UpperBodyStateMachine : AbstractStateMachine
     {
-        private readonly Agent _agent;
-        private readonly PlayerInputSO _input;
-
         private UpperIdleState _idleState;
         private UpperGrabState _grabState;
         private UpperAttackState _attackState;
 
-        public UpperBodyStateMachine(Agent agent, PlayerInputSO input, HashDataSO grabHash, HashDataSO attackHash)
+        public UpperBodyStateMachine(Player player)
         {
-            _agent = agent;
-            _input = input;
-
-            _idleState = new UpperIdleState(_agent, this, _input);
-            _grabState = new UpperGrabState(_agent, this, _input, grabHash);
-            _attackState = new UpperAttackState(_agent, this, _input, attackHash);
+            _idleState = new UpperIdleState(player, this);
+            _grabState = new UpperGrabState(player, this);
+            _attackState = new UpperAttackState(player, this);
         }
 
         public void Initialize()

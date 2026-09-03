@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players
 {
-    public class Player : Agent
+    public class Player : Agents.Player
     {
         [Header("Input")]
         [field: SerializeField] public PlayerInputSO PlayerInput { get; private set; }

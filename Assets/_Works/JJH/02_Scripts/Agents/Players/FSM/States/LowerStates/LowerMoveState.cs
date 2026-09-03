@@ -7,28 +7,23 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
     public class LowerMoveState : AbstractState
     {
         private PlayerMover _playerMover;
-
-        public LowerMoveState(Agent agent, AbstractStateMachine stateMachine,
-            PlayerInputSO input) : base(agent, stateMachine, input)
+        public LowerMoveState(Player player, AbstractStateMachine stateMachine)
+            : base(player, stateMachine)
         {
-        }
-
-        public override void Enter()
-        {
-            _playerMover = (PlayerMover)Agent.Mover;
+            _playerMover = (PlayerMover)player.Mover;
         }
 
         public override void Update()
         {
-            _playerMover.UpdateSprintState(PlayerInput.IsSprinting);
+            _playerMover.UpdateSprintState(Player.PlayerInput.IsSprinting);
 
-            if (PlayerInput.MoveDirection.sqrMagnitude <= 0.01f)
+            if (Player.PlayerInput.MoveDirection.sqrMagnitude <= 0.01f)
             {
                 ((LowerBodyStateMachine)StateMachine).Idle();
                 return;
             }
 
-            if (PlayerInput.IsSprinting && _playerMover.CanRun)
+            if (Player.PlayerInput.IsSprinting && _playerMover.CanRun)
             {
                 ((LowerBodyStateMachine)StateMachine).Run();
                 return;
@@ -36,13 +31,14 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
 
             _playerMover.RecoverStamina();
 
-            Vector3 direction = new Vector3(PlayerInput.MoveDirection.x, 0f, PlayerInput.MoveDirection.y);
-            Agent.Mover.Move(direction);
+            Vector3 direction = new Vector3(Player.PlayerInput.MoveDirection.x, 0f,
+                                                                Player.PlayerInput.MoveDirection.y);
+            Player.Mover.Move(direction);
         }
 
         public override void Exit()
         {
-            Agent.Mover.Stop();
+            Player.Mover.Stop();
         }
     }
 }

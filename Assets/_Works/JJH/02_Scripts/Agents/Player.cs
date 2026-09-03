@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents
 {
-    public abstract class Agent : ModuleOwner
+    public abstract class Player : ModuleOwner
     {
         public IRenderer Renderer { get; private set; }
         public ISensor Sensor { get; private set; }
         public IMover Mover { get; private set; }
-        public IBoardable Boarding;
+        public IBoardable Boarding { get; private set; }
 
         protected override void InitializeComponents()
         {

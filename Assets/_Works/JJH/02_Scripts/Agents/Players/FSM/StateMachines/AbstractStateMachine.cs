@@ -4,7 +4,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM
 {
     public abstract class AbstractStateMachine
     {
-        protected AbstractState CurrentState { get; private set; }
+        public AbstractState CurrentState { get; private set; }
 
         public void ChangeState(AbstractState nextState)
         {
