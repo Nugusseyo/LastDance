@@ -8,14 +8,18 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines
         private readonly Agent _agent;
         private readonly PlayerInputSO _input;
 
-        private readonly HashDataSO _attackHash;
+        private UpperIdleState _idleState;
+        private UpperGrabState _grabState;
+        private UpperAttackState _attackState;
 
-        public UpperBodyStateMachine(Agent agent, PlayerInputSO input, HashDataSO attackHash)
+        public UpperBodyStateMachine(Agent agent, PlayerInputSO input, HashDataSO grabHash, HashDataSO attackHash)
         {
             _agent = agent;
             _input = input;
 
-            _attackHash = attackHash;
+            _idleState = new UpperIdleState(_agent, this, _input);
+            _grabState = new UpperGrabState(_agent, this, _input, grabHash);
+            _attackState = new UpperAttackState(_agent, this, _input, attackHash);
         }
 
         public void Initialize()
@@ -25,12 +29,17 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines
 
         public void Idle()
         {
-            ChangeState(new UpperIdleState(_agent, this, _input));
+            ChangeState(_idleState);
+        }
+
+        public void Grab()
+        {
+            ChangeState(_grabState);
         }
 
         public void Attack()
         {
-            ChangeState(new UpperAttackState(_agent, this, _input, _attackHash));
+            ChangeState(_attackState);
         }
     }
 }

@@ -4,7 +4,7 @@
     {
         public override void Attack()
         {
-            if (player.Weapon == null || player.Weapon.CurrentWeapon == null)
+            if (player.Grab == null || player.Grab.CurrentWeapon == null)
                 return;
 
 

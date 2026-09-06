@@ -1,26 +1,21 @@
 ﻿using _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines;
 using _Works.JJH._02_Scripts.Agents.Players.Modules;
-using DevLib.AnimatorSystem;
 using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
 {
     public class LowerMoveState : AbstractState
     {
-        private readonly HashDataSO _moveHash;
         private PlayerMover _playerMover;
 
         public LowerMoveState(Agent agent, AbstractStateMachine stateMachine,
-            PlayerInputSO input, HashDataSO moveHash) : base(agent, stateMachine, input)
+            PlayerInputSO input) : base(agent, stateMachine, input)
         {
-            _moveHash = moveHash;
         }
 
         public override void Enter()
         {
             _playerMover = (PlayerMover)Agent.Mover;
-
-            //Agent.Renderer.PlayClip(_moveHash.HashValue, 0f, 0.1f);
         }
 
         public override void Update()

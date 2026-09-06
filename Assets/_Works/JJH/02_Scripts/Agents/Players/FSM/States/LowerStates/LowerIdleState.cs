@@ -17,7 +17,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
         {
             Agent.Mover.Stop();
 
-            //Agent.Renderer.PlayClip(_idleHash.HashValue, 0f, 0.1f);
+            Agent.Renderer.PlayClip(_idleHash.HashValue, 0f, 0.1f);
         }
 
         public override void Update()
