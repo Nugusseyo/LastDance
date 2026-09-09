@@ -323,8 +323,8 @@ MonoBehaviour:
     m_Bits: 128
   popForce: 5
   upForce: 3
-  collapseTiltAngle: 15
-  collapseDuration: 0.6
+  collapseTiltAngle: 5
+  collapseDuration: 0.15
   pickupDistance: 4
 --- !u!4 &4288756451129770566 stripped
 Transform:
