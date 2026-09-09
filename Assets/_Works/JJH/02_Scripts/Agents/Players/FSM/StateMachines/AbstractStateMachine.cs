@@ -1,24 +1,44 @@
 ﻿using _Works.JJH._02_Scripts.Agents.Players.FSM.States;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.FSM
 {
     public abstract class AbstractStateMachine
     {
-        public AbstractState CurrentState { get; private set; }
+        private List<AbstractState> _states = new();
+        private AbstractState _currentState;
 
-        public void ChangeState(AbstractState nextState)
+        public void SetState(params AbstractState[] states)
         {
-            if (CurrentState == nextState)
+            _states.AddRange(states);
+        }
+
+        public void ChangeState<T>() where T : AbstractState
+        {
+            T nextState = GetState<T>();
+
+            if (_currentState == nextState)
                 return;
 
-            CurrentState?.Exit();
-            CurrentState = nextState;
-            CurrentState.Enter();
+            _currentState?.Exit();
+            _currentState = nextState;
+            _currentState.Enter();
+        }
+
+        public bool IsState<T>() where T : AbstractState
+        {
+            return _currentState is T;
+        }
+
+        private T GetState<T>() where T : AbstractState
+        {
+            return _states.OfType<T>().FirstOrDefault();
         }
 
         public void Update()
         {
-            CurrentState?.Update();
+            _currentState?.Update();
         }
     }
 }

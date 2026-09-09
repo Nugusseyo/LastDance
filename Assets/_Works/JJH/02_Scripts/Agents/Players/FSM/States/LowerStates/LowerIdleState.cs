@@ -1,6 +1,4 @@
-﻿using _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines;
-
-namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
+﻿namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
 {
     public class LowerIdleState : AbstractState
     {
@@ -15,15 +13,14 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
             if (Player.PlayerInput.MoveDirection.sqrMagnitude <= 0.01f)
                 return;
 
-            LowerBodyStateMachine stateMachine = (LowerBodyStateMachine)StateMachine;
-
             if (Player.PlayerInput.IsSprinting)
             {
-                stateMachine.Run();
+                StateMachine.ChangeState<LowerRunState>();
+
                 return;
             }
 
-            stateMachine.Move();
+            StateMachine.ChangeState<LowerMoveState>();
         }
     }
 }

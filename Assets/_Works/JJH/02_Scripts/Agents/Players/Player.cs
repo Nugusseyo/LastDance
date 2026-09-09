@@ -43,9 +43,11 @@ namespace _Works.JJH._02_Scripts.Agents.Players
 
 
         private void HandleFindItem()
-            => Grab.PickupWeapon();
+            => Grab.PickupItem();
+
         private void HandleAttackKeyPressed()
             => AttackSkill.ChangeCurrentAttack<AttackSkill>();
+
         private void HandleThrowAttackKeyPressed()
             => AttackSkill.ChangeCurrentAttack<ThrowAttackSkill>();
     }

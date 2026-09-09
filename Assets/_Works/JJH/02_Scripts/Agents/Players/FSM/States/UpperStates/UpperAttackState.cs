@@ -1,5 +1,4 @@
-﻿using _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.UpperStates
 {
@@ -25,7 +24,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.UpperStates
 
             if (_attackTimer >= 0.5f)
             {
-                ((UpperBodyStateMachine)StateMachine).Grab();
+                StateMachine.ChangeState<UpperGrabState>();
             }
         }
     }

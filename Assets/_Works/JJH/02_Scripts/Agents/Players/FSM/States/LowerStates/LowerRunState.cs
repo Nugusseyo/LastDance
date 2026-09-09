@@ -1,5 +1,4 @@
-﻿using _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines;
-using _Works.JJH._02_Scripts.Agents.Players.Modules;
+﻿using _Works.JJH._02_Scripts.Agents.Players.Modules;
 using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
@@ -27,13 +26,13 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
 
             if (Player.PlayerInput.MoveDirection.sqrMagnitude <= 0.01f)
             {
-                ((LowerBodyStateMachine)StateMachine).Idle();
+                StateMachine.ChangeState<LowerIdleState>();
                 return;
             }
 
             if (!Player.PlayerInput.IsSprinting || !_playerMover.CanRun)
             {
-                ((LowerBodyStateMachine)StateMachine).Move();
+                StateMachine.ChangeState<LowerMoveState>();
                 return;
             }
 
