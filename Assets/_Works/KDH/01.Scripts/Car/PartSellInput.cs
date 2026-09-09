@@ -4,7 +4,7 @@ using _Works.KDH._01.Scripts.Car;
 
 public class PartSellInput : MonoBehaviour
 {
-    [SerializeField] private PartDetacher partDetacher;
+   /* [SerializeField] private PartDetacher partDetacher;
     [SerializeField] private PartSeller partSeller;
 
     private void Update()
@@ -20,5 +20,5 @@ public class PartSellInput : MonoBehaviour
                 Debug.Log("부품을 팔았다! 가격: " + price);
             }
         }
-    }
+    }*/
 }
