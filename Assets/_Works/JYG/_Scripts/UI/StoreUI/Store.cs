@@ -7,18 +7,22 @@ namespace _Works.JYG._Scripts.UI.StoreUI
 {
     public class Store : MonoBehaviour
     {
+        [SerializeField] private Transform upgradeContentParent;
+        [SerializeField] private UpgradeBlock upgradeBlock;
          public List<StoreItem> itemList = new List<StoreItem>(); //엑셀에 있는 리스트로 긁어와야 한다.
 
          private void Awake()
          {
-             int index = 0;
-             foreach (StoreBlock block in GetComponentsInChildren<StoreBlock>())
-             {
-                 block.InitializeItem(new StoreItem(index++, "아이템"+index, 2000 * (index + 1)), this); //나중에 저장된 값을 기반으로 들고오게 해야한다.
-             }
+             if(upgradeContentParent != null)
+                 foreach (StoreItem item in itemList)
+                 {
+                     UpgradeBlock block = Instantiate(upgradeBlock, upgradeContentParent);
+                     block.UpgradeInit();
+                 }
          }
     }
 
+    [Serializable]
     public class StoreItem  //엑셀에 있는 DB데이터로 바꿔야 한다.
     {
         public int level;
@@ -30,29 +34,6 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             this.level = level;
             this.itemName = itemName;
             this.price = price;
-        }
-    }
-
-    public class StoreBlock : MonoBehaviour
-    {
-        private Store _owner;
-        
-        [SerializeField] private TextMeshProUGUI itemTmp;
-        [SerializeField] private TextMeshProUGUI priceTmp;
-        [Header("Slot")]
-        [SerializeField] private GameObject slotPrefab;
-        [SerializeField] private Transform slotParent;
-        
-        public void InitializeItem(StoreItem itemData, Store owner)
-        {
-            _owner = owner;
-            itemTmp.text = itemData.itemName;
-            priceTmp.text = itemData.price + "$";
-
-            for (int i = 0; i < itemData.level; ++i)
-            {
-                Instantiate(slotPrefab, slotParent);
-            }
         }
     }
 }
