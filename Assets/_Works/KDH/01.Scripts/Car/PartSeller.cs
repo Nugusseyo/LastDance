@@ -30,7 +30,6 @@ namespace _Works.KDH._01.Scripts.Car
             {
                 return partValue.SellPrice;
             }
-
             return defaultPrice;
         }
     }
