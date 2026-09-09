@@ -22,7 +22,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
         private float _horizontal;
         private float _vertical;
 
-        private float _shakeTime;
         private float _shakeWeight;
         private bool _isShake = false;
 
@@ -56,7 +55,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
 
         private void ShakeCamera()
         {
-            _shakeTime += Time.deltaTime;
             _shakeWeight = Mathf.MoveTowards(_shakeWeight, 1f, Time.deltaTime * 5f);
 
             float shake = Mathf.Sin(Time.time * shakeSpeed) * shakeAmount * _shakeWeight;
@@ -68,7 +66,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
             _isShake = isRunning;
             if (isRunning)
             {
-                _shakeTime = 0f;
                 _shakeWeight = 0f;
             }
             else

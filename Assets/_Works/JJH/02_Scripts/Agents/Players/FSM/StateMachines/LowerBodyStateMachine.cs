@@ -8,9 +8,9 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines
         private readonly Agent _agent;
         private readonly PlayerInputSO _input;
 
-        private readonly HashDataSO _idleHash;
-        private readonly HashDataSO _moveHash;
-        private readonly HashDataSO _runHash;
+        private LowerIdleState _idleState;
+        private LowerMoveState _moveState;
+        private LowerRunState _runState;
 
         public LowerBodyStateMachine(Agent agent, PlayerInputSO input,
             HashDataSO idleHash, HashDataSO moveHash, HashDataSO runHash)
@@ -18,9 +18,9 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines
             _agent = agent;
             _input = input;
 
-            _idleHash = idleHash;
-            _moveHash = moveHash;
-            _runHash = runHash;
+            _idleState = new LowerIdleState(_agent, this, _input, idleHash);
+            _moveState = new LowerMoveState(_agent, this, _input);
+            _runState = new LowerRunState(_agent, this, _input, runHash);
         }
 
         public void Initialize()
@@ -30,17 +30,17 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines
 
         public void Idle()
         {
-            ChangeState(new LowerIdleState(_agent, this, _input, _idleHash));
+            ChangeState(_idleState);
         }
 
         public void Move()
         {
-            ChangeState(new LowerMoveState(_agent, this, _input, _moveHash));
+            ChangeState(_moveState);
         }
 
         public void Run()
         {
-            ChangeState(new LowerRunState(_agent, this, _input, _runHash));
+            ChangeState(_runState);
         }
     }
 }

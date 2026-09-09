@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,24 +16,31 @@ public class PartDetacher : MonoBehaviour
 
     [SerializeField] private Transform holdPoint;
     [SerializeField] private float pickupDistance = 4f;
-    [SerializeField] private float approachDistance = 1.2f;
 
     private Rigidbody heldPart;
-    private Rigidbody selfRb;
 
-    private void Awake()
-    {
-        selfRb = GetComponent<Rigidbody>();
-    }
+    // 지금 들고 있는 부품을 다른 스크립트에서도 알 수 있게 해줌 (없으면 null)
+    public GameObject HeldPart => heldPart != null ? heldPart.gameObject : null;
 
-    private struct WheelSocket
+    private struct PartSocket
     {
         public Transform parent;
         public Vector3 localPosition;
         public Quaternion localRotation;
     }
 
-    private readonly System.Collections.Generic.Dictionary<GameObject, WheelSocket> wheelSockets = new System.Collections.Generic.Dictionary<GameObject, WheelSocket>();
+    private static readonly string[] ReattachableLayers = { "Wheel", "Engine" };
+
+    private readonly Dictionary<GameObject, PartSocket> partSockets = new System.Collections.Generic.Dictionary<GameObject, PartSocket>();
+
+    private static bool IsReattachableLayer(int layer)
+    {
+        for (int i = 0; i < ReattachableLayers.Length; i++)
+        {
+            if (layer == LayerMask.NameToLayer(ReattachableLayers[i])) return true;
+        }
+        return false;
+    }
 
     private void Update()
     {
@@ -49,7 +58,7 @@ public class PartDetacher : MonoBehaviour
 
         if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
         {
-            TryAttachWheel();
+            TryAttachPart();
         }
 
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
@@ -63,6 +72,7 @@ public class PartDetacher : MonoBehaviour
                 TryPickupPart();
             }
         }
+
     }
 
     private bool TryDetachPart()
@@ -73,13 +83,14 @@ public class PartDetacher : MonoBehaviour
 
         GameObject part = hit.collider.gameObject;
         Transform car = part.transform.parent;
-        if (car == null) return false; // already detached, let caller try pickup instead
+        if (car == null) return false;
 
         Vector3 wheelDropPoint = part.transform.position;
+        bool isWheel = hit.collider.gameObject.layer == LayerMask.NameToLayer("Wheel");
 
-        if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Wheel") && !wheelSockets.ContainsKey(part))
+        if (IsReattachableLayer(hit.collider.gameObject.layer) && !partSockets.ContainsKey(part))
         {
-            wheelSockets[part] = new WheelSocket
+            partSockets[part] = new PartSocket
             {
                 parent = car,
                 localPosition = part.transform.localPosition,
@@ -102,7 +113,7 @@ public class PartDetacher : MonoBehaviour
         Vector3 launchDir = outward * popForce + Vector3.up * upForce;
         rb.AddForce(launchDir, ForceMode.VelocityChange);
 
-        if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Wheel"))
+        if (isWheel)
         {
             CollapseCar(car, wheelDropPoint);
         }
@@ -118,7 +129,7 @@ public class PartDetacher : MonoBehaviour
         StartCoroutine(CollapseRoutine(car, wheelDropPoint));
     }
 
-    private System.Collections.IEnumerator CollapseRoutine(Transform car, Vector3 wheelDropPoint)
+    private IEnumerator CollapseRoutine(Transform car, Vector3 wheelDropPoint)
     {
         Vector3 localCorner = car.InverseTransformPoint(wheelDropPoint);
         localCorner.y = 0f;
@@ -138,38 +149,65 @@ public class PartDetacher : MonoBehaviour
         Vector3 endPos = new Vector3(startPos.x, Mathf.Min(startPos.y, groundY), startPos.z);
         Quaternion endRot = startRot * Quaternion.AngleAxis(collapseTiltAngle, tiltAxis);
 
+
+        Rigidbody carRb = car.GetComponent<Rigidbody>();
+        bool addedRb = carRb == null;
+        if (addedRb)
+        {
+            carRb = car.gameObject.AddComponent<Rigidbody>();
+            carRb.isKinematic = true;
+        }
+        bool wasKinematic = carRb.isKinematic;
+        carRb.isKinematic = true;
+
         float t = 0f;
         while (t < collapseDuration)
         {
             t += Time.deltaTime;
             float progress = t / collapseDuration;
-            car.position = Vector3.Lerp(startPos, endPos, progress);
-            car.rotation = Quaternion.Slerp(startRot, endRot, progress);
-            yield return null;
+            carRb.MovePosition(Vector3.Lerp(startPos, endPos, progress));
+            carRb.MoveRotation(Quaternion.Slerp(startRot, endRot, progress));
+            yield return new WaitForFixedUpdate();
         }
 
-        car.position = endPos;
-        car.rotation = endRot;
+        carRb.MovePosition(endPos);
+        carRb.MoveRotation(endRot);
+
+        if (addedRb)
+        {
+            Destroy(carRb);
+        }
+        else
+        {
+            carRb.isKinematic = wasKinematic;
+        }
     }
 
-    private void TryAttachWheel()
+    private void TryAttachPart()
     {
         if (heldPart == null) return;
-        if (!wheelSockets.TryGetValue(heldPart.gameObject, out WheelSocket socket)) return;
+        if (!partSockets.TryGetValue(heldPart.gameObject, out PartSocket socket)) return;
         if (socket.parent == null) return;
 
-        float sqrDist = (transform.position - socket.parent.position).sqrMagnitude;
-        if (sqrDist > pickupDistance * pickupDistance) return;
 
-        GameObject wheel = heldPart.gameObject;
-        wheel.transform.SetParent(socket.parent);
-        wheel.transform.localPosition = socket.localPosition;
-        wheel.transform.localRotation = socket.localRotation;
+        Vector3 socketWorldPos = socket.parent.TransformPoint(socket.localPosition);
+        float sqrDist = (transform.position - socketWorldPos).sqrMagnitude;
+        if (sqrDist > pickupDistance * pickupDistance)
+        {
+            return;
+        }
+
+        GameObject part = heldPart.gameObject;
+        SetPartCollidersEnabled(part, true);
+        part.transform.SetParent(socket.parent);
+        part.transform.localPosition = socket.localPosition;
+        part.transform.localRotation = socket.localRotation;
 
         heldPart.linearVelocity = Vector3.zero;
         heldPart.angularVelocity = Vector3.zero;
         heldPart.isKinematic = true;
         heldPart.useGravity = false;
+        partSockets.Remove(part);
         heldPart = null;
     }
 
@@ -182,26 +220,30 @@ public class PartDetacher : MonoBehaviour
         Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
         if (rb == null || rb.transform.parent != null) return;
 
-        Vector3 approachPos = hit.point - ray.direction.normalized * approachDistance;
-        approachPos.y = transform.position.y;
-        if (selfRb != null)
-        {
-            selfRb.linearVelocity = Vector3.zero;
-            selfRb.position = approachPos;
-        }
-        transform.position = approachPos;
-
         heldPart = rb;
         heldPart.isKinematic = true;
         heldPart.transform.SetParent(holdPoint);
         heldPart.transform.localPosition = Vector3.zero;
         heldPart.transform.localRotation = Quaternion.identity;
+
+
+        SetPartCollidersEnabled(heldPart.gameObject, false);
     }
 
     private void DropPart()
     {
+        SetPartCollidersEnabled(heldPart.gameObject, true);
         heldPart.transform.SetParent(null);
         heldPart.isKinematic = false;
         heldPart = null;
+    }
+
+    private static void SetPartCollidersEnabled(GameObject part, bool enabled)
+    {
+        Collider[] colliders = part.GetComponentsInChildren<Collider>(true);
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            colliders[i].enabled = enabled;
+        }
     }
 }
