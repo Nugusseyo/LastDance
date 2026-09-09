@@ -636,6 +636,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.StoreUI.UpgradeBarInitializer
   barPrefab: {fileID: 1859932034086308545, guid: 4c09e4e6efa1c1f4cb6d485310c50563, type: 3}
+  defaultColor: {r: 0, g: 0, b: 0, a: 0}
+  upgradeColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &5054483606239520945
 GameObject:
   m_ObjectHideFlags: 0
@@ -1069,6 +1071,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54b021733272a574fa6e5766fbf5e3a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.StoreUI.UpgradeBlock
+  titleTmp: {fileID: 2065917231382621962}
+  priceTmp: {fileID: 567417935881254121}
+  countTmp: {fileID: 1534654659524945051}
+  curLevel: 0
   barInitializer: {fileID: 1735322449252035732}
 --- !u!1 &6537499793679552780
 GameObject:

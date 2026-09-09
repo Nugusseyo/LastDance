@@ -12,3 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32fc2c6bfb4231a47a04aff87dda7b12, type: 3}
   m_Name: UpgradeDB
   m_EditorClassIdentifier: Assembly-CSharp::Resources.DataBase.Upgrade_Data.UpgradeDB
+  UpgradeSheet:
+  - index: 0
+    value: "\uD14C\uC2A4\uD2B8 \uC774\uB984"
+    maxlv: 7
+    lv1price: 1
+    lv2price: 2
+    lv3price: 3
+    lv4price: 5
+    lv5price: 7
+    lv6price: 9
+    lv7price: 11
+    lv8price: 12
+    lv9price: 13
+    lv1value: 1
+    lv2value: 2
+    lv3value: 4
+    lv4value: 6
+    lv5value: 8
+    lv6value: 10
+    lv7value: 12
+    lv8value: 13
+    lv9value: 15
+    upgradetype: 1

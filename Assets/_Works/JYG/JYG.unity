@@ -12214,7 +12214,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7762833500097732933, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3909043718392149512, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
@@ -12245,10 +12246,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.StoreUI.Store
   upgradeContentParent: {fileID: 2680572877814268380}
   upgradeBlock: {fileID: 2531731542846607908, guid: c3a7937fc12249a49bd63d6790b0c479, type: 3}
-  itemList:
-  - level: 5
-    itemName: "\uD574\uC719"
-    price: 5
 --- !u!1001 &5053586909236059620
 PrefabInstance:
   m_ObjectHideFlags: 0
