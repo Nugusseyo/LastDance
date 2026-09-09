@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using _Works.KDH._01.Scripts.Car;
 
-// E키를 누르면 지금 들고 있는 부품을 판다
 public class PartSellInput : MonoBehaviour
 {
     [SerializeField] private PartDetacher partDetacher;

@@ -19,7 +19,6 @@ public class PartDetacher : MonoBehaviour
 
     private Rigidbody heldPart;
 
-    // 지금 들고 있는 부품을 다른 스크립트에서도 알 수 있게 해줌 (없으면 null)
     public GameObject HeldPart => heldPart != null ? heldPart.gameObject : null;
 
     private struct PartSocket
