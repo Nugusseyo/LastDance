@@ -13,9 +13,10 @@ namespace _Works.CJW.Scripts.MapSystems
     {
         None = 0,
         ParkingSlot = 1,
-        ShopEntrance = 2,
+        OilDispenser = 2,
         Counter = 3,
         Table = 4,
-        Exit = 5,
+        WaitingLine = 5,
+        Exit = 6,
     }
 }

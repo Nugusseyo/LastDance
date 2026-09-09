@@ -13,7 +13,7 @@ namespace _Works.CJW.Scripts.MapSystems
 
         public override bool IsAvailable => !IsOccupied;
 
-        internal void SetOccupied(bool value)
+        public void SetOccupied(bool value)
         {
             IsOccupied = value;
         }

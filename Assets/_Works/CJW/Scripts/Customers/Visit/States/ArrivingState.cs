@@ -27,9 +27,19 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
         /// </summary>
         private Quaternion _targetRotation = Quaternion.identity;
 
+        /// <summary>
+        /// 이 단계에 머물 수 있는 한계 시간(초).
+        /// 여기서 막히면 세션이 끝나지 않아 주차 자리가 영영 반납되지 않고,
+        /// 동시 방문 수를 채우면 스폰 자체가 멈춘다. 그걸 막는 바닥이다.
+        /// </summary>
+        private const float PhaseTimeout = 45f;
+
+        private float _elapsed;
+
         public void Enter(VisitContext context)
         {
             _aligning = false;
+            _elapsed = 0f;
 
             // 자리 정면으로 ApproachDistance만큼 물러난 지점을 경유지로 넘긴다.
             // 목적지를 따로 끊어 주지 않으므로 차는 중간에서 멈추지 않고,
@@ -99,11 +109,24 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
 
         public VisitPhase Tick(VisitContext context, float dt)
         {
+            _elapsed += dt;
+
             if (!_aligning)
             {
                 if (!context.Car.IsArrived)
                 {
-                    return VisitPhase.Arriving;
+                    // 경로가 자리에 닿지 않으면 기다려도 달라지지 않는다. 한계 시간을 채우지 않고 넘긴다.
+                    bool unreachable = !context.Car.HasCompletePath;
+
+                    if (!unreachable && _elapsed < PhaseTimeout)
+                    {
+                        return VisitPhase.Arriving;
+                    }
+
+                    Debug.LogWarning(unreachable
+                            ? $"[Arriving] {context.Car.name}의 경로가 자리에 닿지 않습니다. 자리와 NavMesh를 확인하세요. 서 있는 자리에서 그대로 진행합니다."
+                            : $"[Arriving] {context.Car.name}이(가) {PhaseTimeout}초 안에 자리에 들어가지 못해 그대로 진행합니다.",
+                        context.Car);
                 }
 
                 // NavMesh가 회전을 되돌리지 않도록 먼저 멈춘 뒤에 방향을 맞춘다.

@@ -8,6 +8,9 @@ namespace _Works.CJW.Scripts.Cars
     /// </summary>
     public interface ICarMoveModule : IModule
     {
+        /// <summary>목적지까지 실제로 닿는 경로를 들고 있는지. 부분 경로면 false다. 계산 중이면 판정을 미루고 true를 돌려준다.</summary>
+        bool HasCompletePath { get; }
+
         bool IsArrived { get; }
 
         void MoveTo(Vector3 destination);

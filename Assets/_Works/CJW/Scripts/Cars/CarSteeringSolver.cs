@@ -81,19 +81,19 @@ namespace _Works.CJW.Scripts.Cars
         ///  · 목표점이 최소 회전원 안에 들어오면 어떤 조향으로도 닿을 수 없다.
         ///    계속 꺾으면 그 자리를 영원히 맴돌므로, 조향을 풀고 직진해 원 밖으로 빠져나온 뒤 다시 붙는다.
         /// </summary>
+        /// <summary>
+        /// 전진해서 이 목표에 닿을 때 쓸 곱률. 닿을 수 없는 목표면 0(직진)을 돌려준다.
+        ///
+        /// 곱률은 κ = 2x / Ld² 이다. 차를 원점, 정면을 +z로 두면 원은 z축에 접해야 하므로
+        /// 중심이 (R, 0)에 오고, (x − R)² + z² = R² 을 풀면 Ld² = 2Rx 가 나온다.
+        ///
+        /// 목표가 최소 회전원 안에 들어오면 어떤 조향으로도 닿지 못한다.
+        /// 계속 꾫으면 그 자리를 영원히 맴돌므로 조향을 풀고 직진한다.
+        /// 호출하는 쪽이 <see cref="CanReachForward"/>로 이 상황을 미리 알고 후진을 고를 수도 있다.
+        /// </summary>
         public static float TargetCurvature(Vector3 local, float maxCurvature, float minTurnRadius)
         {
-            float curvature;
-
-            if (local.z <= 0.01f)
-            {
-                curvature = local.x >= 0f ? maxCurvature : -maxCurvature;
-            }
-            else
-            {
-                curvature = 2f * local.x / Mathf.Max(local.sqrMagnitude, 1e-4f);
-                curvature = Mathf.Clamp(curvature, -maxCurvature, maxCurvature);
-            }
+            float curvature = DesiredCurvature(local, maxCurvature);
 
             if (curvature != 0f && IsInsideTurningCircle(local, curvature, minTurnRadius))
             {
@@ -101,6 +101,48 @@ namespace _Works.CJW.Scripts.Cars
             }
 
             return curvature;
+        }
+
+        /// <summary>
+        /// 이 목표 쪽으로 돌고 싶은 방향의 곱률. 닿을 수 있는지는 따지지 않는다.
+        ///
+        /// 후진이 이걸 쓴다. 후진 중에는 이 값의 부호를 뒤집어 꾫는다 —
+        /// 속도가 음수라 yawRate = v·κ 의 부호가 반대가 되므로,
+        /// 그래야 차머리가 목표 쪽으로 돌아간다. 사람이 주차할 때 하는 동작과 같다.
+        /// </summary>
+        public static float DesiredCurvature(Vector3 local, float maxCurvature)
+        {
+            // 목표가 옆이나 뒤에 있으면 원호 공식이 무너진다. 가까운 쪽으로 최대로 꾫는다.
+            if (local.z <= 0.01f)
+            {
+                return local.x >= 0f ? maxCurvature : -maxCurvature;
+            }
+
+            float curvature = 2f * local.x / Mathf.Max(local.sqrMagnitude, 1e-4f);
+            return Mathf.Clamp(curvature, -maxCurvature, maxCurvature);
+        }
+
+        /// <summary>
+        /// 지금 자세에서 전진만으로 이 목표에 닿을 수 있는가.
+        /// false면 핸들을 끝까지 꾺어도 모자라지 못한다 — 물러나서 각을 벌어야 한다.
+        /// </summary>
+        public static bool CanReachForward(Vector3 local, float minTurnRadius)
+        {
+            // 옆이거나 뒤에 있다. 전진으로는 안 된다.
+            if (local.z <= 0.01f)
+            {
+                return false;
+            }
+
+            float curvature = 2f * local.x / Mathf.Max(local.sqrMagnitude, 1e-4f);
+
+            // 정면 직진이라 회전원을 따질 일이 없다.
+            if (curvature == 0f)
+            {
+                return true;
+            }
+
+            return !IsInsideTurningCircle(local, curvature, minTurnRadius);
         }
 
         /// <summary>

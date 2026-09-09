@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 3316282907894504734}
   - component: {fileID: 4970135090332284217}
   - component: {fileID: 2314230673827454265}
-  - component: {fileID: 6198682341420244795}
   - component: {fileID: 1576516382994881372}
+  - component: {fileID: 6198682341420244795}
   - component: {fileID: -5519712589566943789}
   - component: {fileID: 2288414602135475725}
   m_Layer: 0
@@ -118,20 +118,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6198682341420244795
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 757970547890689392}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bde5fd399f54a7db30709fbc6e3e094, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.TestCustomer
-  <Agent>k__BackingField: {fileID: 1576516382994881372}
-  <PoolItem>k__BackingField: {fileID: 11400000, guid: cdb25d5902bdea147b12f0acc1c6b9ac, type: 2}
 --- !u!195 &1576516382994881372
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -146,7 +132,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 0.4
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -154,6 +140,21 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &6198682341420244795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 757970547890689392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bde5fd399f54a7db30709fbc6e3e094, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.TestCustomer
+  <HumanType>k__BackingField: 1
+  <Agent>k__BackingField: {fileID: 1576516382994881372}
+  <PoolItem>k__BackingField: {fileID: 11400000, guid: cdb25d5902bdea147b12f0acc1c6b9ac, type: 2}
 --- !u!114 &-5519712589566943789
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,11 +183,11 @@ MonoBehaviour:
   sequences:
   - Phase: 2
     States:
-    - rid: 1136881396192641110
+    - rid: 4377106523458895949
     - rid: 1136881396192641111
   - Phase: 3
     States:
-    - rid: 1136881396192641112
+    - rid: 4377106365052878927
   - Phase: 4
     States:
     - rid: 1136881396192641113
@@ -200,23 +201,25 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 1136881396192641110
-      type: {class: UnboardState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
-      data:
-        stagger: 0
-        jitter: 0.2
     - rid: 1136881396192641111
       type: {class: MoveToNearestPointState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
       data:
         targetPoint: 2
         timeout: 15
-    - rid: 1136881396192641112
-      type: {class: StayState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
-      data:
-        duration: 0
     - rid: 1136881396192641113
       type: {class: BoardState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
       data:
         stagger: 0
         jitter: 0.2
         timeout: 20
+    - rid: 4377106365052878927
+      type: {class: SpeechState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
+      data:
+        poolManager: {fileID: 11400000, guid: 82a79d66fc97ee6499cc178f42fc175f, type: 2}
+        bubbleItem: {fileID: 11400000, guid: 2a00163c0ed52214a828e00935dbf2e5, type: 2}
+        offset: {x: 0, y: 2.2, z: 0}
+    - rid: 4377106523458895949
+      type: {class: UnboardState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
+      data:
+        stagger: 0
+        jitter: 0.2

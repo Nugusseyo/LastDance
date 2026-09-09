@@ -17,7 +17,7 @@ namespace _Works.CJW.Scripts.Customers
     /// </summary>
     public abstract class AbstractCustomer : ManagingAgent, IPoolable
     {
-        [field: SerializeField] public HumanType HumanType { get; private set; }
+        [field: SerializeField] public HumanType HumanType { get; private set; } = HumanType.Good;
         [field: SerializeField] public NavMeshAgent Agent { get; private set; }
         [field: SerializeField] public PoolItemSO PoolItem { get; set; }
         
