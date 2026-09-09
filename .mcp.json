@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "UnityMCP": {
+      "type": "stdio",
+      "command": "C:\\Users\\김태완\\.local\\bin\\uvx.exe",
+      "args": [
+        "--offline",
+        "--from",
+        "mcpforunityserver==10.0.0",
+        "mcp-for-unity"
+      ],
+      "env": {}
+    }
+  }
+}
