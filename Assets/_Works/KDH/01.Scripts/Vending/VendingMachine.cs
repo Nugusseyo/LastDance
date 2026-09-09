@@ -18,6 +18,13 @@ namespace _Works.KDH._01.Scripts.Vending
 
             GameObject droppedItem = Instantiate(item.ItemPrefab, vendingPoint.position, vendingPoint.rotation);
 
+            // 콜라이더가 없으면 바닥이랑 부딪힐 수가 없어서 그냥 뚫고 떨어진다.
+            Collider collider = droppedItem.GetComponentInChildren<Collider>();
+            if (collider == null)
+            {
+                droppedItem.AddComponent<BoxCollider>();
+            }
+
             Rigidbody rb = droppedItem.GetComponent<Rigidbody>();
             if (rb == null)
             {
@@ -27,6 +34,9 @@ namespace _Works.KDH._01.Scripts.Vending
             // 회전이 자유로우면 떨어지면서 이상하게 구르거나 눕는다.
             // 회전을 막아두면 위에서 아래로 똑바로 서서 떨어진다.
             rb.constraints = RigidbodyConstraints.FreezeRotation;
+
+            // 빠르게 떨어지다가 바닥을 뚫고 지나가는(터널링) 걸 막는다.
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
         }
     }
 }
