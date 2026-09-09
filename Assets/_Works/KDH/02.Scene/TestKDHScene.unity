@@ -13911,32 +13911,6 @@ MonoBehaviour:
   vendingMachineLayerMask:
     serializedVersion: 2
     m_Bits: 65536
---- !u!114 &1201501174
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1201501172}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72b6e2bec38aa0841b730436ec236537, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PartDetacher
-  playerCamera: {fileID: 2004992978}
-  rayDistance: 5
-  partLayerMask:
-    serializedVersion: 2
-    m_Bits: 32512
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  popForce: 5
-  upForce: 3
-  collapseTiltAngle: 15
-  collapseDuration: 0.6
-  holdPoint: {fileID: 1448861618}
-  pickupDistance: 4
 --- !u!1001 &1216491705
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19071,9 +19045,6 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1732737491634738388, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1201501174}
     - targetCorrespondingSourceObject: {fileID: 1732737491634738388, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1201501173}
