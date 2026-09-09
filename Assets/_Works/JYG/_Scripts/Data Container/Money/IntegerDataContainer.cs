@@ -7,7 +7,7 @@ namespace _Works.JYG._Scripts.Data_Container.Money
     [CreateAssetMenu(fileName = "new Integer Manager", menuName = "Data Container/Integer Data Manager")]
     public class IntegerDataContainer : ScriptableObject, IDataContainer<int>, ISavableData
     {
-        public event IDataContainer<int>.OnValueChangedEvent OnValueChanged;
+        public event IDataContainer<int>.OnValueChangedEvent OnValueChanged;    //T밸류(int) 변경 시 동작하는 액션
         private int _value;
 
         public int Value
@@ -40,10 +40,8 @@ namespace _Works.JYG._Scripts.Data_Container.Money
         public void SaveData(string key)
         {
             IntegerDataForJson saveData = new IntegerDataForJson(_value);
-            Debug.Log($"IntValue : {saveData.value}");
-            string value = JsonUtility.ToJson(saveData);
             
-            DataSaveSystem.SetSaveData(key, value);
+            DataSaveSystem.SetSaveData<IntegerDataForJson>(key, saveData);
         }
     }
 

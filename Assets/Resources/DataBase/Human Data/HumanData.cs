@@ -6,8 +6,8 @@ namespace Resources.DataBase.Human_Data
     [Serializable]
     public class HumanData
     {
-        public HumanType type;
-        public int index;
+        public HumanType type;      //손님의 타입
+        public int index;           //손님 인덱스 (진상 손님 인덱스)
         public string contents1;
         public string contents2;
         public string contents3;
@@ -19,7 +19,7 @@ namespace Resources.DataBase.Human_Data
         public string contents9;
         public string contents10;
 
-        public List<string> GetStrings()
+        public List<string> GetStrings()    //content들을 모두 리스트화 시킴.
         {
             List<string> contents = new List<string>()
             {

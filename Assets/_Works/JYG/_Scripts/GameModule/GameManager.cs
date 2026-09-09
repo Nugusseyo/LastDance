@@ -12,7 +12,7 @@ namespace _Works.JYG._Scripts.GameModule
 
         private void Start()
         {
-            foreach (InitDataWrap wrap in initDatas)
+            foreach (InitDataWrap wrap in initDatas)    //등록된 이니셜라이즈가 꼭 필요한 데이터들의 함수를 실행한다. (주로 머니매니저와 같은 데이터)
             {
                 SerializableInterface<ISavableData> serializableInterface = wrap.data;
                 ISavableData savable = serializableInterface.GetInterface();
@@ -35,7 +35,7 @@ namespace _Works.JYG._Scripts.GameModule
     }
 
     [Serializable]
-    public class InitDataWrap
+    public class InitDataWrap   //Savable 데이터들을 담게 해주는 Wrapper
     {
         public SerializableInterface<ISavableData> data;
         public string key;

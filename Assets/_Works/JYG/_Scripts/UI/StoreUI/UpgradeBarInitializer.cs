@@ -5,19 +5,20 @@ namespace _Works.JYG._Scripts.UI.StoreUI
 {
     public class UpgradeBarInitializer : MonoBehaviour
     {
-        [SerializeField] private GameObject barPrefab;
-        private List<SpriteRenderer> _barRendererList = new List<SpriteRenderer>();
+        [SerializeField] private GameObject barPrefab;                              //만들어질 바 프리팹
+        private List<SpriteRenderer> _barRendererList = new List<SpriteRenderer>(); //Bar(레벨 칸)을 만들고, 만들어진 바의 렌더러를 담는다.
 
         [Header("Color Settings")] 
-        [SerializeField] private Color defaultColor;
-        [SerializeField] private Color upgradeColor;
+        [SerializeField] private Color defaultColor;    //레벨업이 안된 상태의 색상이다.
+        [SerializeField] private Color upgradeColor;    //레벨업 시 바뀔 색상이다.
         
         #region Property
 
-        public List<SpriteRenderer> BarRendererList => _barRendererList;
+        public Color DefaultColor => defaultColor;  //업그레이드 시 올라갈 바를 미리 보여주는 작업을 하기 위해서
+        public Color UpgradeColor => upgradeColor;  //Upgrade와 Def컬러를 받을 수 있도록 프로퍼티로 묶어주었다.
         
         #endregion
-        public void InitializeBar(int count)
+        public void InitializeBar(int count)    //갯수만큼 Bar를 만들어낸다.
         {
             for (int i = 0; i < count; ++i)
             {
@@ -25,7 +26,7 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             }
         }
 
-        public void SetColor(int index, bool isUpgrade)
+        public void SetColor(int index, bool isUpgrade) //업그레이드 시 해당 함수를 호출해 비주얼을 바꾸어줄 수 있다.
         {
             if (index >= _barRendererList.Count)
             {
