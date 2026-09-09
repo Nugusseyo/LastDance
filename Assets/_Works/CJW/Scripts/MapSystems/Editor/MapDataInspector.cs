@@ -430,7 +430,7 @@ namespace _Works.CJW.Scripts.MapSystems.Editor
             return type switch
             {
                 MapPointType.ParkingSlot => "주차 자리",
-                MapPointType.ShopEntrance => "가게 입구",
+                MapPointType.OilDispenser => "가게 입구",
                 MapPointType.Counter => "카운터",
                 MapPointType.Table => "테이블",
                 MapPointType.Exit => "퇴장 지점",

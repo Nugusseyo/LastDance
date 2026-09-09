@@ -19,6 +19,11 @@ namespace _Works.CJW.Scripts.Cars
 
         private bool _hasDestination;
 
+        /// <summary>부분 경로면 목적지에 닿지 못한다. 경로 계산 중에는 판정을 미룬다.</summary>
+        public bool HasCompletePath =>
+            !_hasDestination || agent == null || agent.pathPending ||
+            agent.pathStatus == NavMeshPathStatus.PathComplete;
+
         public bool IsArrived
         {
             get
