@@ -83,7 +83,7 @@ public class PartDetacher : MonoBehaviour
 
         GameObject part = hit.collider.gameObject;
         Transform car = part.transform.parent;
-        if (car == null) return false; // already detached, let caller try pickup instead
+        if (car == null) return false;
 
         Vector3 wheelDropPoint = part.transform.position;
         bool isWheel = hit.collider.gameObject.layer == LayerMask.NameToLayer("Wheel");
@@ -149,9 +149,7 @@ public class PartDetacher : MonoBehaviour
         Vector3 endPos = new Vector3(startPos.x, Mathf.Min(startPos.y, groundY), startPos.z);
         Quaternion endRot = startRot * Quaternion.AngleAxis(collapseTiltAngle, tiltAxis);
 
-        // 차체를 Transform으로 직접 옮기면 콜라이더가 플레이어를 밀어내지 못해
-        // 내려앉는 동안 플레이어가 차체 안쪽으로 겹쳐 들어갈 수 있다.
-        // Kinematic Rigidbody의 Move로 옮기면 물리 엔진이 겹침을 풀어 밀어낸다.
+
         Rigidbody carRb = car.GetComponent<Rigidbody>();
         bool addedRb = carRb == null;
         if (addedRb)
@@ -191,14 +189,11 @@ public class PartDetacher : MonoBehaviour
         if (!partSockets.TryGetValue(heldPart.gameObject, out PartSocket socket)) return;
         if (socket.parent == null) return;
 
-        // 차체 피벗이 아니라 실제로 부품이 다시 꽂힐 소켓 위치를 기준으로 거리를 재야 한다.
-        // 피벗 기준으로 재면 popForce로 밀려난 바퀴 소켓 위치가 이미 pickupDistance 밖일 수 있어
-        // 플레이어가 아무리 가까이 가도 R을 눌러도 반응이 없는 것처럼 보인다.
+
         Vector3 socketWorldPos = socket.parent.TransformPoint(socket.localPosition);
         float sqrDist = (transform.position - socketWorldPos).sqrMagnitude;
         if (sqrDist > pickupDistance * pickupDistance)
         {
-            Debug.Log($"[PartDetacher] 재장착 실패: 소켓까지 거리 {Mathf.Sqrt(sqrDist):F2}m (허용 {pickupDistance}m). 더 가까이 가서 R을 눌러주세요.");
             return;
         }
 
@@ -231,8 +226,7 @@ public class PartDetacher : MonoBehaviour
         heldPart.transform.localPosition = Vector3.zero;
         heldPart.transform.localRotation = Quaternion.identity;
 
-        // 콜라이더를 켜둔 채로 들면 플레이어 자신의 콜라이더와 겹쳐서
-        // 물리엔진이 플레이어를 계속 밀어내(플레이어가 저절로 움직이는 원인).
+
         SetPartCollidersEnabled(heldPart.gameObject, false);
     }
 
