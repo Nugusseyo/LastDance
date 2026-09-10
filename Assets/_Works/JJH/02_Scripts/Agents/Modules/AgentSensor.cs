@@ -5,7 +5,7 @@ namespace _Works.JJH._02_Scripts.Agents.Modules
 {
     public class AgentSensor : AbstractModule, ISensor
     {
-        public bool FindWeapon(Transform cameraTrm, LayerMask weaponLayer,
+        public bool FindItem(Transform cameraTrm, LayerMask weaponLayer,
             float distance, out Collider weaponCollider)
         {
             weaponCollider = null;

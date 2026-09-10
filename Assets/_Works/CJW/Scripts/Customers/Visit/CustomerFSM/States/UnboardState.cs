@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 {
@@ -32,7 +33,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
             if (jitter > 0f)
             {
-                delay += UnityEngine.Random.Range(0f, jitter);
+                delay += Random.Range(0f, jitter);
             }
 
             if (delay > 0f)

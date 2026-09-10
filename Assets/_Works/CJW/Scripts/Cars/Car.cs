@@ -65,14 +65,28 @@ namespace _Works.CJW.Scripts.Cars
         /// <summary>손님이 내려서 처음 서는 위치. 미지정이면 차량 위치.</summary>
         public Vector3 DropOffPosition => dropOffPoint != null ? dropOffPoint.position : transform.position;
 
+        /// <summary>목적지까지 닿는 경로를 들고 있는지. 부분 경로면 기다려도 달라지지 않는다.</summary>
+        public bool HasCompletePath => _moveModule == null || _moveModule.HasCompletePath;
+
         public bool IsArrived => _moveModule == null || _moveModule.IsArrived;
 
         protected override void Awake()
         {
             base.Awake();
             _moveModule = GetModule<ICarMoveModule>();
+
+            // 없으면 IsArrived가 항상 true라 이동 없이 모든 단계를 조용히 통과한다.
+            // 증상이 "차가 스폰 자리에서 안 움직임"으로만 보이므로 반드시 남긴다.
+            if (_moduleMissingLogged == false && _moveModule == null)
+            {
+                _moduleMissingLogged = true;
+                Debug.LogError($"[Car] {name}에 ICarMoveModule이 없습니다. 이동 없이 방문이 즉시 끝납니다.", this);
+            }
+
             EnsureSeatCache();
         }
+
+        private bool _moduleMissingLogged;
 
         /// <summary>풀에서 꺼낸 직후 이 차가 쓸 데이터를 넣어준다.</summary>
         public virtual void Setup(CarDataSO data)

@@ -14,6 +14,9 @@ namespace _Works.CJW.Scripts.Cars
     {
         private const int MaxCorners = 256;
 
+        /// <summary>이 거리 안으로 경유지에 붙었으면 각도를 따지지 않고 전환한다(m).</summary>
+        private const float NearViaDistance = 1.5f;
+
         private readonly Vector3[] _corners = new Vector3[MaxCorners];
         private int _cornerCount;
         private int _segIndex;
@@ -40,6 +43,12 @@ namespace _Works.CJW.Scripts.Cars
         /// <summary>코너가 둘 이상 있어야 따라갈 선분이 생긴다.</summary>
         public bool HasPath => _cornerCount >= 2;
 
+        /// <summary>
+        /// 마지막으로 읽은 경로의 상태. PathComplete가 아니면 목적지에 닿지 못한다는 뜻이다.
+        /// SetDestination은 부분 경로에도 true를 돌려주므로 이걸 따로 봐야 한다.
+        /// </summary>
+        public NavMeshPathStatus Status { get; private set; } = NavMeshPathStatus.PathComplete;
+
         /// <summary>정차. 들고 있던 경로를 통째로 버린다.</summary>
         public void Clear()
         {
@@ -51,12 +60,16 @@ namespace _Works.CJW.Scripts.Cars
         }
 
         /// <summary>새 목적지를 향해 출발할 때. 예약해 둔 진입점 정보는 그대로 남긴다.</summary>
+        /// <summary>새 목적지를 향해 출발할 때. 예약해 둔 진입점 정보는 그대로 남긴다.</summary>
         public void BeginPath()
         {
             _cornerCount = 0;
             _segIndex = 0;
             _refreshTimer = 0f;
             _onFinalLeg = false;
+
+            // 아직 경로를 읽기 전이다. 이전 목적지의 판정을 끌고 가지 않는다.
+            Status = NavMeshPathStatus.PathComplete;
         }
 
         /// <summary>진입점을 거쳐 destination으로 들어가겠다고 예약한다. BeginPath보다 먼저 부른다.</summary>
@@ -84,14 +97,34 @@ namespace _Works.CJW.Scripts.Cars
         /// 그래서 진입점→목적지 직선을 직접 경로로 박아넣어 그 선을 추종하게 한다.
         /// 도착 방향이 자리 방향과 같아져 정차 뒤 제자리 회전이 사라진다.
         /// </summary>
-        public void TrySwitchToFinalLeg(Vector3 position, float switchDistance, NavMeshAgent agent)
+        /// <summary>
+        /// 경유지에 충분히 가까워지고 방향까지 맞으면 마지막 구간을 직접 들고 간다.
+        ///
+        /// 경유지를 계속 에이전트의 목적지로 두면, 차가 Lookahead 때문에 경유지를 살짝 지나친 순간
+        /// 경로가 되돌아갔다 다시 가는 헤어핀이 된다. 그 꾫이는 지점이 최소 회전원 안에 들어가면
+        /// 차는 그 자리를 영원히 맴돌다.
+        ///
+        /// 또 에이전트 경로는 언제나 "현재 위치 → 목적지"라서 진입 방향이라는 정보가 사라진다.
+        /// 그래서 진입점→목적지 직선을 직접 경로로 박아넣어 그 선을 추종하게 한다.
+        ///
+        /// 단, 차 머리가 그 선과 크게 어긋난 채로 갈아타면 짧은 구간 안에 선에 못 붙는다.
+        /// 그래서 각도도 같이 본다. 아주 가까워졌으면 더 기다려봐야 소용없으므로 그냥 전환한다.
+        /// </summary>
+        public void TrySwitchToFinalLeg(Vector3 position, Vector3 forward, float switchDistance, NavMeshAgent agent)
         {
             if (!_hasFinalPoint || agent == null || !agent.isOnNavMesh)
             {
                 return;
             }
 
-            if (HorizontalDistance(position, _viaPoint) > switchDistance)
+            float distance = HorizontalDistance(position, _viaPoint);
+
+            if (distance > switchDistance)
+            {
+                return;
+            }
+
+            if (distance > NearViaDistance && !IsAlignedWithFinalLeg(forward))
             {
                 return;
             }
@@ -108,6 +141,25 @@ namespace _Works.CJW.Scripts.Cars
             _segIndex = 0;
         }
 
+        /// <summary>차 머리가 마지막 직선 방향과 얼추나마 맞는지(60도 이내).</summary>
+        private bool IsAlignedWithFinalLeg(Vector3 forward)
+        {
+            Vector3 leg = _finalPoint - _viaPoint;
+            leg.y = 0f;
+            forward.y = 0f;
+
+            if (leg.sqrMagnitude < 1e-6f || forward.sqrMagnitude < 1e-6f)
+            {
+                return true;
+            }
+
+            return Vector3.Dot(forward.normalized, leg.normalized) >= 0.5f;
+        }
+
+        /// <summary>
+        /// 에이전트가 계산해 둔 경로를 주기적으로 읽어온다.
+        /// 매 프레임 읽지 않는 이유는 agent.path가 호출될 때마다 새 객체를 만들기 때문이다.
+        /// </summary>
         /// <summary>
         /// 에이전트가 계산해 둔 경로를 주기적으로 읽어온다.
         /// 매 프레임 읽지 않는 이유는 agent.path가 호출될 때마다 새 객체를 만들기 때문이다.
@@ -142,11 +194,16 @@ namespace _Works.CJW.Scripts.Cars
             }
 
             _cornerCount = path.GetCornersNonAlloc(_corners);
+            Status = path.status;
 
             // 진입점까지의 경로 뒤에 실제 목적지를 붙인다.
-            // 두 번에 나눠 MoveTo하면 진입점에서 한 번 서버리며 오버슈트하지만,
+            // 두 번에 나눠 MoveTo하면 진입점에서 한 번 서버리며 오버슈팅하지만,
             // 한 경로로 이어붙이면 속도를 유지한 채 매끄럽게 통과한다.
-            if (_hasFinalPoint && _cornerCount > 0 && _cornerCount < MaxCorners)
+            //
+            // 단, 경로가 진입점에 닿지도 못했는데(부분 경로) 목적지를 이어붙이면
+            // 경로 끝에서 자리까지 벽을 관통하는 직선이 생긴다. 그때는 붙이지 않는다.
+            if (_hasFinalPoint && Status == NavMeshPathStatus.PathComplete
+                && _cornerCount > 0 && _cornerCount < MaxCorners)
             {
                 _corners[_cornerCount] = _finalPoint;
                 _cornerCount++;

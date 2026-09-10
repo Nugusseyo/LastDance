@@ -2,9 +2,16 @@
 {
     public class UpperIdleState : AbstractState
     {
-        public UpperIdleState(Agent agent, AbstractStateMachine stateMachine,
-             PlayerInputSO input) : base(agent, stateMachine, input)
+        public UpperIdleState(Player agent, AbstractStateMachine stateMachine)
+            : base(agent, stateMachine)
         {
+        }
+
+        public override void Update()
+        {
+            bool isGrabbed = Player.Grab.CurrentWeapon != null;
+            if (isGrabbed)
+                StateMachine.ChangeState<UpperGrabState>();
         }
     }
 }

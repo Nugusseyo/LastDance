@@ -14,7 +14,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
     public sealed class MoveToNearestPointState : CustomerState
     {
         [Tooltip("이 종류의 지점 중 가장 가까운 곳으로 간다.")]
-        [SerializeField] private MapPointType targetPoint = MapPointType.ShopEntrance;
+        [SerializeField] private MapPointType targetPoint = MapPointType.OilDispenser;
 
         [Tooltip("이 시간 안에 도착하지 못하면 Timeout으로 끝낸다. 0이면 무제한.")]
         [SerializeField, Min(0f)] private float timeout = 15f;
@@ -29,13 +29,11 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 return VisitOutcome.Failed;
             }
 
-            if (!Ctx.MapData.TryGetNearest(targetPoint, customer.transform.position, out MapPosition point))
-            {
-                Debug.LogWarning($"[MoveToNearestPoint] {targetPoint} 지점을 찾지 못해 이동하지 않습니다.", customer);
-                return VisitOutcome.Blocked;
-            }
-
-            return await MoveAndWait(point.Position, timeout, ct);
+            if (Ctx.MapData.TryGetNearest(targetPoint, customer.transform.position, out var point))
+                return await MoveAndWait(point.Position, timeout, ct);
+            
+            Debug.LogWarning($"[MoveToNearestPoint] {targetPoint} 지점을 찾지 못해 이동하지 않습니다.", customer);
+            return VisitOutcome.Blocked;
         }
     }
 }

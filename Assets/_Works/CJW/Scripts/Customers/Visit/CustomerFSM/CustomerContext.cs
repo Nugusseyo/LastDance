@@ -1,5 +1,6 @@
 using _Works.CJW.Scripts.Customers.Data;using _Works.CJW.Scripts.MapSystems;
-
+using JetBrains.Annotations;
+using Resources.DataBase.Human_Data;
 using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
@@ -18,6 +19,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
     /// </summary>
     public sealed class CustomerContext
     {
+        /// <summary> 진상 손님인지 평범한 손님인지 체크 </summary>
+        [field:SerializeField] public HumanType HumanType { get; private set; }
         /// <summary>이 컨텍스트의 주인.</summary>
         public AbstractCustomer Customer { get; private set; }
 
@@ -30,12 +33,14 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
         /// <summary>현재 방문의 차 단위 값. 방문 밖에서는 null이다.</summary>
         public VisitContext Visit { get; private set; }
 
+        /// <summary> 손님이 가는 맵의 위치. Rentable일 경우 Release를 해야한다. </summary>
+        [CanBeNull]
+        public RentableMapPosition RentedPosition { get; set; }
+
         /// <summary>전투 대상이나 파손 대상. 인터럽트를 건 쪽이 채워준다.</summary>
         public Transform Target;
         /// <summary>이 방문에서 배정받은 좌석 번호. 하차 순서와 승차 좌석에 모두 쓰인다.</summary>
         public int SeatIndex { get; private set; }
-
-
         public CustomerDataSO Data => Customer != null ? Customer.Data : null;
 
         public void Bind(AbstractCustomer customer, CustomerStateMachine machine, MapDataSo mapData)
@@ -45,7 +50,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             MapData = mapData;
         }
 
-                public void SetVisit(VisitContext visit, int seatIndex = 0)
+        public void SetVisit(VisitContext visit, int seatIndex = 0)
         {
             Visit = visit;
             SeatIndex = seatIndex;
@@ -57,7 +62,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
         /// </summary>
         public void Reset()
         {
-                        Visit = null;
+            Visit = null;
             Target = null;
             SeatIndex = 0;
         }
