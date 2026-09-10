@@ -9,12 +9,9 @@
 
         public override void Update()
         {
-            bool isGrabbed = Player.Grab.CurrentWeapon != null
-                                        && !StateMachine.IsState<UpperAttackState>();
+            bool isGrabbed = Player.Grab.CurrentWeapon != null;
             if (isGrabbed)
                 StateMachine.ChangeState<UpperGrabState>();
-            else
-                StateMachine.ChangeState<UpperIdleState>();
         }
     }
 }
