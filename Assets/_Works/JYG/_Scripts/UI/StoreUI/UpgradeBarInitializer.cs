@@ -31,7 +31,7 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             if (index >= _barRendererList.Count)
             {
                 Debug.LogWarning("레벨보다 더 큰 레벨값을 전달했습니다. : " + gameObject.name);
-                return;
+                index = _barRendererList.Count - 1;
             }
 
             int maxCount = _barRendererList.Count - 1;

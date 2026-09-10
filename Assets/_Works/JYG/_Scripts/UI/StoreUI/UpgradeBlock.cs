@@ -24,6 +24,17 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             countTmp.text = GetStringWithUpgradeType(item.value.ValueType, item.value.Value);
             curLevel = item.level;
         }
+
+        public void UpgradeRequest(int level, bool isScan) //Save & Load에서 사용되는 함수. 또는 레벨업 시 사용 되는 함수
+        {
+            curLevel = level;
+            int startPos = isScan ? 0 : curLevel - 1;
+            
+            for (int i = startPos; i < curLevel; ++i)
+            {
+                barInitializer.SetColor(level, true);
+            }
+        }
         
         //ValueType과 value를 받으면 가공해서 ~%, ~회, x~ 형태로 반환해준다.
         private string GetStringWithUpgradeType(UpgradeType upgradeType, float value)
