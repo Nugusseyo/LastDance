@@ -35,3 +35,25 @@ MonoBehaviour:
     lv8value: 13
     lv9value: 15
     upgradetype: 1
+  - index: 1
+    value: "\uC548\uB155\uD558\uC138\uC6A9"
+    maxlv: 9
+    lv1price: 1
+    lv2price: 2
+    lv3price: 3
+    lv4price: 4
+    lv5price: 5
+    lv6price: 6
+    lv7price: 7
+    lv8price: 8
+    lv9price: 9
+    lv1value: 1
+    lv2value: 2
+    lv3value: 3
+    lv4value: 4
+    lv5value: 5
+    lv6value: 6
+    lv7value: 7
+    lv8value: 8
+    lv9value: 9
+    upgradetype: 3

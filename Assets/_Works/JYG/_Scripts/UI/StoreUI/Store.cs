@@ -50,7 +50,8 @@ namespace _Works.JYG._Scripts.UI.StoreUI
              {
                  StoreItem loadItem = saveLoadData[data.index];
                  UpgradeBlock block = upgradeDict[loadItem.index];
-                 block.UpgradeRequest(loadItem.level, true);
+                 Debug.Log(loadItem.itemName + " : " + loadItem.maxlevel);
+                 block.UpgradeRequest(loadItem.curLevel, true);
              }
          }
 
@@ -62,6 +63,7 @@ namespace _Works.JYG._Scripts.UI.StoreUI
                  (
                      data.index,
                      data.maxlv,
+                     0,
                      data.value,
                      data.lv1price,
                      new UpgradeValue(data.upgradetype, data.lv1value)
@@ -129,15 +131,17 @@ namespace _Works.JYG._Scripts.UI.StoreUI
     public struct StoreItem  //엑셀에 있는 DB데이터로 바꿔야 한다.
     {
         public int index;
-        public int level;
+        public int maxlevel;
+        public int curLevel;
         public string itemName;
         public int price;
         public UpgradeValue value;
 
-        public StoreItem(int index, int level, string itemName, int price, UpgradeValue value)
+        public StoreItem(int index, int maxlevel, int curLevel, string itemName, int price, UpgradeValue value)
         {
             this.index = index;
-            this.level = level;
+            this.maxlevel = maxlevel;
+            this.curLevel = curLevel;
             this.itemName = itemName;
             this.price = price;
             this.value = value;

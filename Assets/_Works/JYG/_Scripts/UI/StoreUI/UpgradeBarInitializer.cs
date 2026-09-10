@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace _Works.JYG._Scripts.UI.StoreUI
 {
     public class UpgradeBarInitializer : MonoBehaviour
     {
         [SerializeField] private GameObject barPrefab;                              //만들어질 바 프리팹
-        private List<SpriteRenderer> _barRendererList = new List<SpriteRenderer>(); //Bar(레벨 칸)을 만들고, 만들어진 바의 렌더러를 담는다.
+        private List<Image> _barRendererList = new List<Image>(); //Bar(레벨 칸)을 만들고, 만들어진 바의 렌더러를 담는다.
 
         [Header("Color Settings")] 
         [SerializeField] private Color defaultColor;    //레벨업이 안된 상태의 색상이다.
@@ -22,7 +23,7 @@ namespace _Works.JYG._Scripts.UI.StoreUI
         {
             for (int i = 0; i < count; ++i)
             {
-                _barRendererList.Add(Instantiate(barPrefab, transform).GetComponent<SpriteRenderer>());
+                _barRendererList.Add(Instantiate(barPrefab, transform).GetComponent<Image>());
             }
         }
 

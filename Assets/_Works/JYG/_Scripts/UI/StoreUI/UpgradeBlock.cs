@@ -17,12 +17,12 @@ namespace _Works.JYG._Scripts.UI.StoreUI
 
         public void UpgradeInit(StoreItem item) //Class 받아야 함. // 받았음.
         {
-            barInitializer.InitializeBar(item.level);
+            barInitializer.InitializeBar(item.maxlevel);
             //여기서 저장된 현재 레벨을 들고와 SetColor 해줘야 한다.
             titleTmp.text = item.itemName;
             priceTmp.text = item.price.ToString();
             countTmp.text = GetStringWithUpgradeType(item.value.ValueType, item.value.Value);
-            curLevel = item.level;
+            curLevel = item.maxlevel;
         }
 
         public void UpgradeRequest(int level, bool isScan) //Save & Load에서 사용되는 함수. 또는 레벨업 시 사용 되는 함수
@@ -39,28 +39,14 @@ namespace _Works.JYG._Scripts.UI.StoreUI
         //ValueType과 value를 받으면 가공해서 ~%, ~회, x~ 형태로 반환해준다.
         private string GetStringWithUpgradeType(UpgradeType upgradeType, float value)
         {
-            return string.Format("{0}{1}{2}", 
-                
-                upgradeType switch 
-                {
-                UpgradeType.Multiply => 'x',
-                _ => '\0' 
-                }, 
-                
-                value,
-                
-                upgradeType switch
-                {
-                    UpgradeType.Percent => "%",
-                    UpgradeType.Add => "회",
-                    _ => '\0'
-                });
-            
-            //(value)%
-            //x(value)
-            //(value)회
-            //이걸 만들고싶었다. Enum값으로.
-            //근데 너무 복잡해진거같아서, 나중에 다시 생각해봐야겠다.
+            string returnText = upgradeType switch
+            {
+                UpgradeType.Multiply => $"x{value}",
+                UpgradeType.Percent  => $"{value}%",
+                UpgradeType.Add      => $"{value}회",
+                _                    => value.ToString()
+            };
+            return returnText;
         }
     }
 }
