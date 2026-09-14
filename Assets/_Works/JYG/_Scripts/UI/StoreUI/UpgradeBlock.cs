@@ -16,7 +16,9 @@ namespace _Works.JYG._Scripts.UI.StoreUI
         [SerializeField] private UpgradeBarInitializer barInitializer;
 
         [SerializeField] private StoreValueContainer storeValueContainer;   //복사해서 써야함. SO라서
-        //[SerializeField] private 여기에클래스입력 이름
+        private StoreValueContainer _realStoreValue;
+
+        public StoreValueContainer RealStoreValue => _realStoreValue;
 
         public void UpgradeInit(StoreItem item) //Class 받아야 함. // 받았음.
         {
@@ -26,6 +28,8 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             priceTmp.text = item.price.ToString();
             countTmp.text = GetStringWithUpgradeType(item.value.ValueType, item.value.Value);
             curLevel = item.maxlevel;
+
+            _realStoreValue = Instantiate(storeValueContainer);
         }
 
         public void UpgradeRequest(int level, bool isScan) //Save & Load에서 사용되는 함수. 또는 레벨업 시 사용 되는 함수
@@ -37,6 +41,8 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             {
                 barInitializer.SetColor(level, true);
             }
+            
+            _realStoreValue.Value = 
         }
         
         //ValueType과 value를 받으면 가공해서 ~%, ~회, x~ 형태로 반환해준다.
@@ -51,5 +57,7 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             };
             return returnText;
         }
+        
+        public void DestroyRealStoreValue() => Destroy(_realStoreValue);
     }
 }

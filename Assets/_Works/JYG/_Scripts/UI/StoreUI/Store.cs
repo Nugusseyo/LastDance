@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using _Works.JYG._Scripts.Data_Container.Money;
 using Resources.DataBase.Human_Data;
 using Resources.DataBase.Upgrade_Data;
 using TMPro;
@@ -11,6 +12,8 @@ namespace _Works.JYG._Scripts.UI.StoreUI
 {
     public class Store : MonoBehaviour
     {
+         [SerializeField] private IntegerDataContainer moneyManager;
+         
          [SerializeField] private Transform upgradeContentParent;    //업그레이드 블럭을 만들 때, 부모가 될 대상이다.
          [SerializeField] private UpgradeBlock upgradeBlock;         //업그레이드 블록의 프리팹임.
          [SerializeField] private List<StoreItem> itemList = new List<StoreItem>();  //엑셀에 있는 리스트로 긁어와야 한다.
@@ -40,6 +43,9 @@ namespace _Works.JYG._Scripts.UI.StoreUI
          private void OnDestroy()
          {
              SaveList();
+             
+             foreach (UpgradeBlock block in upgradeDict.Values)
+                 block.DestroyRealStoreValue();
          }
 
          private void ApplyBlockData()
@@ -115,6 +121,24 @@ namespace _Works.JYG._Scripts.UI.StoreUI
                  Debug.LogError("상점 정보 저장에 실패했습니다.");
              }
          }
+
+         public void TryUpgradeItem(int index)
+         {
+             if (index <= 0 || index >= itemList.Count)
+                 return;
+             
+             if(!CanUpgradeItem(itemList[index]))
+             {
+                 Debug.Log("아이템 구매에 실패했습니다.");
+                 return;
+             }
+             StoreItem curItem = itemList[index];
+             upgradeDict[index].UpgradeRequest(curItem.curLevel + 1, false);
+             
+             
+         }
+         private bool CanUpgradeItem(StoreItem item) => moneyManager.Value >= item.price;
+        
     }
 
     [Serializable]
@@ -148,6 +172,16 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             this.itemName = itemName;
             this.price = price;
             this.value = value;
+        }
+
+        public StoreItem(StoreItem item)
+        {
+            index = item.index;
+            maxlevel = item.maxlevel;
+            curLevel = item.curLevel;
+            itemName = item.itemName;
+            price = item.price;
+            value = item.value;
         }
     }
 
