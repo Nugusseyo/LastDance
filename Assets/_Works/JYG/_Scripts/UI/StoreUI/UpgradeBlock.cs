@@ -1,4 +1,5 @@
 using System;
+using _Works.JYG._Scripts.Data_Container.Store;
 using Resources.DataBase.Upgrade_Data;
 using TMPro;
 using UnityEngine;
@@ -13,6 +14,8 @@ namespace _Works.JYG._Scripts.UI.StoreUI
         [SerializeField] private int curLevel;  //판매 상품의 레벨
         
         [SerializeField] private UpgradeBarInitializer barInitializer;
+
+        [SerializeField] private StoreValueContainer storeValueContainer;   //복사해서 써야함. SO라서
         //[SerializeField] private 여기에클래스입력 이름
 
         public void UpgradeInit(StoreItem item) //Class 받아야 함. // 받았음.

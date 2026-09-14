@@ -16,8 +16,8 @@ namespace _Works.JYG._Scripts.UI.StoreUI
          [SerializeField] private List<StoreItem> itemList = new List<StoreItem>();  //엑셀에 있는 리스트로 긁어와야 한다.
          private List<StoreItem> saveLoadData;     //저장된 파일로부터 가져온 이전 게임의 레벨 데이터
 
-         private const string SaveFilePath = "storeData.json";
-         public string SavePath => Path.Combine(Application.persistentDataPath, SaveFilePath);
+         private const string SaveFilePath = "storeData.json";  //저장할 json데이터의 이름
+         public string SavePath => Path.Combine(Application.persistentDataPath, SaveFilePath);  //저장 루트 (윈도우나 apk가 지정해주는 폴더임)
          private UpgradeDB upgradeDB;
          
          private Dictionary<int, UpgradeBlock> upgradeDict = new();
@@ -101,8 +101,11 @@ namespace _Works.JYG._Scripts.UI.StoreUI
          {
              try
              {
-                 StoreValueForJson jsonClass = new();
-                 jsonClass.saveData = itemList;
+                 StoreValueForJson jsonClass = new()
+                 {
+                     saveData = itemList
+                 };
+                 
                  string saveJson = JsonUtility.ToJson(jsonClass);
                  Debug.Log("<color=green> Save : </color>" + saveJson);
                  File.WriteAllText(SavePath, saveJson);
