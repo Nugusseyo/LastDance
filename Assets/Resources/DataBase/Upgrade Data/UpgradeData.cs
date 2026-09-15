@@ -39,15 +39,16 @@ namespace Resources.DataBase.Upgrade_Data
             // Add : 저장된 값 그대로 반환
             List<UpgradeDataWrapper> listValue = new()
             {
-                new UpgradeDataWrapper(lv1price, lv1value),
-                new UpgradeDataWrapper(lv2price, lv2value),
-                new UpgradeDataWrapper(lv3price, lv3value),
-                new UpgradeDataWrapper(lv4price, lv4value),
-                new UpgradeDataWrapper(lv5price, lv5value),
-                new UpgradeDataWrapper(lv6price, lv6value),
-                new UpgradeDataWrapper(lv7price, lv7value),
-                new UpgradeDataWrapper(lv8price, lv8value),
-                new UpgradeDataWrapper(lv9price, lv9value),
+                new UpgradeDataWrapper(lv1price, 0),
+                new UpgradeDataWrapper(lv2price, lv1value),
+                new UpgradeDataWrapper(lv3price, lv2value),
+                new UpgradeDataWrapper(lv4price, lv3value),
+                new UpgradeDataWrapper(lv5price, lv4value),
+                new UpgradeDataWrapper(lv6price, lv5value),
+                new UpgradeDataWrapper(lv7price, lv6value),
+                new UpgradeDataWrapper(lv8price, lv7value),
+                new UpgradeDataWrapper(lv9price, lv8value),
+                new UpgradeDataWrapper(0, lv9value),
             };
 
             float multiplier = 1;

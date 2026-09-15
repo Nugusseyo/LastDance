@@ -54,10 +54,14 @@ namespace _Works.JYG._Scripts.UI.StoreUI
 
              foreach (StoreItem data in saveLoadData)
              {
-                 StoreItem loadItem = saveLoadData[data.index];
-                 UpgradeBlock block = upgradeDict[loadItem.index];
-                 Debug.Log(loadItem.itemName + " : " + loadItem.maxlevel);
-                 block.UpgradeRequest(loadItem.curLevel, true);
+                 if (upgradeDict.TryGetValue(data.index, out UpgradeBlock block))
+                 {
+                     // 세이브 데이터를 메모리 itemList에도 반영하여 세이브 데이터 유실 방지
+                     int targetIdx = itemList.FindIndex(x => x.index == data.index);
+                     if (targetIdx != -1) itemList[targetIdx] = data;
+
+                     block.UpgradeRequest(data, true);
+                 }
              }
          }
 
@@ -80,7 +84,10 @@ namespace _Works.JYG._Scripts.UI.StoreUI
                  foreach (StoreItem item in itemList)   //블럭의 수만큼 foreach 돌려준다.
                  {
                      UpgradeBlock block = Instantiate(upgradeBlock, upgradeContentParent);
-                     block.UpgradeInit(item);   //Block Init에서는 레벨 칸 갯수, 이벤트 연결 작업을 해준다.
+                     int itemIdx = item.index;
+                     block.UpgradeInit(item,
+                         upgradeDB.UpgradeSheet[item.index].GetNormalizedValue(),
+                         () => TryUpgradeItem(itemIdx));   //Block Init에서는 레벨 칸 갯수, 이벤트 연결 작업을 해준다.
                      upgradeDict.Add(item.index, block);
                  }
          }
@@ -99,6 +106,13 @@ namespace _Works.JYG._Scripts.UI.StoreUI
              string jsonFile = File.ReadAllText(SavePath);
              
              StoreValueForJson save = JsonUtility.FromJson<StoreValueForJson>(jsonFile);
+             if (save == null)
+             {
+                 Debug.Log("저장된 세이브 파일이 손상되어서 기본 값을 사용함.");
+                 saveLoadData = new();
+                 return;
+             }
+             
              saveLoadData = new(save.saveData);
              Debug.Log("데이터 로드 성공.");
          }
@@ -124,20 +138,22 @@ namespace _Works.JYG._Scripts.UI.StoreUI
 
          public void TryUpgradeItem(int index)
          {
-             if (index <= 0 || index >= itemList.Count)
+             if (index < 0 || index >= itemList.Count)
                  return;
              
-             if(!CanUpgradeItem(itemList[index]))
+             StoreItem curItem = itemList[index];
+             if(!CanUpgradeItem(curItem))
              {
                  Debug.Log("아이템 구매에 실패했습니다.");
                  return;
              }
-             StoreItem curItem = itemList[index];
-             upgradeDict[index].UpgradeRequest(curItem.curLevel + 1, false);
-             
-             
+             UpgradeBlock block = upgradeDict[curItem.index];
+             StoreItem upgradeItem = block.GetUpgradeStoreItem();
+             itemList[index] = upgradeItem;
+             moneyManager.Value -= curItem.price;
+             block.UpgradeRequest(upgradeItem, false);
          }
-         private bool CanUpgradeItem(StoreItem item) => moneyManager.Value >= item.price;
+         private bool CanUpgradeItem(StoreItem item) => moneyManager.Value >= item.price && item.maxlevel > item.curLevel;
         
     }
 
@@ -151,6 +167,12 @@ namespace _Works.JYG._Scripts.UI.StoreUI
         {
             this.ValueType = type;
             this.Value = value;
+        }
+
+        public UpgradeValue(UpgradeValue value)
+        {
+            ValueType = value.ValueType;
+            Value = value.Value;
         }
     }
     

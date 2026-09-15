@@ -12053,6 +12053,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6272284727962881775, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
+      propertyPath: moneyManager
+      value: 
+      objectReference: {fileID: 11400000, guid: e2d9677edeb7e28419dd3296b34645f6, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
