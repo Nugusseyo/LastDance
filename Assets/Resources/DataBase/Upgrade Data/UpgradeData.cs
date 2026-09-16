@@ -75,6 +75,7 @@ namespace Resources.DataBase.Upgrade_Data
                     continue;
                 }
                 wrapper.value *= multiplier;
+                wrapper.value = (float)Math.Round(wrapper.value, 2);
             }
             
             return listValue;

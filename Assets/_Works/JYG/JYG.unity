@@ -10878,6 +10878,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7289878340555720972, guid: bda339a6352bc964793845848649cd45, type: 3}
   m_PrefabInstance: {fileID: 1939431650}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1975422930
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1975422931}
+  m_Layer: 0
+  m_Name: Interactable Obj Area
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1975422931
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1975422930}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.97, y: 0, z: -4.51}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1978259523
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12053,10 +12084,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6272284727962881775, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
-      propertyPath: moneyManager
-      value: 
-      objectReference: {fileID: 11400000, guid: e2d9677edeb7e28419dd3296b34645f6, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12134,3 +12161,4 @@ SceneRoots:
   - {fileID: 2202228569491852363}
   - {fileID: 1883589565}
   - {fileID: 690705183}
+  - {fileID: 1975422931}

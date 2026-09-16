@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using _Works.JYG._Scripts.Data_Container;
 using _Works.JYG._Scripts.Data_Container.Store;
 using Resources.DataBase.Upgrade_Data;
 using TMPro;
@@ -26,7 +27,9 @@ namespace _Works.JYG._Scripts.UI.StoreUI
 
         private Action onBuyButtonPressed;
 
-        public StoreValueContainer RealStoreValue => _realStoreValue;
+        private const string Max = "MAX";
+
+        public IDataContainer<float> RealStoreValue => _realStoreValue;
         public StoreItem CurItem => _item;
 
         public void UpgradeInit(StoreItem item, List<UpgradeDataWrapper> upgradeData, Action buyLogic) //Class 받아야 함. // 받았음.
@@ -43,13 +46,6 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             buyButton.onClick.AddListener(() => onBuyButtonPressed?.Invoke());
         }
 
-        private void UpdateUI(StoreItem item)
-        {
-            titleTmp.text = item.itemName;
-            priceTmp.text = item.price.ToString();
-            countTmp.text = GetStringWithUpgradeType(item.value.ValueType, item.value.Value);
-        }
-
         public void UpgradeRequest(StoreItem item, bool isScan) //Save & Load에서 사용되는 함수. 또는 레벨업 시 사용 되는 함수
         {
             _item = item;
@@ -64,6 +60,21 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             UpdateUI(item);
 
             SetStatusWithLevel();
+        }
+        
+        private void UpdateUI(StoreItem item)
+        {
+            titleTmp.text = item.itemName;
+
+            if (item.maxlevel == item.curLevel)
+            {
+                priceTmp.text = Max;
+                buyButton.enabled = false;
+            }
+            else
+                priceTmp.text = item.price.ToString();
+            
+            countTmp.text = GetStringWithUpgradeType(item.value.ValueType, item.value.Value);
         }
 
         private void SetStatusWithLevel()
