@@ -2,13 +2,17 @@
 {
     public class UpperGrabState : AbstractState
     {
-        private Player _player;
-
         public UpperGrabState(Player player, AbstractStateMachine stateMachine)
             : base(player, stateMachine)
         {
+
         }
 
-
+        public override void Update()
+        {
+            bool isGrabbed = Player.Grab.CurrentWeapon != null;
+            if (isGrabbed == false)
+                StateMachine.ChangeState<UpperIdleState>();
+        }
     }
 }
