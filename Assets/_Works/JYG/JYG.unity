@@ -11828,10 +11828,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SpeechBubble Canvas
       objectReference: {fileID: 0}
-    - target: {fileID: 5454252561990155093, guid: 1e1caf86021a45048b09a5c09de6ce2f, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -11845,18 +11841,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 51777301986931315, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 51777301986931315, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 51777301986931315, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 154686411378449123, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -11961,14 +11945,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2590593519659726545, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: -549.9601
-      objectReference: {fileID: 0}
-    - target: {fileID: 2590593519659726545, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -34.979965
-      objectReference: {fileID: 0}
     - target: {fileID: 3610933756458392111, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -12008,10 +11984,6 @@ PrefabInstance:
     - target: {fileID: 3866654951270489308, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3909043718392149512, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4245357494270122425, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
       propertyPath: m_AnchorMax.y
@@ -12079,22 +12051,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4868993279761095589, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6357726610246223432, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9120496641836048195, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9120496641836048195, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9120496641836048195, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
-      propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
