@@ -6,18 +6,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
 {
-    /// <summary>
-    /// 손님 한 명의 행동 머신. MonoBehaviour가 아니라 순수 C#이고,
-    /// 직렬화와 수명은 <see cref="CustomerFSMModule"/>이 맡는다.
-    ///
-    /// 세션이 Phase를 넘길 때 <see cref="RunPhase"/>를 부르고, 그 Phase의 시퀀스가 끝나면
-    /// UniTask가 완료된다. 이것이 세션과 손님을 잇는 유일한 접점이다 —
-    /// 머신은 자기가 어느 Phase에 있는지 스스로 판단하지 않는다.
-    ///
-    /// 전이 통로는 둘이다.
-    ///  - 정상 완료: 상태가 <see cref="VisitOutcome"/>을 반환하고 다음 인덱스로
-    ///  - 인터럽트: 토큰이 취소되고 지정된 상태로 갈아탄 뒤 원래 상태부터 재개
-    /// </summary>
+    /// <summary>손님 한 명의 행동 머신. 순수 C# 클래스이며 직렬화와 수명은 <see cref="CustomerFSMModule"/>이 맡는다. 전이는 정상 완료(다음 인덱스로) 또는 인터럽트(지정 상태로 갈아탄 뒤 재개) 둘 중 하나다.</summary>
     public sealed class CustomerStateMachine
     {
         private readonly CustomerContext _ctx;
@@ -35,10 +24,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
 
         private CustomerState _interruptTarget;
 
-        /// <summary>
-        /// 전이 세대. 인터럽트를 걸었던 그 상태가 아직 돌고 있을 때만 유효하도록 묶는다.
-        /// 이게 없으면 상태가 정상 완료되는 순간 들어온 인터럽트가 다음 상태를 엉뚱하게 바꾼다.
-        /// </summary>
+        /// <summary>전이 세대. 인터럽트를 걸었던 상태가 아직 돌고 있을 때만 유효하도록 묶는다.</summary>
         private int _generation;
         private int _interruptGeneration = -1;
 
@@ -96,10 +82,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             _lifetime = new CancellationTokenSource();
         }
 
-        /// <summary>
-        /// 방문 종료. 풀 반납 시 반드시 호출해야 한다.
-        /// 호출하지 않으면 대기 중이던 상태가 좀비로 남는다.
-        /// </summary>
+        /// <summary>방문 종료. 풀 반납 시 반드시 호출해야 한다. 안 그러면 대기 중이던 상태가 좀비로 남는다.</summary>
         public void Stop()
         {
             _phase?.Cancel();
@@ -117,11 +100,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             Current = null;
         }
 
-        /// <summary>
-        /// 해당 Phase의 시퀀스를 순서대로 실행하고, 전부 끝나면 완료된다.
-        /// 등록된 상태가 없으면 즉시 완료된다 — 차에서 안 내리는 손님이
-        /// Unloading 칸을 비워두는 방식이 이것이다.
-        /// </summary>
+        /// <summary>해당 Phase의 시퀀스를 순서대로 실행하고, 전부 끝나면 완료된다. 등록된 상태가 없으면 즉시 완료된다.</summary>
         public async UniTask RunPhase(VisitPhase phase)
         {
             if (_lifetime == null)
@@ -196,10 +175,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             }
         }
 
-        /// <summary>
-        /// 어느 상태에서든 지정한 상태로 갈아탄다.
-        /// 상태마다 "전투로 갈 수 있는가"를 정의할 필요가 없어 상태 곱셈이 막힌다.
-        /// </summary>
+        /// <summary>어느 상태에서든 지정한 상태로 갈아탄다. 상태마다 전이 가능 여부를 정의할 필요가 없다.</summary>
         public void Interrupt(CustomerState to)
         {
             if (to == null || _running == null || _running.IsCancellationRequested)

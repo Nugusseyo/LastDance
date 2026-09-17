@@ -160,11 +160,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 28105991}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &166488014
@@ -208,11 +208,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 166488014}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &205586802
@@ -426,11 +426,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 206790677}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &336491503
@@ -718,6 +718,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1022473432
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 757970547890689392, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_Name
+      value: Capsule
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 5.46166
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -7.44476
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
 --- !u!1 &1192592655
 GameObject:
   m_ObjectHideFlags: 0
@@ -1083,11 +1140,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1304488402}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &1544321865
@@ -1179,11 +1236,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1722761556}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &1775278942
@@ -1227,11 +1284,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1775278942}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &1820375806
@@ -1275,11 +1332,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1820375806}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &1863309873
@@ -1485,3 +1542,4 @@ SceneRoots:
   - {fileID: 1544321867}
   - {fileID: 731816921}
   - {fileID: 825971556}
+  - {fileID: 1022473432}

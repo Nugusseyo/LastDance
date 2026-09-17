@@ -7,10 +7,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
     {
         public VisitPhase Phase => VisitPhase.Leaving;
 
-        /// <summary>
-        /// 퇴장에 쓸 수 있는 한계 시간(초).
-        /// 여기서 막히면 방문이 Completed에 도달하지 못해 차·손님·주차 자리가 전부 회수되지 않는다.
-        /// </summary>
+        /// <summary>퇴장에 쓸 수 있는 한계 시간(초). 없으면 막힌 방문이 Completed에 도달하지 못해 자원이 회수되지 않는다.</summary>
         private const float PhaseTimeout = 30f;
 
         private float _elapsed;

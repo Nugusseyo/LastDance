@@ -7,24 +7,7 @@ using UnityEngine.UIElements;
 
 namespace GameEditor
 {
-    /// <summary>
-    /// <c>[SerializeReference]</c> 필드에 <b>종류를 고르는 드롭다운</b>을 붙인다.
-    ///
-    /// 에디터 버전과 인스펙터 구현에 따라 내장 타입 피커가 나타나지 않아, <c>+</c>를 눌러도
-    /// 리스트에 null(<c>rid: -2</c>)만 들어가는 경우가 있다. 조각을 쌓아서 카드와 적을 만드는
-    /// 이 프로젝트에서는 그 드롭다운이 곧 작업 도구이므로, 내장 UI에 기대지 않고 직접 그린다.
-    ///
-    /// 모양은 <c>Editor/UI/ManagedReferencePicker.uxml</c>과 <c>.uss</c>가 갖는다. IMGUI처럼
-    /// 좌표를 계산해 그리지 않으므로 <b>줄 높이를 직접 재는 코드가 없다</b> — 조각마다 칸 수가 다르고
-    /// 접힘 상태까지 얽히는 자리라, 높이 계산은 원래 어긋나기 가장 쉬운 부분이다.
-    ///
-    /// 고를 수 있는 후보는 필드에 선언된 타입에서 파생된 것 중 <see cref="SerializableAttribute"/>가
-    /// 붙은 구체 클래스뿐이다. 선언 타입은 <c>managedReferenceFieldTypename</c>이 알려 주므로,
-    /// 새 조각을 만들어도 이 드로어는 손대지 않는다.
-    ///
-    /// 인터페이스로 선언된 필드에는 붙일 수 없다 — <see cref="CustomPropertyDrawer"/>가 클래스만
-    /// 대상으로 받기 때문이다. 조각의 부모를 추상 클래스로 두는 또 하나의 이유다.
-    /// </summary>
+    /// <summary><c>[SerializeReference]</c> 필드에 종류를 고르는 드롭다운을 붙인다. 내장 타입 피커가 에디터 버전에 따라 나타나지 않는 경우가 있어 UI를 직접 그린다. 모양은 <c>Editor/UI/ManagedReferencePicker.uxml</c>/<c>.uss</c>가 갖는다.</summary>
     public abstract class ManagedReferencePickerDrawer : PropertyDrawer
     {
         private const string TemplateName = "ManagedReferencePicker";
@@ -170,10 +153,7 @@ namespace GameEditor
             owner.ApplyModifiedProperties();
         }
 
-        /// <summary>
-        /// 필드에 선언된 타입. 리스트라면 요소 타입이 들어오므로 목록과 단일 필드를 구분할 필요가 없다.
-        /// 형식은 "어셈블리 이름 + 공백 + 전체 이름"이다.
-        /// </summary>
+        /// <summary>필드에 선언된 타입. 형식은 "어셈블리 이름 + 공백 + 전체 이름"이다.</summary>
         private static Type ResolveFieldType(SerializedProperty property)
         {
             string declared = property.managedReferenceFieldTypename;
@@ -191,10 +171,7 @@ namespace GameEditor
             // 전체 이름, 어셈블리를 하면 어셈블리로 가서 찾아줌
         }
 
-        /// <summary>
-        /// 고를 수 있는 조각들. 추상 클래스와 <see cref="SerializableAttribute"/>가 없는 타입은
-        /// 담을 수 없으므로 뺀다.
-        /// </summary>
+        /// <summary>고를 수 있는 조각들. 추상 클래스와 <see cref="SerializableAttribute"/>가 없는 타입은 뺀다.</summary>
         private static List<Type> GetSelectableTypes(Type baseType)
         {
             var result = new List<Type>();
@@ -228,9 +205,7 @@ namespace GameEditor
             }
         }
 
-        /// <summary>
-        /// 틀 자산을 찾는다. 경로를 박아 두지 않고 이름으로 찾으므로 Editor 폴더를 옮겨도 따라온다.
-        /// </summary>
+        /// <summary>틀 자산을 찾는다. 경로를 박아 두지 않고 이름으로 찾으므로 Editor 폴더를 옮겨도 따라온다.</summary>
         private static VisualTreeAsset LoadTemplate()
         {
             if (_template != null) return _template;

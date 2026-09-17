@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using _Works.CJW.Scripts.MapSystems;
 using DevLib.ModuleSystem;
@@ -6,13 +7,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
 {
-    /// <summary>
-    /// 손님 상태 머신의 껍데기. 직렬화와 수명만 맡고 로직은 <see cref="CustomerStateMachine"/>에 있다.
-    ///
-    /// 손님 타입은 이 모듈에 꽂힌 시퀀스가 정의한다. 상태는 [SerializeReference]로
-    /// 프리팹에 직접 저장되므로 설정값이 그 손님 타입에만 속한다 —
-    /// 같은 행동을 손님마다 다른 값으로 쓸 수 있고, 공유 에셋을 건드릴 일이 없다.
-    /// </summary>
+    /// <summary>손님 상태 머신의 껍데기. 직렬화와 수명만 맡고 로직은 <see cref="CustomerStateMachine"/>에 있다. 상태는 [SerializeReference]로 프리팹에 직접 저장되어 손님마다 다른 값을 쓸 수 있다.</summary>
     public class CustomerFSMModule : AbstractModule
     {
         [Serializable]
@@ -63,9 +58,27 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
 
             if (sequences != null)
             {
+                // 같은 Phase가 두 번 등록되면 Register가 Dictionary에 덮어써 앞의 시퀀스가 통째로 사라진다.
+                HashSet<VisitPhase> seen = new HashSet<VisitPhase>();
+
                 for (int i = 0; i < sequences.Length; i++)
                 {
-                    Machine.Register(sequences[i].Phase, sequences[i].States);
+                    VisitPhase phase = sequences[i].Phase;
+
+                    // VisitPhase는 4번이 비어 있는 enum이다. 정의되지 않은 값에 등록된 시퀀스는
+                    // RunPhase의 TryGetValue가 영영 찾지 못해 조용히 통째로 건너뛰어진다.
+                    if (!Enum.IsDefined(typeof(VisitPhase), phase))
+                    {
+                        Debug.LogError($"[CustomerFSMModule] 정의되지 않은 Phase({(int)phase})에 시퀀스가 등록되어 있어 실행되지 않습니다.", this);
+                        continue;
+                    }
+
+                    if (!seen.Add(phase))
+                    {
+                        Debug.LogError($"[CustomerFSMModule] {phase} 시퀀스가 두 번 등록되어 앞의 것이 무시됩니다.", this);
+                    }
+
+                    Machine.Register(phase, sequences[i].States);
                 }
             }
 
@@ -74,7 +87,6 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             Machine.Bind(flee);
         }
 
-        /// <summary>방문 시작. VisitSession.Begin이 손님마다 호출한다.</summary>
         /// <summary>방문 시작. VisitSession.Begin이 손님마다 호출한다.</summary>
         public void Begin(VisitContext visit, int seatIndex)
         {

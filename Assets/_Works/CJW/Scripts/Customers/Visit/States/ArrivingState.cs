@@ -6,11 +6,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
     /// <summary>차량이 정차 지점까지 들어온다.</summary>
     public sealed class ArrivingState : IVisitState
     {
-        /// <summary>
-        /// 정차 지점 앞에 두는 진입점까지의 거리(m).
-        /// 차는 여기를 먼저 찍고 자리 정면으로 곧게 들어오므로, 도착했을 때 이미 방향이 맞아 있다.
-        /// 자리 앞이 좁아 진입점이 NavMesh 밖으로 나가면 이 단계는 통째로 건너뛴다.
-        /// </summary>
+        /// <summary>정차 지점 앞에 두는 진입점까지의 거리(m). 여길 먼저 찍고 자리 정면으로 곧게 들어와 도착 시 방향이 맞아 있게 한다.</summary>
         private const float ApproachDistance = 9f;
 
         /// <summary>진입점을 NavMesh 위에서 찾을 때 허용할 오차(m).</summary>
@@ -21,17 +17,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
         /// <summary>도착해서 멈춘 뒤, 남은 각도를 마저 맞추는 중인지.</summary>
                 private bool _aligning;
 
-        /// <summary>
-        /// 이번 주차에서 실제로 맞출 방향. 자리 회전 그대로일 수도, 180도 뒤집힌 것일 수도 있다.
-        /// 전면·후면 주차를 둘 다 허용하므로 어느 쪽이든 자리에 나란히 서기만 하면 된다.
-        /// </summary>
+        /// <summary>이번 주차에서 실제로 맞출 방향. 전면·후면 주차를 둘 다 허용하므로 자리 회전 그대로일 수도, 180도 뒤집힌 것일 수도 있다.</summary>
         private Quaternion _targetRotation = Quaternion.identity;
 
-        /// <summary>
-        /// 이 단계에 머물 수 있는 한계 시간(초).
-        /// 여기서 막히면 세션이 끝나지 않아 주차 자리가 영영 반납되지 않고,
-        /// 동시 방문 수를 채우면 스폰 자체가 멈춘다. 그걸 막는 바닥이다.
-        /// </summary>
+        /// <summary>이 단계에 머물 수 있는 한계 시간(초). 없으면 막힌 세션이 주차 자리를 영영 반납하지 않아 스폰까지 멈춘다.</summary>
         private const float PhaseTimeout = 45f;
 
         private float _elapsed;

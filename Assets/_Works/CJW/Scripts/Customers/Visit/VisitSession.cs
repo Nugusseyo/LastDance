@@ -11,11 +11,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit
 {
-    /// <summary>
-    /// 차량 1대와 그 차에 탄 손님들의 방문 한 번.
-    /// 차와 손님은 서로를 참조하지 않고, 둘을 엮는 일은 전부 이 세션 안에서만 일어난다.
-    /// 단계별 진행은 IVisitState가 맡고, 세션은 전이와 수명만 소유한다.
-    /// </summary>
+    /// <summary>차량 1대와 그 차에 탄 손님들의 방문 한 번. 차와 손님은 서로를 참조하지 않고 이 세션이 둘을 엮는다. 단계별 진행은 IVisitState가 맡고, 세션은 전이와 수명만 소유한다.</summary>
     public sealed class VisitSession : IUpdate
     {
         private const int PhaseCount = (int)VisitPhase.Completed + 1;
@@ -123,7 +119,6 @@ namespace _Works.CJW.Scripts.Customers.Visit
         }
 
         /// <summary>손님을 먼저, 차를 나중에 반납한다. 순서가 뒤집히면 손님이 허공에 남는다.</summary>
-        /// <summary>손님을 먼저, 차를 나중에 반납한다. 순서가 뒤집히면 손님이 허공에 남는다.</summary>
         public void ReturnToPool(PoolManagerSO pool)
         {
             List<AbstractCustomer> customers = _context.Customers;
@@ -148,6 +143,15 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
         private void ChangeState(VisitPhase phase)
         {
+            // None과 Completed는 상태가 없는 게 정상이다. 그 밖의 Phase에 상태가 없으면
+            // _current가 null로 굳어 방문이 영영 끝나지 않고, 주차 자리도 반납되지 않아
+            // 결국 스폰 전체가 멈춘다. 조용히 굳는 대신 방문을 닫아 자원을 회수한다.
+            if (phase != VisitPhase.None && phase != VisitPhase.Completed && _states[(int)phase] == null)
+            {
+                Debug.LogError($"[VisitSession] {phase} 단계에 IVisitState가 없어 방문을 강제로 종료합니다.");
+                phase = VisitPhase.Completed;
+            }
+
             Phase = phase;
             _current = _states[(int)phase];
             _current?.Enter(_context);
@@ -164,14 +168,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
         }
 
-        /// <summary>
-        /// 해당 Phase에서 손님들이 할 일을 동시에 돌리고 전원 끝날 때까지 기다린다.
-        /// 안 내리는 손님은 즉시 끝나고 난동 부리는 손님은 오래 걸리지만, 세션은 둘을 구별하지 않는다.
-        /// </summary>
-        /// <summary>
-        /// 해당 Phase에서 손님들이 할 일을 동시에 돌리고 전원 끝날 때까지 기다린다.
-        /// 안 내리는 손님은 즉시 끝나고 난동 부리는 손님은 오래 걸리지만, 세션은 둘을 구별하지 않는다.
-        /// </summary>
+        /// <summary>해당 Phase에서 손님들이 할 일을 동시에 돌리고 전원 끝날 때까지 기다린다. 세션은 손님별 소요 시간을 구별하지 않는다.</summary>
         private async UniTaskVoid RunCustomerPhase(VisitPhase phase)
         {
             // 이전 Phase의 시퀀스가 취소되면서 닮힐 때, 그 완료가 지금 Phase를

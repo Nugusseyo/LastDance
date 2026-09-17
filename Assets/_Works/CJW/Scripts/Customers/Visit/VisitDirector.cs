@@ -11,10 +11,7 @@ using Random = UnityEngine.Random;
 
 namespace _Works.CJW.Scripts.Customers.Visit
 {
-    /// <summary>
-    /// 방문을 만들고 끝내는 주체. 풀에서 차와 손님을 꺼내 VisitSession에 넘기고,
-    /// 끝난 방문의 등록 해제와 반납까지 책임진다.
-    /// </summary>
+    /// <summary>방문을 만들고 끝내는 주체. 풀에서 차와 손님을 꺼내 VisitSession에 넘기고, 끝난 방문의 등록 해제와 반납까지 책임진다.</summary>
     public class VisitDirector : MonoBehaviour, IUpdate, IVisitDirector
     {
         private sealed class ActiveVisit
@@ -61,10 +58,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
         public int ActiveVisitCount => _activeVisits.Count;
 
-        /// <summary>
-        /// 방문이 시작될 때 발생. 세션이 이미 Arriving 단계이므로 Car와 Customers를 바로 읽을 수 있다.
-        /// 청소·주문 쪽에서 이걸 구독해 세션을 들고 있다가 RequestDeparture()를 부르면 된다.
-        /// </summary>
+        /// <summary>방문이 시작될 때 발생. 세션이 이미 Arriving 단계라 Car와 Customers를 바로 읽을 수 있다.</summary>
         public event Action<VisitSession> VisitStarted;
         private void OnEnable()
         {
@@ -107,10 +101,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             TickAutoDeparture(dt);
         }
 
-        /// <summary>
-        /// 틱마다 스폰을 할 수 있는지 확인하는 메서드
-        /// </summary>
-        /// <param name="dt"></param>
+        /// <summary>틱마다 스폰할 수 있는지 확인한다.</summary>
         private void TickSpawn(float dt)
         {
             // 최대를 넘으면 return
@@ -153,7 +144,6 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
         }
 
-        /// <summary>차 한 대와 손님 몇 명을 꺼내 방문을 시작한다.</summary>
         /// <summary>주차 자리를 하나 빌리고, 차 한 대와 손님 몇 명을 꺼내 방문을 시작한다.</summary>
         public VisitSession BeginVisit()
         {

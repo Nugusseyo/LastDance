@@ -4,12 +4,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.Test
 {
-    /// <summary>
-    /// 맵이 제대로 채워졌는지 확인만 한다.
-    /// 등록은 MapPosition이 OnEnable에서 스스로 하므로 여기서 손으로 넣을 것이 없다.
-    /// 다만 자리가 하나도 없으면 방문이 아예 시작되지 않는데,
-    /// 그 사실을 늦게 알면 원인을 찾기 어렵다.
-    /// </summary>
+    /// <summary>맵이 제대로 채워졌는지 확인만 한다. 자리가 하나도 없으면 방문이 아예 시작되지 않는데, 그 사실을 늦게 알면 원인을 찾기 어렵다.</summary>
     public class TestMapInitializer : MonoBehaviour
     {
         [SerializeField] private MapDataSo mapDataSo;

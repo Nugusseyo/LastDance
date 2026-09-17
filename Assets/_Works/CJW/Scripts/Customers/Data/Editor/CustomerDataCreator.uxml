@@ -1,0 +1,80 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/_Works/CJW/Scripts/Customers/Data/Editor/CustomerDataCreator.uss?fileID=7433441132597879392&amp;guid=1e2db57c9efc5af42bb7eec524c72221&amp;type=3#CustomerDataCreator"/>
+    <ui:VisualElement class="cd-root">
+        <ui:Label name="title-label" class="cd-title"/>
+
+        <!-- 왼쪽은 무엇을 만들지, 오른쪽은 그 손님이 무엇을 할지. 가운데 선을 끌어 폭을 바꾼다. -->
+        <ui:TwoPaneSplitView name="split" orientation="Horizontal" fixed-pane-index="0" fixed-pane-initial-dimension="400">
+
+            <ui:VisualElement name="left-pane" class="cd-pane">
+                <ui:ScrollView class="cd-scroll">
+
+                    <ui:VisualElement class="cd-section">
+                        <ui:Label name="create-title" class="cd-section__title"/>
+
+                        <ui:TextField name="asset-name-field"/>
+                        <ui:VisualElement class="cd-row">
+                            <ui:TextField name="folder-field" class="cd-grow"/>
+                            <ui:Button name="folder-button" class="cd-row__button"/>
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="cd-divider"/>
+
+                        <!-- CustomerDataSO의 필드가 여기에 그대로 그려진다. 필드를 늘려도 코드를 고칠 필요가 없다. -->
+                        <ui:VisualElement name="data-fields"/>
+
+                        <ui:VisualElement class="cd-divider"/>
+
+                        <ui:Label name="pool-title" class="cd-sub-title"/>
+                        <ui:VisualElement class="cd-row">
+                            <uie:ObjectField name="prefab-field" class="cd-grow"/>
+                            <ui:Button name="pool-button" class="cd-row__button"/>
+                        </ui:VisualElement>
+                        <ui:Label name="pool-help" class="cd-help"/>
+
+                        <uie:ObjectField name="template-field"/>
+                        <ui:VisualElement class="cd-row">
+                            <ui:TextField name="prefab-folder-field" class="cd-grow"/>
+                            <ui:Button name="prefab-folder-button" class="cd-row__button"/>
+                        </ui:VisualElement>
+                        <ui:Label name="template-help" class="cd-help"/>
+
+                        <uie:ObjectField name="pool-manager-field"/>
+                        <ui:Label name="manager-help" class="cd-help"/>
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="cd-section">
+                        <ui:VisualElement class="cd-row">
+                            <ui:Label name="existing-title" class="cd-section__title cd-grow"/>
+                            <ui:Button name="refresh-button" class="cd-row__button"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement name="existing-list"/>
+                    </ui:VisualElement>
+
+                </ui:ScrollView>
+
+                <!-- 목록이 길어져도 만들기 버튼과 경고는 늘 보이도록 스크롤 밖에 둔다. -->
+                <ui:VisualElement class="cd-footer">
+                    <ui:VisualElement name="issue-list" class="cd-issues"/>
+                    <ui:Button name="create-button" class="cd-create"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="right-pane" class="cd-pane">
+                <ui:ScrollView class="cd-scroll">
+                    <ui:VisualElement class="cd-section">
+                        <ui:Label name="state-title" class="cd-section__title"/>
+                        <ui:Label name="state-help" class="cd-help"/>
+                        <ui:Toggle name="state-overwrite-toggle"/>
+
+                        <ui:VisualElement class="cd-divider"/>
+
+                        <!-- CustomerFSMModule의 필드가 여기에 그대로 그려진다. 필드를 늘려도 코드를 고칠 필요가 없다. -->
+                        <ui:VisualElement name="state-fields"/>
+                    </ui:VisualElement>
+                </ui:ScrollView>
+            </ui:VisualElement>
+
+        </ui:TwoPaneSplitView>
+    </ui:VisualElement>
+</ui:UXML>
