@@ -1,4 +1,6 @@
 ﻿using _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines;
+using _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates;
+using _Works.JJH._02_Scripts.Agents.Players.FSM.States.UpperStates;
 using DevLib.AnimatorSystem;
 using DevLib.ModuleSystem;
 using UnityEngine;
@@ -18,7 +20,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM
         public UpperBodyStateMachine UpperBody { get; private set; }
 
         private Player _player;
-        private bool _wasGrabbed;
+        private HashDataSO _currentAnimation;
 
         public override void Initialize(ModuleOwner owner)
         {
@@ -26,14 +28,28 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM
 
             _player = owner as Player;
 
-            LowerBody = new LowerBodyStateMachine(_player, _player.PlayerInput, idleHash, moveHash, runHash);
-            UpperBody = new UpperBodyStateMachine(_player, _player.PlayerInput, grabHash, attackHash);
+            LowerBody = new LowerBodyStateMachine(_player);
+            UpperBody = new UpperBodyStateMachine(_player);
 
             LowerBody.Initialize();
             UpperBody.Initialize();
 
-            _player.PlayerInput.OnAttackKeyPressed += UpperBody.Attack;
-            _player.PlayerInput.OnThrowAttackKeyPressed += UpperBody.Attack;
+            _player.PlayerInput.OnAttackKeyPressed += HandleAttackKeyPressed;
+            _player.PlayerInput.OnThrowAttackKeyPressed += HandleAttackKeyPressed;
+        }
+
+        private void OnDestroy()
+        {
+            if (_player != null)
+            {
+                _player.PlayerInput.OnAttackKeyPressed -= HandleAttackKeyPressed;
+                _player.PlayerInput.OnThrowAttackKeyPressed -= HandleAttackKeyPressed;
+            }
+        }
+
+        private void HandleAttackKeyPressed()
+        {
+            UpperBody.ChangeState<UpperAttackState>();
         }
 
         private void Update()
@@ -41,20 +57,30 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM
             LowerBody.Update();
             UpperBody.Update();
 
-            bool isGrabbed = _player.Grab.CurrentWeapon != null;
-            if (isGrabbed && !_wasGrabbed)
-                UpperBody.Grab();
-
-            _wasGrabbed = isGrabbed;
+            UpdateAnimation();
         }
 
-        private void OnDestroy()
+        private void UpdateAnimation()
         {
-            if (_player != null)
-            {
-                _player.PlayerInput.OnAttackKeyPressed -= UpperBody.Attack;
-                _player.PlayerInput.OnThrowAttackKeyPressed -= UpperBody.Attack;
-            }
+            HashDataSO nextAnimation;
+
+            if (UpperBody.IsState<UpperAttackState>())
+                nextAnimation = attackHash;
+            else if (UpperBody.IsState<UpperGrabState>())
+                nextAnimation = grabHash;
+            else if (LowerBody.IsState<LowerRunState>())
+                nextAnimation = runHash;
+            else if (LowerBody.IsState<LowerMoveState>())
+                nextAnimation = moveHash;
+            else
+                nextAnimation = idleHash;
+
+            if (_currentAnimation == nextAnimation)
+                return;
+
+            _currentAnimation = nextAnimation;
+
+            _player.Renderer.PlayClip(nextAnimation.HashValue, 0f, 0.1f);
         }
     }
 }

@@ -2,15 +2,13 @@
 {
     public abstract class AbstractState
     {
-        protected Agent Agent { get; private set; }
+        protected Player Player { get; private set; }
         protected AbstractStateMachine StateMachine { get; private set; }
-        protected PlayerInputSO PlayerInput { get; private set; }
 
-        protected AbstractState(Agent agent, AbstractStateMachine stateMachine, PlayerInputSO input)
+        protected AbstractState(Player player, AbstractStateMachine stateMachine)
         {
-            Agent = agent;
+            Player = player;
             StateMachine = stateMachine;
-            PlayerInput = input;
         }
 
         public virtual void Enter() { }

@@ -4,7 +4,7 @@ using Object = UnityEngine.Object;
 
 namespace _Works.JYG._Scripts.Util
 {
-    //Unity Technology - TowerDefense Template에서 참고해 만듦.
+    //Unity Technology - TowerDefense Template에서 참고해 만듦. 인터페이스 직렬화
     public interface ISerializableInterface
     {
     }

@@ -10,7 +10,7 @@ namespace _Works.JJH._02_Scripts.Agents
         public IRenderer Renderer { get; private set; }
         public ISensor Sensor { get; private set; }
         public IMover Mover { get; private set; }
-        public IBoardable Boarding;
+        public IBoardable Boarding { get; private set; }
 
         protected override void InitializeComponents()
         {

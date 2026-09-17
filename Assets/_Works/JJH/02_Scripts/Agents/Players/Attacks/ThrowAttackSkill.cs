@@ -21,11 +21,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
             Vector3 throwDirection = player.Camera.CameraTrans.forward;
 
             weaponObject.transform.SetParent(null);
-            weapon.Collider.isTrigger = false;
-            weapon.Rigidbody.isKinematic = false;
-            weapon.Rigidbody.AddForce(throwDirection * throwForce, ForceMode.Impulse);
+            weapon.SetPhysicsState();
+            weapon.AddForce(throwDirection * throwForce, ForceMode.Impulse);
 
-            player.Grab.ClearCurrentWeapon();
+            player.Grab.ClearCurrentItem();
         }
     }
 }

@@ -8,82 +8,133 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
         public GrabItem CurrentWeapon { get; private set; }
         public GameObject CurrentGrabObject { get; private set; }
 
+        [Header("Layer")]
         [SerializeField] private LayerMask weaponLayer;
+
+        [Header("Grab")]
         [SerializeField] private Transform weaponHoldPoint;
+        [SerializeField] private float pickupDistance = 4f;
+
+        [Header("Car")]
+        [SerializeField] private PartDetacher partDetacher;
 
         private Player _player;
 
         public override void Initialize(ModuleOwner owner)
         {
             base.Initialize(owner);
-
-            _player = (Player)_owner;
+            _player = (Player)owner;
         }
 
-        public void PickupWeapon()
+        public void PickupItem()
         {
-            if (_player.Sensor.FindWeapon(_player.Camera.CameraTrans,
-                weaponLayer, 5, out Collider weaponCollider) == false)
+            if (CurrentGrabObject != null)
+            {
+                if (AttachCurrentItem())
+                    return;
+
+                DropItem();
+                return;
+            }
+
+            if (partDetacher != null
+                && _player.Sensor.FindItem(_player.Camera.CameraTrans, partDetacher.PartLayerMask,
+                                                                pickupDistance, out Collider partCollider))
+            {
+                GrabItem part = partCollider.GetComponent<GrabItem>();
+
+                if (part == null)
+                    return;
+
+                if (part.transform.parent != null
+                    && !partDetacher.TryDetachPart(part))
+                    return;
+
+                EquipItem(part);
+                return;
+            }
+
+            if (!_player.Sensor.FindItem(_player.Camera.CameraTrans, weaponLayer, pickupDistance, out Collider collider))
                 return;
 
-            GrabItem findWeapon = weaponCollider.GetComponent<GrabItem>();
+            GrabItem item = collider.GetComponent<GrabItem>();
+
+            if (item == null)
+                return;
+
+            EquipItem(item);
+        }
+
+        private void EquipItem(GrabItem item)
+        {
+            if (item == null)
+                return;
+
+            CurrentWeapon = item;
+            CurrentGrabObject = item.gameObject;
+
+            item.SetGrabState();
+
+            CurrentGrabObject.transform.SetParent(weaponHoldPoint, true);
+            CurrentGrabObject.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+        }
+
+        public void SwapItem(GrabItem item)
+        {
+            if (item == null || item == CurrentWeapon)
+                return;
 
             if (CurrentGrabObject == null)
             {
-                EquipWeapon(findWeapon);
+                EquipItem(item);
                 return;
             }
 
-            SwapWeapon(findWeapon);
+            Transform currentItemTransform = CurrentGrabObject.transform;
+            Vector3 itemPosition = item.transform.position;
+            Quaternion itemRotation = item.transform.rotation;
+
+            currentItemTransform.SetParent(null);
+            currentItemTransform.SetPositionAndRotation(itemPosition, itemRotation);
+
+            CurrentWeapon.SetPhysicsState();
+
+            EquipItem(item);
         }
 
-        private void EquipWeapon(GrabItem findWeapon)
+        public void DropItem()
         {
-            CurrentWeapon = findWeapon;
-            CurrentGrabObject = findWeapon.gameObject;
+            if (CurrentWeapon == null)
+                return;
 
-            CurrentWeapon.Rigidbody.isKinematic = true;
-            CurrentWeapon.Collider.isTrigger = true;
-
-            CurrentGrabObject.transform.SetParent(weaponHoldPoint, true);
-            CurrentGrabObject.transform.SetLocalPositionAndRotation(
-                                                                    Vector3.zero, Quaternion.identity);
-        }
-
-        private void SwapWeapon(GrabItem findWeapon)
-        {
-            Transform currentWeaponTransform = CurrentGrabObject.transform;
-            Transform newWeaponTransform = findWeapon.transform;
-
-            Vector3 newWeaponPosition = newWeaponTransform.position;
-            Quaternion newWeaponRotation = newWeaponTransform.rotation;
-
-            currentWeaponTransform.SetParent(null);
-            currentWeaponTransform.SetPositionAndRotation(
-                newWeaponPosition, newWeaponRotation);
-
-            CurrentWeapon.Rigidbody.isKinematic = false;
-            CurrentWeapon.Collider.isTrigger = false;
-            newWeaponTransform.SetParent(weaponHoldPoint, true);
-            newWeaponTransform.SetLocalPositionAndRotation(
-                Vector3.zero, Quaternion.identity);
-
-            CurrentWeapon = findWeapon;
-            CurrentGrabObject = findWeapon.gameObject;
-            CurrentWeapon.Rigidbody.isKinematic = true;
-            CurrentWeapon.Collider.isTrigger = true;
-        }
-
-        public void ClearCurrentWeapon()
-        {
-            if (CurrentWeapon != null)
-            {
-                CurrentWeapon.Rigidbody.isKinematic = false;
-                CurrentWeapon.Collider.isTrigger = false;
-            }
+            CurrentWeapon.transform.SetParent(null);
+            CurrentWeapon.SetPhysicsState();
 
             CurrentWeapon = null;
             CurrentGrabObject = null;
+        }
+
+        public void ClearCurrentItem()
+        {
+            if (CurrentWeapon != null)
+                CurrentWeapon.SetPhysicsState();
+
+            CurrentWeapon = null;
+            CurrentGrabObject = null;
+        }
+
+        public bool AttachCurrentItem()
+        {
+            if (CurrentWeapon == null || partDetacher == null)
+                return false;
+
+            if (!partDetacher.TryAttachWheel(CurrentWeapon, _player.Camera.CameraTrans))
+                return false;
+
+            CurrentWeapon = null;
+            CurrentGrabObject = null;
+
+            return true;
         }
     }
 }
