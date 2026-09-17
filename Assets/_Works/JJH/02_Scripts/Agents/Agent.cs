@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents
 {
-    public abstract class Player : ModuleOwner
+    public abstract class Agent : ModuleOwner
     {
         public IRenderer Renderer { get; private set; }
         public ISensor Sensor { get; private set; }

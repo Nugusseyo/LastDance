@@ -28,7 +28,7 @@ namespace _Works.KDH._01.Scripts.Vending
             {
                 return;
             }
-            vendingMachine.DropVendingItem();
+            // vendingMachine.DropVendingItem();
         }
     }
 }
