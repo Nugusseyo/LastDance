@@ -5,12 +5,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 {
-    /// <summary>
-    /// 제자리에 머문다.
-    ///
-    /// duration이 0이면 스스로 끝나지 않고 Phase가 바뀌거나 인터럽트가 들어올 때까지 기다린다.
-    /// 이건 버그가 아니라 설계다 — Waiting 단계는 플레이어가 손님을 내보낼 때까지 이어져야 한다.
-    /// </summary>
+    /// <summary>제자리에 머문다. duration이 0이면 스스로 끝나지 않고 Phase가 바뀌거나 인터럽트가 들어올 때까지 기다린다(의도된 설계).</summary>
     [Serializable]
     public sealed class StayState : CustomerState
     {

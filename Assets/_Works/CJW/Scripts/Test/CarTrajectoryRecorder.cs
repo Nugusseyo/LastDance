@@ -6,10 +6,7 @@ using UnityEngine.AI;
 
 namespace _Works.CJW.Scripts.Test
 {
-    /// <summary>
-    /// 차량 궤적을 일정 간격으로 기록하는 디버그용 컴포넌트. 튜닝이 끝나면 지워도 된다.
-    /// 씬에 빈 오브젝트를 만들어 붙이거나, 런타임에 AddComponent로 붙이면 된다.
-    /// </summary>
+    /// <summary>차량 궤적을 일정 간격으로 기록하는 디버그용 컴포넌트. 튜닝이 끝나면 지워도 된다.</summary>
     public class CarTrajectoryRecorder : MonoBehaviour
     {
         public struct Sample

@@ -6,10 +6,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 {
-    /// <summary>
-    /// 정해진 종류의 지점 중 가장 가까운 곳으로 걸어가 도착할 때까지 기다린다.
-    /// 씬의 Transform을 직접 참조하지 않으므로 풀링해도 참조가 끊기지 않는다.
-    /// </summary>
+    /// <summary>정해진 종류의 지점 중 가장 가까운 곳으로 걸어가 도착할 때까지 기다린다. 씬의 Transform을 직접 참조하지 않아 풀링해도 참조가 끊기지 않는다.</summary>
     [Serializable]
     public sealed class MoveToNearestPointState : CustomerState
     {

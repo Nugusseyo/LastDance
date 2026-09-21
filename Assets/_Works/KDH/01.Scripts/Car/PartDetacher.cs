@@ -10,6 +10,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
         [SerializeField] private LayerMask partLayerMask;
         [SerializeField] private LayerMask wheelLayerMask;
         [SerializeField] private LayerMask groundLayerMask;
+        
 
         [Header("Detach")]
         [SerializeField] private float popForce = 5f;
@@ -17,6 +18,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
         [SerializeField] private float collapseTiltAngle = 5f;
         [SerializeField] private float collapseDuration = 0.15f;
         [SerializeField] private float pickupDistance = 4f;
+        [SerializeField] private float detachTime = 3f;
 
         public LayerMask PartLayerMask => partLayerMask;
 

@@ -7,13 +7,7 @@ using Random = UnityEngine.Random;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 {
-    /// <summary>
-    /// 자기 좌석으로 걸어가 탑승한다.
-    ///
-    /// 좌석 번호만큼 간격을 두고 출발하므로 한 차의 손님들이 겹쳐 움직이지 않는다.
-    /// 좌석은 <see cref="CustomerContext.SeatIndex"/>로 이미 정해져 있어
-    /// 도착 순서가 뒤섞여도 좌석 배정이 어긋나지 않는다.
-    /// </summary>
+    /// <summary>자기 좌석으로 걸어가 탑승한다. 좌석 번호만큼 간격을 두고 출발해 한 차의 손님들이 겹쳐 움직이지 않는다.</summary>
     [Serializable]
     public sealed class BoardState : CustomerState
     {

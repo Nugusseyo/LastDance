@@ -1,3 +1,5 @@
+using _Works.JJH._02_Scripts.Systems.Events;
+using DevLib.EventChannelSystem;
 using UnityEngine;
 
 namespace _Works.KDH._01.Scripts.Vending
@@ -7,18 +9,39 @@ namespace _Works.KDH._01.Scripts.Vending
     {
         [SerializeField] private VendingItemSO[] items;
         [SerializeField] private Transform vendingPoint; // Vending Tp
+        [SerializeField] private EventChannelSO systemEvent;
 
+        private void Awake()
+        {
+            systemEvent.AddListener<VendingMachineDropEvent>(DropRandomItem);
+            systemEvent.AddListener<VendingSelectDropEvent>(DropSelectedItem);
+        }
 
-        public void DropVendingItem()
+        private void OnDestroy()
+        {
+            systemEvent.RemoveListener<VendingMachineDropEvent>(DropRandomItem);
+            systemEvent.RemoveListener<VendingSelectDropEvent>(DropSelectedItem);
+        }
+
+        private void DropRandomItem(VendingMachineDropEvent _)
         {
             if (items == null || items.Length == 0) return;
 
-            VendingItemSO item = items[Random.Range(0, items.Length)];
+            DropVendingItem(items[Random.Range(0, items.Length)]);
+        }
+
+        private void DropSelectedItem(VendingSelectDropEvent e)
+        {
+            DropVendingItem(e.Item);
+        }
+
+        private void DropVendingItem(VendingItemSO item)
+        {
             if (item == null || item.ItemPrefab == null) return;
 
             GameObject droppedItem = Instantiate(item.ItemPrefab, vendingPoint.position, vendingPoint.rotation);
 
- 
+
             Collider collider = droppedItem.GetComponentInChildren<Collider>();
             if (collider == null)
             {
@@ -33,7 +56,7 @@ namespace _Works.KDH._01.Scripts.Vending
 
 
             rb.constraints = RigidbodyConstraints.FreezeRotation;
-            
+
             rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
         }
     }

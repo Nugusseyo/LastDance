@@ -6,20 +6,11 @@ using UnityEngine.UIElements;
 
 namespace _Works.CJW.Scripts.MapSystems.Editor
 {
-    /// <summary>
-    /// MapDataSo의 인스펙터. 좌표를 여기서 편집하지는 않는다.
-    ///
-    /// 이 에셋은 좌표를 들고 있지 않고 씬의 MapPosition이 진실이기 때문에,
-    /// 인스펙터가 하는 일은 지금 맵에 무엇이 있는지 보여주고 빠뜨린 것을 잡아내는 것이다.
-    /// 편집 모드에서는 씬을 훑어 보여주고, 플레이 중에는 실제 등록 상태를 그대로 비춘다.
-    /// </summary>
+    /// <summary>MapDataSo의 인스펙터. 좌표를 여기서 편집하지는 않고, 지금 맵에 무엇이 있는지 보여주고 빠뜨린 것을 잡아낸다.</summary>
     [CustomEditor(typeof(MapDataSo))]
     public class MapDataInspector : UnityEditor.Editor
     {
-        /// <summary>
-        /// 틀 자산은 경로를 박아두지 않고 이름으로 찾는다.
-        /// 폴더를 옮기는 순간 하드코딩된 경로는 조용히 죽고, 그 사실을 인스펙터를 열어봐야 알게 된다.
-        /// </summary>
+        /// <summary>틀 자산은 경로를 박아두지 않고 이름으로 찾는다. 폴더를 옮겨도 조용히 죽지 않는다.</summary>
         private const string AssetName = "MapDataInspector";
 
         private MapDataSo _mapData;
@@ -72,7 +63,7 @@ namespace _Works.CJW.Scripts.MapSystems.Editor
             _createTypeField.RegisterValueChangedCallback(_ => SyncRentableToggle());
 
             _rentableToggle.label = "대여 가능";
-            _rentableToggle.tooltip = "한 번에 한 명만 쓸 수 있는 지점이면 켠다. 주차 자리는 전용 클래스가 있어 항상 켜진다.";
+            _rentableToggle.tooltip = "한 번에 한 명만 쓸 수 있는 지점이면 켠다. 주차 자리는 항상 켜진다.";
             SyncRentableToggle();
 
             Button refresh = root.Q<Button>("refresh-button");
@@ -138,7 +129,7 @@ namespace _Works.CJW.Scripts.MapSystems.Editor
 
         private void SyncRentableToggle()
         {
-            // 주차 자리는 ParkingSlot이라는 전용 클래스가 대여를 이미 갖고 있다.
+            // 주차 자리는 항상 대여 가능해야 한다.
             bool isParkingSlot = (MapPointType)_createTypeField.value == MapPointType.ParkingSlot;
 
             _rentableToggle.SetEnabled(!isParkingSlot);
@@ -384,20 +375,9 @@ namespace _Works.CJW.Scripts.MapSystems.Editor
 
             GameObject go = new($"{type}Point");
 
-            MapPosition point;
-            if (type == MapPointType.ParkingSlot)
-            {
-                // 주차 자리는 종류가 코드로 고정된 전용 클래스가 있다.
-                point = go.AddComponent<ParkingSlot>();
-            }
-            else if (_rentableToggle.value)
-            {
-                point = go.AddComponent<RentableMapPosition>();
-            }
-            else
-            {
-                point = go.AddComponent<MapPosition>();
-            }
+            MapPosition point = _rentableToggle.value
+                ? go.AddComponent<RentableMapPosition>()
+                : go.AddComponent<MapPosition>();
 
             SerializedObject so = new(point);
             so.FindProperty("mapData").objectReferenceValue = _mapData;

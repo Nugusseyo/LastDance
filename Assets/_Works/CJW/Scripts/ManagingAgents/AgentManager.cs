@@ -3,10 +3,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.ManagingAgents
 {
-    /// <summary>
-    /// 씬의 모든 틱 대상을 한 곳에서 돌린다.
-    /// 손님, 차량, 방문 세션처럼 타입이 달라도 IUpdate / IFixedUpdate만 구현하면 등록된다.
-    /// </summary>
+    /// <summary>씬의 모든 틱 대상을 한 곳에서 돌린다. 타입이 달라도 IUpdate / IFixedUpdate만 구현하면 등록된다.</summary>
     public class AgentManager : MonoBehaviour
     {
         [Tooltip("등록/해제 요청이 오가는 이벤트 채널.")]

@@ -1,47 +1,27 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace _Works.CJW.Scripts.Customers.Visit.States
 {
     /// <summary>차량이 정차 지점까지 들어온다.</summary>
-    public sealed class ArrivingState : IVisitState
+    [Serializable]
+    public sealed class ArrivingState : VisitState
     {
-        /// <summary>
-        /// 정차 지점 앞에 두는 진입점까지의 거리(m).
-        /// 차는 여기를 먼저 찍고 자리 정면으로 곧게 들어오므로, 도착했을 때 이미 방향이 맞아 있다.
-        /// 자리 앞이 좁아 진입점이 NavMesh 밖으로 나가면 이 단계는 통째로 건너뛴다.
-        /// </summary>
-        private const float ApproachDistance = 9f;
+        [Tooltip("정차 지점 앞에 두는 진입점까지의 거리(m). 여길 먼저 찍고 자리 정면으로 곧게 들어와 도착 시 방향이 맞아 있게 한다.")]
+        [SerializeField, Min(0f)] private float approachDistance = 9f;
 
-        /// <summary>진입점을 NavMesh 위에서 찾을 때 허용할 오차(m).</summary>
-        private const float ApproachSampleRadius = 2f;
+        [Tooltip("진입점을 NavMesh 위에서 찾을 때 허용할 오차(m).")]
+        [SerializeField, Min(0f)] private float approachSampleRadius = 2f;
 
-        public VisitPhase Phase => VisitPhase.Arriving;
+        [Tooltip("이 단계에 머물 수 있는 한계 시간(초). 없으면 막힌 세션이 주차 자리를 영영 반납하지 않아 스폰까지 멈춘다.")]
+        [SerializeField, Min(0f)] private float phaseTimeout = 45f;
 
-        /// <summary>도착해서 멈춘 뒤, 남은 각도를 마저 맞추는 중인지.</summary>
-                private bool _aligning;
+        public override VisitPhase Phase => VisitPhase.Arriving;
 
-        /// <summary>
-        /// 이번 주차에서 실제로 맞출 방향. 자리 회전 그대로일 수도, 180도 뒤집힌 것일 수도 있다.
-        /// 전면·후면 주차를 둘 다 허용하므로 어느 쪽이든 자리에 나란히 서기만 하면 된다.
-        /// </summary>
-        private Quaternion _targetRotation = Quaternion.identity;
-
-        /// <summary>
-        /// 이 단계에 머물 수 있는 한계 시간(초).
-        /// 여기서 막히면 세션이 끝나지 않아 주차 자리가 영영 반납되지 않고,
-        /// 동시 방문 수를 채우면 스폰 자체가 멈춘다. 그걸 막는 바닥이다.
-        /// </summary>
-        private const float PhaseTimeout = 45f;
-
-        private float _elapsed;
-
-        public void Enter(VisitContext context)
+        public override void Enter(VisitContext context)
         {
-            _aligning = false;
-            _elapsed = 0f;
-
-            // 자리 정면으로 ApproachDistance만큼 물러난 지점을 경유지로 넘긴다.
+            // 자리 정면으로 approachDistance만큼 물러난 지점을 경유지로 넘긴다.
             // 목적지를 따로 끊어 주지 않으므로 차는 중간에서 멈추지 않고,
             // 마지막 직선 구간을 달리는 동안 방향이 저절로 맞는다.
             //
@@ -60,36 +40,36 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
                 bool preferBack = PlanarSqrDistance(carPosition, backApproach) <
                                   PlanarSqrDistance(carPosition, forwardApproach);
 
-                _targetRotation = preferBack ? backIn : forwardIn;
+                context.TargetRotation = preferBack ? backIn : forwardIn;
                 context.Car.MoveTo(context.ArrivalPoint, preferBack ? backApproach : forwardApproach);
                 return;
             }
 
             if (hasForward)
             {
-                _targetRotation = forwardIn;
+                context.TargetRotation = forwardIn;
                 context.Car.MoveTo(context.ArrivalPoint, forwardApproach);
                 return;
             }
 
             if (hasBack)
             {
-                _targetRotation = backIn;
+                context.TargetRotation = backIn;
                 context.Car.MoveTo(context.ArrivalPoint, backApproach);
                 return;
             }
 
             // 양쪽 진입점을 다 못 잡으면 곧장 자리로 간다. 방향은 AlignTo가 마저 맞춘다.
-            _targetRotation = forwardIn;
+            context.TargetRotation = forwardIn;
             context.Car.MoveTo(context.ArrivalPoint);
         }
 
         /// <summary>자리에서 rotation 정면으로 물러난 진입점을 NavMesh 위에서 찾는다.</summary>
-        private static bool TryGetApproachPoint(Vector3 arrivalPoint, Quaternion rotation, out Vector3 point)
+        private bool TryGetApproachPoint(Vector3 arrivalPoint, Quaternion rotation, out Vector3 point)
         {
-            Vector3 candidate = arrivalPoint - rotation * Vector3.forward * ApproachDistance;
+            Vector3 candidate = arrivalPoint - rotation * Vector3.forward * approachDistance;
 
-            if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, ApproachSampleRadius, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, approachSampleRadius, NavMesh.AllAreas))
             {
                 point = hit.position;
                 return true;
@@ -107,25 +87,25 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
             return dx * dx + dz * dz;
         }
 
-        public VisitPhase Tick(VisitContext context, float dt)
+        public override VisitPhase Tick(VisitContext context, float dt)
         {
-            _elapsed += dt;
+            context.PhaseElapsed += dt;
 
-            if (!_aligning)
+            if (!context.Aligning)
             {
                 if (!context.Car.IsArrived)
                 {
                     // 경로가 자리에 닿지 않으면 기다려도 달라지지 않는다. 한계 시간을 채우지 않고 넘긴다.
                     bool unreachable = !context.Car.HasCompletePath;
 
-                    if (!unreachable && _elapsed < PhaseTimeout)
+                    if (!unreachable && context.PhaseElapsed < phaseTimeout)
                     {
                         return VisitPhase.Arriving;
                     }
 
                     Debug.LogWarning(unreachable
                             ? $"[Arriving] {context.Car.name}의 경로가 자리에 닿지 않습니다. 자리와 NavMesh를 확인하세요. 서 있는 자리에서 그대로 진행합니다."
-                            : $"[Arriving] {context.Car.name}이(가) {PhaseTimeout}초 안에 자리에 들어가지 못해 그대로 진행합니다.",
+                            : $"[Arriving] {context.Car.name}이(가) {phaseTimeout}초 안에 자리에 들어가지 못해 그대로 진행합니다.",
                         context.Car);
                 }
 
@@ -134,11 +114,11 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
 
                 // 안전망. 어떤 이유로든 반대로 도착했다면 여기서 뒤집힌 쪽을 고른다.
                 // 덕분에 남는 각도가 항상 90도 이하라 제자리에서 크게 돌 일이 없다.
-                _targetRotation = NearerFacing(context.Car.transform.rotation, _targetRotation);
-                _aligning = true;
+                context.TargetRotation = NearerFacing(context.Car.transform.rotation, context.TargetRotation);
+                context.Aligning = true;
             }
 
-            if (!context.Car.AlignTo(_targetRotation, dt))
+            if (!context.Car.AlignTo(context.TargetRotation, dt))
             {
                 return VisitPhase.Arriving;
             }
