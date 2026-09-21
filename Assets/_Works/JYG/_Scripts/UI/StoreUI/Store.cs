@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using _Works.JYG._Scripts.Data_Container.Money;
-using Resources.DataBase.Human_Data;
 using Resources.DataBase.Upgrade_Data;
-using TMPro;
 using UnityEngine;
 
 namespace _Works.JYG._Scripts.UI.StoreUI
@@ -87,7 +84,8 @@ namespace _Works.JYG._Scripts.UI.StoreUI
                      int itemIdx = item.index;
                      block.UpgradeInit(item,
                          upgradeDB.UpgradeSheet[item.index].GetNormalizedValue(),
-                         () => TryUpgradeItem(itemIdx));   //Block Init에서는 레벨 칸 갯수, 이벤트 연결 작업을 해준다.
+                         () => TryUpgradeItem(itemIdx),
+                                moneyManager);   //Block Init에서는 레벨 칸 갯수, 이벤트 연결 작업을 해준다.
                      upgradeDict.Add(item.index, block);
                  }
          }

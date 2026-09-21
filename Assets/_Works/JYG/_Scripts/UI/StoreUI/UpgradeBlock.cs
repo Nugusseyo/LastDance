@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using _Works.JYG._Scripts.Data_Container;
+using _Works.JYG._Scripts.Data_Container.Money;
 using _Works.JYG._Scripts.Data_Container.Store;
+using _Works.JYG._Scripts.Util;
 using Resources.DataBase.Upgrade_Data;
 using TMPro;
 using UnityEngine;
@@ -25,14 +27,22 @@ namespace _Works.JYG._Scripts.UI.StoreUI
         private StoreItem _item;
         private List<UpgradeDataWrapper> _upgradeData;
 
+        private IntegerDataContainer _moneyManager;
+
         private Action onBuyButtonPressed;
 
         private const string Max = "MAX";
 
+        [Header("구매, 구매 불가능, 최대업글 색상")] 
+        [SerializeField] private Color AllowColor = Color.green;
+        [SerializeField] private Color BlockColor = Color.red;
+        [SerializeField] private Color MaxColor = Color.yellow;
+        [SerializeField] private Image priceBG;
+        
         public IDataContainer<float> RealStoreValue => _realStoreValue;
         public StoreItem CurItem => _item;
 
-        public void UpgradeInit(StoreItem item, List<UpgradeDataWrapper> upgradeData, Action buyLogic) //Class 받아야 함. // 받았음.
+        public void UpgradeInit(StoreItem item, List<UpgradeDataWrapper> upgradeData, Action buyLogic, IntegerDataContainer moneyManager) //Class 받아야 함. // 받았음.
         {
             barInitializer.InitializeBar(item.maxlevel);
             //여기서 저장된 현재 레벨을 들고와 SetColor 해줘야 한다.
@@ -44,6 +54,28 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             _upgradeData = upgradeData;
             onBuyButtonPressed = buyLogic;
             buyButton.onClick.AddListener(() => onBuyButtonPressed?.Invoke());
+            
+            _moneyManager = moneyManager;
+            _moneyManager.OnValueChanged += HandlePriceChanged;
+        }
+        
+        
+        private void HandlePriceChanged(int newValue, int oldValue)
+        {
+            if (CurItem.curLevel == CurItem.maxlevel)
+            {
+                priceBG.color = MaxColor;
+                buyButton.enabled = false;
+                return;
+            }
+            
+            priceBG.color = newValue >= CurItem.price ? AllowColor : BlockColor;
+        }
+
+        private void OnDestroy()
+        {
+            if(_moneyManager != null)
+                _moneyManager.OnValueChanged -= HandlePriceChanged;
         }
 
         public void UpgradeRequest(StoreItem item, bool isScan) //Save & Load에서 사용되는 함수. 또는 레벨업 시 사용 되는 함수
@@ -65,16 +97,18 @@ namespace _Works.JYG._Scripts.UI.StoreUI
         private void UpdateUI(StoreItem item)
         {
             titleTmp.text = item.itemName;
-
-            if (item.maxlevel == item.curLevel)
+            
+            if (item.curLevel == item.maxlevel)
             {
-                priceTmp.text = Max;
+                priceBG.color = MaxColor;
                 buyButton.enabled = false;
             }
-            else
-                priceTmp.text = item.price.ToString();
-            
-            countTmp.text = GetStringWithUpgradeType(item.value.ValueType, item.value.Value);
+
+            if (item.price != CurItem.price)
+            {
+                priceTmp.text = TextConvert.Get(item.price, "$");
+                countTmp.text = GetStringWithUpgradeType(item.value.ValueType, item.value.Value);
+            }
         }
 
         private void SetStatusWithLevel()

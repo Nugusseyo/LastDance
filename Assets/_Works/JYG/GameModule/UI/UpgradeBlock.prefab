@@ -921,7 +921,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 1, b: 0.29504895, a: 1}
+  m_Color: {r: 0.97735846, g: 0.8530733, b: 0.33746523, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1078,7 +1078,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 3
 --- !u!114 &9030343553440383648
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1091,7 +1091,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
-  m_EffectColor: {r: 0.5773585, g: 0.5773585, b: 0.5773585, a: 1}
+  m_EffectColor: {r: 0.5773585, g: 0.5773585, b: 0.5773585, a: 0.7058824}
   m_EffectDistance: {x: 0, y: -2}
   m_UseGraphicAlpha: 1
 --- !u!114 &5767021970957052929
@@ -1159,6 +1159,10 @@ MonoBehaviour:
   curLevel: 0
   barInitializer: {fileID: 1735322449252035732}
   storeValueContainer: {fileID: 11400000, guid: 39a6ce942a3bc584083a7ae008f5c063, type: 2}
+  AllowColor: {r: 0, g: 1, b: 0.29411766, a: 1}
+  BlockColor: {r: 0.9529412, g: 0.21568628, b: 0.31764707, a: 1}
+  MaxColor: {r: 0.98039216, g: 0.85490197, b: 0.34117648, a: 1}
+  priceBG: {fileID: 1479960654815482034}
 --- !u!114 &5836200879939004921
 MonoBehaviour:
   m_ObjectHideFlags: 0

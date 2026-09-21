@@ -10,6 +10,7 @@ namespace _Works.JYG._Scripts.UI
 {
     public class UIDataLinker : MonoBehaviour
     {
+        [SerializeField] private string backString = ""; //출력되는 UI 뒤에 붙여지는 단위 기호
         public List<DataLinkWrappers> dataLinkWrappers = new List<DataLinkWrappers>();
         private List<(IDataContainer, Action<object>)> dataContainersHandler;           //람다식을 구독 해제하기 위해 만든 Data <-> Event 딕셔너리
 
@@ -22,7 +23,7 @@ namespace _Works.JYG._Scripts.UI
             foreach (DataLinkWrappers wrapper in dataLinkWrappers)
             {
                 IDataContainer container = wrapper.targetData.GetInterface();
-                Action<object> handler = (newValue) => wrapper.targetTextField.text = newValue.ToString(); //이거 지역 함수로 쓰는 게 있네. 엄청 신기함.
+                Action<object> handler = (newValue) => wrapper.targetTextField.text = TextConvert.Get((int)newValue, backString); //이거 지역 함수로 쓰는 게 있네. 엄청 신기함.
                 container.OnRawValueChanged += handler;
                 dataContainersHandler.Add((container, handler));
                 //void Handler(object newValue) => wrapper.targetTextField.text = newValue.ToString();
