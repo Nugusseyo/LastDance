@@ -27184,6 +27184,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e405049591786824f921ca80e564d24f, type: 2}
   - {fileID: 11400000, guid: 1900197248f73d54fb25c61d6becaa11, type: 2}
   vendingPoint: {fileID: 1895226917}
+  systemEvent: {fileID: 11400000, guid: d31e526d71d1b444f89007a57798b10f, type: 2}
 --- !u!4 &5514653542796558776
 Transform:
   m_ObjectHideFlags: 0

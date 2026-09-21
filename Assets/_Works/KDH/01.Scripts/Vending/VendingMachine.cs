@@ -13,19 +13,30 @@ namespace _Works.KDH._01.Scripts.Vending
 
         private void Awake()
         {
-            systemEvent.AddListener<VendingMachineDropEvent>(DropVendingItem);
+            systemEvent.AddListener<VendingMachineDropEvent>(DropRandomItem);
+            systemEvent.AddListener<VendingSelectDropEvent>(DropSelectedItem);
         }
 
         private void OnDestroy()
         {
-            systemEvent.RemoveListener<VendingMachineDropEvent>(DropVendingItem);
+            systemEvent.RemoveListener<VendingMachineDropEvent>(DropRandomItem);
+            systemEvent.RemoveListener<VendingSelectDropEvent>(DropSelectedItem);
         }
 
-        private void DropVendingItem(VendingMachineDropEvent _)
+        private void DropRandomItem(VendingMachineDropEvent _)
         {
             if (items == null || items.Length == 0) return;
 
-            VendingItemSO item = items[Random.Range(0, items.Length)];
+            DropVendingItem(items[Random.Range(0, items.Length)]);
+        }
+
+        private void DropSelectedItem(VendingSelectDropEvent e)
+        {
+            DropVendingItem(e.Item);
+        }
+
+        private void DropVendingItem(VendingItemSO item)
+        {
             if (item == null || item.ItemPrefab == null) return;
 
             GameObject droppedItem = Instantiate(item.ItemPrefab, vendingPoint.position, vendingPoint.rotation);
