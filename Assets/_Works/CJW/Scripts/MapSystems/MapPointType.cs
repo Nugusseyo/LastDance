@@ -10,5 +10,8 @@ namespace _Works.CJW.Scripts.MapSystems
         Table = 4,
         WaitingLine = 5,
         Exit = 6,
+
+        /// <summary>손님끼리 싸우러 모이는 자리. 짝이 맺어지면 둘의 중간에서 가장 가까운 여기로 함께 온다.</summary>
+        FightArea = 7,
     }
 }

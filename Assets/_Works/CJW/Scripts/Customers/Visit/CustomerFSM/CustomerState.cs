@@ -9,11 +9,20 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
     [Serializable]
     public abstract class CustomerState
     {
+        [Tooltip("비워두면 항상 실행한다. 채우면 조건이 맞을 때만 실행하고, 맞지 않으면 건너뛰고 다음 행동으로 넘어간다.")]
+        [SerializeReference] private StateCondition condition;
+
         protected CustomerContext Ctx { get; private set; }
 
         public void Bind(CustomerContext ctx)
         {
             Ctx = ctx;
+        }
+
+        /// <summary>지금 이 행동을 실행해도 되는지. 시퀀스를 도는 쪽이 매 실행 직전에 묻는다.</summary>
+        public bool CanRun()
+        {
+            return condition == null || condition.IsMet(Ctx);
         }
 
         /// <summary>이 행동을 수행하고 어떻게 끝났는지 반환한다. 모든 대기에 <paramref name="ct"/>를 물려야 반납 후에도 태스크가 계속 도는 일이 없다.</summary>

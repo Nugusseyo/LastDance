@@ -1,4 +1,5 @@
 using _Works.CJW.Scripts.Customers.Data;
+using _Works.CJW.Scripts.Customers.Visit;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
 
@@ -31,6 +32,11 @@ namespace _Works.CJW.Scripts.MapSystems
                  "비워두면 프리팹 머티리얼 색을 그대로 쓴다. 메시가 다른 차는 이게 아니라 프리팹을 나눠야 한다.")]
         [SerializeField] private Color[] bodyColors;
 
+        [Header("방문 연출")]
+        [Tooltip("이 차만 다르게 굴릴 단계. 각 항목의 Phase가 같은 단계를 덮어쓰고, 비워둔 단계는 기본 연출을 쓴다. " +
+                 "입구를 막거나 뺑뺑 도는 차처럼 정상 진입·퇴장을 하지 않는 차가 여기 들어간다.")]
+        [SerializeReference] private VisitState[] stateOverrides;
+
         [Header("스폰")]
         [Tooltip("여러 차 중 하나를 뽑을 때의 가중치. 0이면 뽑히지 않는다.")]
         [SerializeField, Min(0f)] private float spawnWeight = 1f;
@@ -46,5 +52,9 @@ namespace _Works.CJW.Scripts.MapSystems
 
         /// <summary>비어 있으면 null. 호출한 쪽이 프리팹 색을 그대로 두면 된다.</summary>
         public Color[] BodyColors => bodyColors != null && bodyColors.Length > 0 ? bodyColors : null;
+
+        /// <summary>비어 있으면 null. 호출한 쪽이 기본 연출을 그대로 쓰면 된다.</summary>
+        public VisitState[] StateOverrides =>
+            stateOverrides != null && stateOverrides.Length > 0 ? stateOverrides : null;
     }
 }

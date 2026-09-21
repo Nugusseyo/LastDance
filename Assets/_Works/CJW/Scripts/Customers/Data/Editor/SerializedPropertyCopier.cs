@@ -31,18 +31,12 @@ namespace _Works.CJW.Scripts.Customers.Data.Editor
             switch (src.propertyType)
             {
                 case SerializedPropertyType.ManagedReference:
-                    // 같은 인스턴스를 넘기면 초안과 구운 프리팹이 한 객체를 공유한다.
-                    // 창을 닫지 않고 손님을 연달아 만들 때 값이 서로 샌다.
-                    dst.managedReferenceValue = DeepCopy(src.managedReferenceValue);
+                    CopyManagedReference(src, dst);
                     return;
 
                 case SerializedPropertyType.Generic:
                     // PhaseSequence 같은 [Serializable] 클래스. 자식마다 다시 내려간다.
-                    foreach (SerializedProperty child in Children(src))
-                    {
-                        Copy(child, dst.FindPropertyRelative(child.name));
-                    }
-
+                    CopyChildren(src, dst);
                     return;
 
                 default:
@@ -53,20 +47,31 @@ namespace _Works.CJW.Scripts.Customers.Data.Editor
             }
         }
 
-        /// <summary><c>[Serializable]</c> 평범한 클래스의 복사본. <see cref="EditorJsonUtility"/>를 쓰는 이유는 <c>UnityEngine.Object</c> 참조를 세션 안에서 온전히 보존하기 때문이다.</summary>
-        private static object DeepCopy(object source)
+        /// <summary><c>[SerializeReference]</c> 한 칸. 타입만 먼저 세우고 값은 자식 순회로 채운다.</summary>
+        private static void CopyManagedReference(SerializedProperty src, SerializedProperty dst)
         {
+            object source = src.managedReferenceValue;
+
             if (source == null)
             {
-                return null;
+                dst.managedReferenceValue = null;
+                return;
             }
 
-            Type type = source.GetType();
-            object clone = Activator.CreateInstance(type);
+            // JSON으로 통째 복사하지 않는 이유: EditorJsonUtility는 중첩된 [SerializeReference]를
+            // 보존하지 못한다. 행동 안에 든 조건처럼 한 겹 더 들어간 참조가 조용히 null이 된다.
+            // 타입만 세워 두고 나머지는 이 함수가 재귀로 채우면 몇 겹이든 따라온다.
+            dst.managedReferenceValue = Activator.CreateInstance(source.GetType());
 
-            EditorJsonUtility.FromJsonOverwrite(EditorJsonUtility.ToJson(source), clone);
+            CopyChildren(src, dst);
+        }
 
-            return clone;
+        private static void CopyChildren(SerializedProperty src, SerializedProperty dst)
+        {
+            foreach (SerializedProperty child in Children(src))
+            {
+                Copy(child, dst.FindPropertyRelative(child.name));
+            }
         }
 
         /// <summary>직속 자식 프로퍼티들. 순회하는 동안 반복자가 움직이므로 복사해서 돌려준다.</summary>

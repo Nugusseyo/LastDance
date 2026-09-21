@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Energy Drink
   m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Vending.VendingItemSO
   <ItemName>k__BackingField: Energy Drink
-  <ItemPrefab>k__BackingField: {fileID: 4610496521290304439, guid: 95448f869bdcd1f409f571596a03abc1, type: 3}
+  <ItemPrefab>k__BackingField: {fileID: 148702010015571901, guid: 421af326af46a3b4f826cddf3457792e, type: 3}
+  <ItemType>k__BackingField: 0

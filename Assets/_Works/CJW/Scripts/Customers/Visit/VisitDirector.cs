@@ -52,7 +52,13 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
         private readonly List<ActiveVisit> _activeVisits = new();
         private readonly Stack<VisitSession> _sessionPool = new();
+        /// <summary>한 차에 태울 수 있는 주유 손님의 최대 인원.</summary>
+        private const int MaxRefuelingPerCar = 1;
+
         private readonly List<AbstractCustomer> _spawnBuffer = new();
+
+        /// <summary>조건으로 후보를 좁힐 때 쓰는 임시 목록. 스폰마다 새로 할당하지 않으려고 들고 있는다.</summary>
+        private readonly List<CustomerDataSO> _pickBuffer = new();
 
         private float _spawnTimer;
 
@@ -144,6 +150,22 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
         }
 
+        /// <summary>퇴치를 눈으로 확인하기 위한 임시 진입점. 무엇이 퇴치를 부를지 정해지면
+        /// PlayerInteractModule 쪽에서 이벤트로 넘어오게 바꾸고 이건 지운다.</summary>
+        [ContextMenu("디버그: 첫 방문 퇴치")]
+        private void DebugRepelFirst()
+        {
+            if (_activeVisits.Count == 0)
+            {
+                Debug.Log("[VisitDirector] 진행 중인 방문이 없습니다.", this);
+                return;
+            }
+
+            VisitSession session = _activeVisits[0].Session;
+            Debug.Log($"[VisitDirector] {session.Car?.name}의 방문을 {session.Phase} 단계에서 퇴치합니다.", this);
+            session.Repel();
+        }
+
         /// <summary>주차 자리를 하나 빌리고, 차 한 대와 손님 몇 명을 꺼내 방문을 시작한다.</summary>
         public VisitSession BeginVisit()
         {
@@ -223,10 +245,20 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
             int count = Random.Range(customerRange.x, customerRange.y + 1);
 
+            // 좌석마다 독립으로 뽑으면 한 차의 구성이 통제되지 않는다. 이미 태운 사람을 보고 후보를 좁힌다.
+            int refuelingTaken = 0;
+
             for (int i = 0; i < count; i++)
             {
-                CustomerDataSO customerData = WeightedPicker.Pick(pool, data => data.SpawnWeight);
-                if (customerData == null || customerData.PoolItem == null)
+                CustomerDataSO customerData = PickForSeat(pool, refuelingTaken);
+
+                if (customerData == null)
+                {
+                    // 조건을 만족하는 후보가 더 없다. 억지로 태우는 대신 인원을 줄여 끝낸다.
+                    break;
+                }
+
+                if (customerData.PoolItem == null)
                 {
                     Debug.LogError("[VisitDirector] 뽑을 수 있는 손님 데이터가 없습니다. CustomerDataSO의 풀 항목과 가중치를 확인하세요.", this);
                     ReturnSpawnBuffer();
@@ -247,9 +279,53 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 // 좌석에 붙기 전까지 NavMesh 밖에 서 있지 않도록 차 위치로 옮겨둔다.
                 customer.transform.position = car.transform.position;
                 _spawnBuffer.Add(customer);
+
+                if (IsRefueling(customerData))
+                {
+                    refuelingTaken++;
+                }
+            }
+
+            if (_spawnBuffer.Count == 0)
+            {
+                Debug.LogError($"[VisitDirector] {carData.name}의 손님 후보가 조건을 하나도 만족하지 못해 아무도 태우지 못했습니다.", this);
+                return false;
             }
 
             return true;
+        }
+
+        /// <summary>좌석 하나를 채울 손님을 뽑는다. 이미 태운 구성을 보고 후보를 좁힌 뒤 추첨한다.
+        /// 조건을 만족하는 후보가 없으면 null을 돌려주고, 부르는 쪽이 인원을 줄인다.</summary>
+        private CustomerDataSO PickForSeat(CustomerDataSO[] pool, int refuelingTaken)
+        {
+            if (refuelingTaken < MaxRefuelingPerCar)
+            {
+                return WeightedPicker.Pick(pool, data => data.SpawnWeight);
+            }
+
+            // 주유 손님의 가중치만 0으로 만들면 안 된다. 후보가 전부 주유 손님이면 합이 0이 되어
+            // WeightedPicker가 균등 추첨으로 물러나고, 결국 걸러내려던 손님을 돌려준다.
+            // 목록에서 아예 빼야 조건이 지켜진다.
+            _pickBuffer.Clear();
+
+            for (int i = 0; i < pool.Length; i++)
+            {
+                if (pool[i] != null && !IsRefueling(pool[i]))
+                {
+                    _pickBuffer.Add(pool[i]);
+                }
+            }
+
+            return WeightedPicker.Pick(_pickBuffer, data => data.SpawnWeight);
+        }
+
+        /// <summary>주유기를 차지하러 가는 손님인지. 주유기 수가 한정돼 있어 한 차가 여럿 태우면
+        /// 다른 차 손님이 계속 대기열로 밀린다. 주유기를 쓰는 종류가 늘면 여기에 더한다.
+        /// (차 안에 머무는 StayInCar는 주유기를 차지하지 않으므로 여기 들어가지 않는다.)</summary>
+        private static bool IsRefueling(CustomerDataSO data)
+        {
+            return data != null && data.customerType == CustomerType.Refueling;
         }
 
         private void ReturnSpawnBuffer()
