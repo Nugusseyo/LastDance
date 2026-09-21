@@ -53,6 +53,8 @@ MonoBehaviour:
   priceTmp: {fileID: 8423005248747567134}
   itemImage: {fileID: 2756821417375899712}
   priceBackground: {fileID: 8193872759650391073}
+  buyButton: {fileID: 6562986012535696895}
+  eventChannelSO: {fileID: 11400000, guid: 96d2e87518c0a72489435762b197cf91, type: 2}
   greenColor: {r: 0, g: 1, b: 0.29411766, a: 1}
   redColor: {r: 0.9529412, g: 0.21568628, b: 0.31764707, a: 1}
 --- !u!1 &2690315893376222551

@@ -25,6 +25,8 @@ namespace _Works.JYG._Scripts.UI.Center.Duration
             fillImage.enabled = false;
             timerTmp.enabled = false;
             
+            GetComponent<CanvasGroup>().alpha = 1;
+            
             eventChannelSO.AddListener<DurationEvent>(HandleDurationEvent);
         }
 
