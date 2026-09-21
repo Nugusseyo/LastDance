@@ -3,19 +3,17 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.Cars
 {
-    /// <summary>
-    /// 차량의 이동 수단. NavMesh, 스플라인 등 구현은 모듈이 정한다.
-    /// </summary>
+    /// <summary>차량의 이동 수단. NavMesh, 스플라인 등 구현은 모듈이 정한다.</summary>
     public interface ICarMoveModule : IModule
     {
+        /// <summary>목적지까지 실제로 닿는 경로를 들고 있는지. 부분 경로면 false다. 계산 중이면 판정을 미루고 true를 돌려준다.</summary>
+        bool HasCompletePath { get; }
+
         bool IsArrived { get; }
 
         void MoveTo(Vector3 destination);
 
-        /// <summary>
-        /// approachFrom을 먼저 지나 destination에 닿는다. 마지막 구간을 직선으로 만들어
-        /// 도착했을 때 방향까지 맞추려는 용도다. 구현이 지원하지 않으면 그냥 destination으로 가도 된다.
-        /// </summary>
+        /// <summary>approachFrom을 먼저 지나 destination에 닿는다. 구현이 지원하지 않으면 그냥 destination으로 가도 된다.</summary>
         void MoveTo(Vector3 destination, Vector3 approachFrom);
         void Stop();
 

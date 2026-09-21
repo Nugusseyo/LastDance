@@ -3,16 +3,13 @@ using UnityEngine.AI;
 
 namespace _Works.CJW.Scripts.Cars
 {
-    /// <summary>
-    /// NavMesh 경로를 코너 배열로 들고 있으면서 두 가지 질문에만 답하는 클래스.
-    /// "차가 지금 경로의 어디쯤인가", "몇 미터 앞의 어느 점을 겨눠야 하는가".
-    ///
-    /// 조향각이나 속도는 계산하지 않는다. 그건 <see cref="CarSteeringSolver"/>의 몫이다.
-    /// MonoBehaviour가 아니라 순수 C# 클래스라서, 경로 로직만 따로 떼어 읽고 고칠 수 있다.
-    /// </summary>
+    /// <summary>NavMesh 경로를 코너 배열로 들고 있으면서 "지금 경로의 어디쯤인가", "몇 미터 앞을 겨눠야 하는가"에만 답하는 클래스. 조향각·속도 계산은 <see cref="CarSteeringSolver"/>의 몫이다.</summary>
     public sealed class CarPathTracker
     {
         private const int MaxCorners = 256;
+
+        /// <summary>이 거리 안으로 경유지에 붙었으면 각도를 따지지 않고 전환한다(m).</summary>
+        private const float NearViaDistance = 1.5f;
 
         private readonly Vector3[] _corners = new Vector3[MaxCorners];
         private int _cornerCount;
@@ -40,6 +37,9 @@ namespace _Works.CJW.Scripts.Cars
         /// <summary>코너가 둘 이상 있어야 따라갈 선분이 생긴다.</summary>
         public bool HasPath => _cornerCount >= 2;
 
+        /// <summary>마지막으로 읽은 경로의 상태. PathComplete가 아니면 목적지에 닿지 못한다는 뜻이다.</summary>
+        public NavMeshPathStatus Status { get; private set; } = NavMeshPathStatus.PathComplete;
+
         /// <summary>정차. 들고 있던 경로를 통째로 버린다.</summary>
         public void Clear()
         {
@@ -57,6 +57,9 @@ namespace _Works.CJW.Scripts.Cars
             _segIndex = 0;
             _refreshTimer = 0f;
             _onFinalLeg = false;
+
+            // 아직 경로를 읽기 전이다. 이전 목적지의 판정을 끌고 가지 않는다.
+            Status = NavMeshPathStatus.PathComplete;
         }
 
         /// <summary>진입점을 거쳐 destination으로 들어가겠다고 예약한다. BeginPath보다 먼저 부른다.</summary>
@@ -73,25 +76,22 @@ namespace _Works.CJW.Scripts.Cars
             _hasFinalPoint = false;
         }
 
-        /// <summary>
-        /// 경유지에 충분히 가까워지면 마지막 구간을 직접 들고 간다.
-        ///
-        /// 경유지를 계속 에이전트의 목적지로 두면, 차가 Lookahead 때문에 경유지를 살짝 지나친 순간
-        /// 경로가 되돌아갔다 다시 가는 헤어핀이 된다. 그 꺾이는 지점이 최소 회전원 안에 들어가면
-        /// 차는 그 자리를 영원히 맴돈다.
-        ///
-        /// 또 에이전트 경로는 언제나 "현재 위치 → 목적지"라서 진입 방향이라는 정보가 사라진다.
-        /// 그래서 진입점→목적지 직선을 직접 경로로 박아넣어 그 선을 추종하게 한다.
-        /// 도착 방향이 자리 방향과 같아져 정차 뒤 제자리 회전이 사라진다.
-        /// </summary>
-        public void TrySwitchToFinalLeg(Vector3 position, float switchDistance, NavMeshAgent agent)
+        /// <summary>경유지에 충분히 가까워지고 방향까지 맞으면 마지막 구간을 직선 경로로 직접 박아넣는다. 에이전트 목적지로만 두면 Lookahead 때문에 경유지를 살짝 지나쳐 헤어핀 경로가 생기기 때문이다.</summary>
+        public void TrySwitchToFinalLeg(Vector3 position, Vector3 forward, float switchDistance, NavMeshAgent agent)
         {
             if (!_hasFinalPoint || agent == null || !agent.isOnNavMesh)
             {
                 return;
             }
 
-            if (HorizontalDistance(position, _viaPoint) > switchDistance)
+            float distance = HorizontalDistance(position, _viaPoint);
+
+            if (distance > switchDistance)
+            {
+                return;
+            }
+
+            if (distance > NearViaDistance && !IsAlignedWithFinalLeg(forward))
             {
                 return;
             }
@@ -108,10 +108,22 @@ namespace _Works.CJW.Scripts.Cars
             _segIndex = 0;
         }
 
-        /// <summary>
-        /// 에이전트가 계산해 둔 경로를 주기적으로 읽어온다.
-        /// 매 프레임 읽지 않는 이유는 agent.path가 호출될 때마다 새 객체를 만들기 때문이다.
-        /// </summary>
+        /// <summary>차 머리가 마지막 직선 방향과 얼추나마 맞는지(60도 이내).</summary>
+        private bool IsAlignedWithFinalLeg(Vector3 forward)
+        {
+            Vector3 leg = _finalPoint - _viaPoint;
+            leg.y = 0f;
+            forward.y = 0f;
+
+            if (leg.sqrMagnitude < 1e-6f || forward.sqrMagnitude < 1e-6f)
+            {
+                return true;
+            }
+
+            return Vector3.Dot(forward.normalized, leg.normalized) >= 0.5f;
+        }
+
+        /// <summary>에이전트가 계산해 둔 경로를 주기적으로 읽어온다. 매 프레임 읽지 않는 이유는 agent.path가 호출될 때마다 새 객체를 만들기 때문이다.</summary>
         public void RefreshIfNeeded(NavMeshAgent agent, float dt, float interval)
         {
             // 마지막 직선 구간은 직접 박아둔 경로다. 에이전트 경로로 덮어쓰지 않는다.
@@ -142,11 +154,16 @@ namespace _Works.CJW.Scripts.Cars
             }
 
             _cornerCount = path.GetCornersNonAlloc(_corners);
+            Status = path.status;
 
             // 진입점까지의 경로 뒤에 실제 목적지를 붙인다.
-            // 두 번에 나눠 MoveTo하면 진입점에서 한 번 서버리며 오버슈트하지만,
+            // 두 번에 나눠 MoveTo하면 진입점에서 한 번 서버리며 오버슈팅하지만,
             // 한 경로로 이어붙이면 속도를 유지한 채 매끄럽게 통과한다.
-            if (_hasFinalPoint && _cornerCount > 0 && _cornerCount < MaxCorners)
+            //
+            // 단, 경로가 진입점에 닿지도 못했는데(부분 경로) 목적지를 이어붙이면
+            // 경로 끝에서 자리까지 벽을 관통하는 직선이 생긴다. 그때는 붙이지 않는다.
+            if (_hasFinalPoint && Status == NavMeshPathStatus.PathComplete
+                && _cornerCount > 0 && _cornerCount < MaxCorners)
             {
                 _corners[_cornerCount] = _finalPoint;
                 _cornerCount++;
@@ -155,10 +172,7 @@ namespace _Works.CJW.Scripts.Cars
             _segIndex = 0;
         }
 
-        /// <summary>
-        /// 차를 경로에 투영해 현재 지점(커서)을 구하고, 지나온 세그먼트를 버린다.
-        /// 인덱스를 앞으로만 밀기 때문에 경로가 자기 근처로 되돌아와도 뒷구간에 달라붙지 않는다.
-        /// </summary>
+        /// <summary>차를 경로에 투영해 현재 지점(커서)을 구하고, 지나온 세그먼트를 버린다. 인덱스를 앞으로만 밀어 경로가 되돌아와도 뒷구간에 달라붙지 않는다.</summary>
         public Vector3 Advance(Vector3 position, out float remaining)
         {
             while (_segIndex < _cornerCount - 2)
@@ -183,14 +197,7 @@ namespace _Works.CJW.Scripts.Cars
             return cursor;
         }
 
-        /// <summary>
-        /// 경로를 따라 lookahead만큼 앞선 점.
-        /// 경로 끝을 넘으면 마지막 구간 방향으로 더 뻗은 가상의 점을 돌려준다.
-        ///
-        /// 끝점 자체를 겨누면 차가 그 점으로 빨려들면서 방향이 틀어진 채 도착하고,
-        /// 그 오차를 정차 뒤에 제자리 회전으로 메꾸게 된다.
-        /// 선을 따라가게 두면 도착할 때 방향까지 맞는다.
-        /// </summary>
+        /// <summary>경로를 따라 lookahead만큼 앞선 점. 끝점 자체를 겨누면 도착 방향이 틀어져 제자리 회전이 생기므로, 경로 끝을 넘으면 마지막 구간 방향으로 더 뻗은 가상의 점을 돌려준다.</summary>
         public Vector3 FindGoalPoint(Vector3 cursor, float lookahead)
         {
             float left = lookahead;

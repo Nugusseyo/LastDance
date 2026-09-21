@@ -4,11 +4,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.MapSystems
 {
-    /// <summary>
-    /// 차 한 종류의 설정. 예전에는 VisitDirector가 모든 차에 같은 값을 먹였지만,
-    /// 이제 하차 간격·이동 속도·손님 종류·차체 색을 차마다 따로 정할 수 있다.
-    /// 태울 인원은 여기 없다. 좌석은 프리팹의 구조이므로 Car가 자기 좌석 수에서 직접 뽑는다.
-    /// </summary>
+    /// <summary>차 한 종류의 설정. 하차 간격·이동 속도·손님 종류·차체 색을 차마다 따로 정한다. 태울 인원은 여기 없고 Car가 좌석 수에서 직접 뽑는다.</summary>
     [CreateAssetMenu(fileName = "Car Data", menuName = "JW/Customers/Car Data", order = 0)]
     public class CarDataSO : ScriptableObject
     {

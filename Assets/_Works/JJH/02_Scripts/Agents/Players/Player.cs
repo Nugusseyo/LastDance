@@ -15,10 +15,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         public IPlayerCamera Camera { get; private set; }
         public IPlayerAttackSkill AttackSkill { get; private set; }
         public IPlayerGrab Grab { get; private set; }
+        public IPlayerInteract Interact { get; private set; }
 
         protected override void InitializeComponents()
         {
-
             FSM = GetModule<IPlayerFSM>();
             Debug.Assert(FSM != null, $"{gameObject.name}에는 IPlayerFSM 모듈이 필요합니다.");
             Camera = GetModule<IPlayerCamera>();
@@ -27,8 +27,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players
             Debug.Assert(AttackSkill != null, $"{gameObject.name}에는 IPlayerAttackSkill 모듈이 필요합니다.");
             Grab = GetModule<IPlayerGrab>();
             Debug.Assert(Grab != null, $"{gameObject.name}에는 IPlayerGrab 모듈이 필요합니다.");
+            Interact = GetModule<IPlayerInteract>();
+            Debug.Assert(Interact != null, $"{gameObject.name}에는 IPlayerInteract 모듈이 필요합니다.");
 
-            PlayerInput.OnInteractKeyPressed += HandleFindItem;
+            PlayerInput.OnInteractKeyPressed += HandleInteract;
             PlayerInput.OnAttackKeyPressed += HandleAttackKeyPressed;
             PlayerInput.OnThrowAttackKeyPressed += HandleThrowAttackKeyPressed;
             base.InitializeComponents();
@@ -36,16 +38,20 @@ namespace _Works.JJH._02_Scripts.Agents.Players
 
         private void OnDestroy()
         {
-            PlayerInput.OnInteractKeyPressed -= HandleFindItem;
+            PlayerInput.OnInteractKeyPressed -= HandleInteract;
             PlayerInput.OnAttackKeyPressed -= HandleAttackKeyPressed;
             PlayerInput.OnThrowAttackKeyPressed -= HandleThrowAttackKeyPressed;
         }
 
+        private void HandleInteract()
+        {
+            Grab.PickupItem();
+            Interact.ActiveVendingMachine();
+        }
 
-        private void HandleFindItem()
-            => Grab.PickupWeapon();
         private void HandleAttackKeyPressed()
             => AttackSkill.ChangeCurrentAttack<AttackSkill>();
+
         private void HandleThrowAttackKeyPressed()
             => AttackSkill.ChangeCurrentAttack<ThrowAttackSkill>();
     }

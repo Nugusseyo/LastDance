@@ -2,14 +2,11 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 {
-    /// <summary>
-    /// 차에서 내린다. 좌석 번호만큼 간격을 두고 내리므로
-    /// 세션이 커서를 돌리며 한 명씩 처리할 필요가 없다.
-    /// 내리는 일과 어디로 갈지는 별개다 — 목적지는 다음 상태가 정한다.
-    /// </summary>
+    /// <summary>차에서 내린다. 좌석 번호만큼 간격을 두고 내려 세션이 한 명씩 처리할 필요가 없다. 어디로 갈지는 다음 상태가 정한다.</summary>
     [Serializable]
     public sealed class UnboardState : CustomerState
     {
@@ -32,7 +29,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
             if (jitter > 0f)
             {
-                delay += UnityEngine.Random.Range(0f, jitter);
+                delay += Random.Range(0f, jitter);
             }
 
             if (delay > 0f)

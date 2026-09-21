@@ -6,11 +6,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
     /// <summary>차량이 정차 지점까지 들어온다.</summary>
     public sealed class ArrivingState : IVisitState
     {
-        /// <summary>
-        /// 정차 지점 앞에 두는 진입점까지의 거리(m).
-        /// 차는 여기를 먼저 찍고 자리 정면으로 곧게 들어오므로, 도착했을 때 이미 방향이 맞아 있다.
-        /// 자리 앞이 좁아 진입점이 NavMesh 밖으로 나가면 이 단계는 통째로 건너뛴다.
-        /// </summary>
+        /// <summary>정차 지점 앞에 두는 진입점까지의 거리(m). 여길 먼저 찍고 자리 정면으로 곧게 들어와 도착 시 방향이 맞아 있게 한다.</summary>
         private const float ApproachDistance = 9f;
 
         /// <summary>진입점을 NavMesh 위에서 찾을 때 허용할 오차(m).</summary>
@@ -21,15 +17,18 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
         /// <summary>도착해서 멈춘 뒤, 남은 각도를 마저 맞추는 중인지.</summary>
                 private bool _aligning;
 
-        /// <summary>
-        /// 이번 주차에서 실제로 맞출 방향. 자리 회전 그대로일 수도, 180도 뒤집힌 것일 수도 있다.
-        /// 전면·후면 주차를 둘 다 허용하므로 어느 쪽이든 자리에 나란히 서기만 하면 된다.
-        /// </summary>
+        /// <summary>이번 주차에서 실제로 맞출 방향. 전면·후면 주차를 둘 다 허용하므로 자리 회전 그대로일 수도, 180도 뒤집힌 것일 수도 있다.</summary>
         private Quaternion _targetRotation = Quaternion.identity;
+
+        /// <summary>이 단계에 머물 수 있는 한계 시간(초). 없으면 막힌 세션이 주차 자리를 영영 반납하지 않아 스폰까지 멈춘다.</summary>
+        private const float PhaseTimeout = 45f;
+
+        private float _elapsed;
 
         public void Enter(VisitContext context)
         {
             _aligning = false;
+            _elapsed = 0f;
 
             // 자리 정면으로 ApproachDistance만큼 물러난 지점을 경유지로 넘긴다.
             // 목적지를 따로 끊어 주지 않으므로 차는 중간에서 멈추지 않고,
@@ -99,11 +98,24 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
 
         public VisitPhase Tick(VisitContext context, float dt)
         {
+            _elapsed += dt;
+
             if (!_aligning)
             {
                 if (!context.Car.IsArrived)
                 {
-                    return VisitPhase.Arriving;
+                    // 경로가 자리에 닿지 않으면 기다려도 달라지지 않는다. 한계 시간을 채우지 않고 넘긴다.
+                    bool unreachable = !context.Car.HasCompletePath;
+
+                    if (!unreachable && _elapsed < PhaseTimeout)
+                    {
+                        return VisitPhase.Arriving;
+                    }
+
+                    Debug.LogWarning(unreachable
+                            ? $"[Arriving] {context.Car.name}의 경로가 자리에 닿지 않습니다. 자리와 NavMesh를 확인하세요. 서 있는 자리에서 그대로 진행합니다."
+                            : $"[Arriving] {context.Car.name}이(가) {PhaseTimeout}초 안에 자리에 들어가지 못해 그대로 진행합니다.",
+                        context.Car);
                 }
 
                 // NavMesh가 회전을 되돌리지 않도록 먼저 멈춘 뒤에 방향을 맞춘다.

@@ -46,10 +46,7 @@ namespace _Works.CJW.Scripts.Cars
             }
         }
 
-        /// <summary>
-        /// 태울 인원 범위. 좌석 수가 곧 상한이라 어긋날 값이 애초에 없다.
-        /// 좌석이 하나도 없으면 (0, 0)이 나오고, 그 차는 방문을 시작하지 않는다.
-        /// </summary>
+        /// <summary>태울 인원 범위. 좌석 수가 곧 상한이다. 좌석이 없으면 (0, 0)이 나와 그 차는 방문을 시작하지 않는다.</summary>
         public Vector2Int CustomerCountRange
         {
             get
@@ -65,14 +62,28 @@ namespace _Works.CJW.Scripts.Cars
         /// <summary>손님이 내려서 처음 서는 위치. 미지정이면 차량 위치.</summary>
         public Vector3 DropOffPosition => dropOffPoint != null ? dropOffPoint.position : transform.position;
 
+        /// <summary>목적지까지 닿는 경로를 들고 있는지. 부분 경로면 기다려도 달라지지 않는다.</summary>
+        public bool HasCompletePath => _moveModule == null || _moveModule.HasCompletePath;
+
         public bool IsArrived => _moveModule == null || _moveModule.IsArrived;
 
         protected override void Awake()
         {
             base.Awake();
             _moveModule = GetModule<ICarMoveModule>();
+
+            // 없으면 IsArrived가 항상 true라 이동 없이 모든 단계를 조용히 통과한다.
+            // 증상이 "차가 스폰 자리에서 안 움직임"으로만 보이므로 반드시 남긴다.
+            if (_moduleMissingLogged == false && _moveModule == null)
+            {
+                _moduleMissingLogged = true;
+                Debug.LogError($"[Car] {name}에 ICarMoveModule이 없습니다. 이동 없이 방문이 즉시 끝납니다.", this);
+            }
+
             EnsureSeatCache();
         }
+
+        private bool _moduleMissingLogged;
 
         /// <summary>풀에서 꺼낸 직후 이 차가 쓸 데이터를 넣어준다.</summary>
         public virtual void Setup(CarDataSO data)
@@ -89,10 +100,7 @@ namespace _Works.CJW.Scripts.Cars
             ApplyBodyColor(data.BodyColors);
         }
 
-        /// <summary>
-        /// 후보 중 하나를 골라 차체 색만 갈아끼운다. MaterialPropertyBlock이라
-        /// 머티리얼 인스턴스가 생기지 않고 SRP Batcher도 그대로 묶인다.
-        /// </summary>
+        /// <summary>후보 중 하나를 골라 차체 색만 갈아끼운다. MaterialPropertyBlock이라 머티리얼 인스턴스가 생기지 않는다.</summary>
         private void ApplyBodyColor(Color[] candidates)
         {
             if (bodyRenderers == null || bodyRenderers.Length == 0)
@@ -173,10 +181,7 @@ namespace _Works.CJW.Scripts.Cars
             _moveModule?.Stop();
         }
 
-        /// <summary>
-        /// 정차 자리 방향으로 조금씩 돌린다. 회전이 다 맞으면 true.
-        /// NavMesh가 회전을 다시 가져가지 않도록 Stop() 뒤에 불러야 한다.
-        /// </summary>
+        /// <summary>정차 자리 방향으로 조금씩 돌린다. 회전이 다 맞으면 true. Stop() 뒤에 불러야 한다.</summary>
         public bool AlignTo(Quaternion target, float dt)
         {
             float step = Mathf.Max(parkingTurnSpeed, 1f) * dt;

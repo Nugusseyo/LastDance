@@ -4,16 +4,10 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.ManagingAgents
 {
-    /// <summary>
-    /// IUpdate / IFixedUpdate 대상들을 모아 틱을 전파하는 디스패처.
-    /// 순회 도중 등록/해제가 일어나도 안전하다.
-    /// </summary>
+    /// <summary>IUpdate / IFixedUpdate 대상들을 모아 틱을 전파하는 디스패처. 순회 도중 등록/해제가 일어나도 안전하다.</summary>
     public sealed class TickGroup
     {
-        /// <summary>
-        /// 한 종류의 틱 대상을 보관하는 채널.
-        /// 순회용 스냅샷은 원본이 바뀐 다음 틱에만 갱신한다.
-        /// </summary>
+        /// <summary>한 종류의 틱 대상을 보관하는 채널. 순회용 스냅샷은 원본이 바뀐 다음 틱에만 갱신한다.</summary>
         private sealed class Channel<T> where T : class
         {
             private readonly List<T> _targets = new();
@@ -50,9 +44,7 @@ namespace _Works.CJW.Scripts.ManagingAgents
                 _dirty = true;
             }
 
-            /// <summary>
-            /// 최신 스냅샷을 돌려준다. 반환된 배열에는 해제된 자리에 null이 섞일 수 있다.
-            /// </summary>
+            /// <summary>최신 스냅샷을 돌려준다. 반환된 배열에는 해제된 자리에 null이 섞일 수 있다.</summary>
             public T[] GetSnapshot(out int count)
             {
                 if (_dirty)
@@ -90,9 +82,7 @@ namespace _Works.CJW.Scripts.ManagingAgents
         private readonly Channel<IUpdate> _updateChannel = new();
         private readonly Channel<IFixedUpdate> _fixedUpdateChannel = new();
 
-        /// <summary>
-        /// 틱 대상임이 확실한 곳에서 사용한다. 대상이 아니면 경고를 남긴다.
-        /// </summary>
+        /// <summary>틱 대상임이 확실한 곳에서 사용한다. 대상이 아니면 경고를 남긴다.</summary>
         public void Register(object target)
         {
             if (TryRegister(target))
@@ -104,9 +94,7 @@ namespace _Works.CJW.Scripts.ManagingAgents
                              $"{nameof(IUpdate)} / {nameof(IFixedUpdate)}를 구현하지 않아 등록되지 않았습니다.");
         }
 
-        /// <summary>
-        /// 틱 대상이 섞여 있는 목록을 훑을 때 사용한다. 등록 여부만 돌려주고 경고하지 않는다.
-        /// </summary>
+        /// <summary>틱 대상이 섞여 있는 목록을 훑을 때 사용한다. 등록 여부만 돌려주고 경고하지 않는다.</summary>
         public bool TryRegister(object target)
         {
             IUpdate update = target as IUpdate;

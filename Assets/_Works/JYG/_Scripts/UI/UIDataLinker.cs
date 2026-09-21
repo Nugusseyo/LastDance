@@ -11,7 +11,7 @@ namespace _Works.JYG._Scripts.UI
     public class UIDataLinker : MonoBehaviour
     {
         public List<DataLinkWrappers> dataLinkWrappers = new List<DataLinkWrappers>();
-        private List<(IDataContainer, Action<object>)> dataContainersHandler;
+        private List<(IDataContainer, Action<object>)> dataContainersHandler;           //람다식을 구독 해제하기 위해 만든 Data <-> Event 딕셔너리
 
         private void Awake()
         {
@@ -41,7 +41,7 @@ namespace _Works.JYG._Scripts.UI
             }
         }
 
-        public IEnumerable<IDataContainer<T>> GetDataContainers<T>()
+        public IEnumerable<IDataContainer<T>> GetDataContainers<T>()    //List나 배열로 받게 하기 위해서, IEnumerable로 했다.
         {
             return dataLinkWrappers
                 .Select(x => x.targetData.GetInterface())

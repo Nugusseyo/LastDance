@@ -112,7 +112,7 @@ NavMeshObstacle:
   m_Shape: 1
   m_Extents: {x: 1.15, y: 1.26, z: 3.3}
   m_MoveThreshold: 0.1
-  m_Carve: 0
+  m_Carve: 1
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0.5, z: 0}
   m_TimeToStationary: 0.5
@@ -438,6 +438,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Cars.CarSteeringMoveModule
   _agent: {fileID: 4426528510196855596}
   _arriveThreshold: 0.5
+  _arrivalRadius: 1
+  _maxApproachRetries: 2
   _avoidancePriority: 0
   _wheelBase: 2
   _maxSteerAngle: 45
@@ -452,6 +454,10 @@ MonoBehaviour:
   _viaSwitchDistance: 4
   _finalLegLookahead: 2.5
   _finalLegSpeed: 3.5
+  _reverseSpeed: 2
+  _maxReverseDistance: 6
+  _minReverseDistance: 1.2
+  _reverseClearance: 2.5
 --- !u!1 &3443648458402252513
 GameObject:
   m_ObjectHideFlags: 0

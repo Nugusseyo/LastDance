@@ -5,17 +5,16 @@ using _Works.CJW.Scripts.Customers.Data;
 using _Works.CJW.Scripts.ManagingAgents;
 using _Works.Shared.Boarding;
 using DevLib.ObjectPool.Runtime;
+using Resources.DataBase.Human_Data;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace _Works.CJW.Scripts.Customers
 {
-    /// <summary>
-    /// 손님의 데이터와 이동만 소유한다.
-    /// 탑승은 <see cref="_Works.Shared.Boarding.IBoardable"/> 모듈이 맡는다.
-    /// </summary>
+    /// <summary>손님의 데이터와 이동만 소유한다. 탑승은 <see cref="_Works.Shared.Boarding.IBoardable"/> 모듈이 맡는다.</summary>
     public abstract class AbstractCustomer : ManagingAgent, IPoolable
     {
+        [field: SerializeField] public HumanType HumanType { get; private set; } = HumanType.Good;
         [field: SerializeField] public NavMeshAgent Agent { get; private set; }
         [field: SerializeField] public PoolItemSO PoolItem { get; set; }
         
@@ -29,11 +28,7 @@ namespace _Works.CJW.Scripts.Customers
 
         /// <summary>행동 머신. 프리팹에 CustomerFSMModule이 없으면 null이다.</summary>
         public CustomerFSMModule Fsm { get; private set; }
-        /// <summary>
-        /// 세션이 손님 목록을 순회하며 직접 물려준다.
-        /// 전역 방송을 쓰면 수신자마다 "내 세션인가" 필터가 필요하고, 그 필터가 빠지면
-        /// 다른 차의 세션에 붙는다. 세션은 자기 손님이 누군지 이미 알고 있으므로 방송할 이유가 없다.
-        /// </summary>
+        /// <summary>세션이 손님 목록을 순회하며 직접 물려준다. 전역 방송을 쓰면 다른 차의 세션에 붙을 수 있어 직접 호출한다.</summary>
         public void BindSession(VisitSession session)
         {
             Session = session;
@@ -42,12 +37,9 @@ namespace _Works.CJW.Scripts.Customers
         
 
         /// <summary>이 손님의 수치. 스폰될 때 <see cref="Setup"/>으로 주입된다.</summary>
-        public CustomerDataSO Data { get; private set; }
+        public CustomerDataSO Data { get; set; }
 
-        /// <summary>
-        /// 탑승 중에는 탑승 모듈이 Agent를 꺼두므로 Agent.enabled 하나로 걸러진다.
-        /// 손님이 탑승 여부를 따로 들고 있지 않아도 되는 이유다.
-        /// </summary>
+        /// <summary>탑승 중에는 탑승 모듈이 Agent를 꺼두므로 Agent.enabled 하나로 걸러진다.</summary>
         public bool IsArrived =>
             Agent != null &&
             Agent.enabled &&
