@@ -28,6 +28,14 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
 
         /// <summary>전투 대상이나 파손 대상. 인터럽트를 건 쪽이 채워준다.</summary>
         public Transform Target;
+
+        /// <summary>약속으로 맺어진 상대. 짝이 풀리면 null이 되므로, 기다리는 쪽은 이걸 보고 빠져나온다.
+        /// 다른 차의 손님일 수 있어 <see cref="Visit"/>의 손님 목록으로는 찾을 수 없다.</summary>
+        [CanBeNull]
+        public CustomerContext Partner;
+
+        /// <summary>짝과 만나기로 한 지점. <see cref="CustomerRendezvousSO"/>가 둘의 중간으로 정해 양쪽에 같은 값을 넣는다.</summary>
+        public Vector3 MeetPoint;
         /// <summary>이 방문에서 배정받은 좌석 번호. 하차 순서와 승차 좌석에 모두 쓰인다.</summary>
         public int SeatIndex { get; private set; }
         public CustomerDataSO Data => Customer != null ? Customer.Data : null;
@@ -56,8 +64,20 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
                 RentedPosition = null;
             }
 
+            // 짝도 같은 이유로 끊어 준다. 안 끊으면 상대가 반납된 손님을 계속 기다린다.
+            if (Partner != null)
+            {
+                if (Partner.Partner == this)
+                {
+                    Partner.Partner = null;
+                }
+
+                Partner = null;
+            }
+
             Visit = null;
             Target = null;
+            MeetPoint = Vector3.zero;
             SeatIndex = 0;
         }
     }

@@ -403,7 +403,8 @@ namespace _Works.CJW.Scripts.Customers.Data.Editor
         }
 
         /// <summary>풀 항목 에셋을 만들고 프리팹의 PoolItem 칸까지 채워 준다. 이걸 빼먹으면 Push가 조용히 실패해 손님이 회수되지 않는다.</summary>
-        private PoolItemSO CreatePoolItem(GameObject prefab, string itemName)
+        /// <param name="overwriteBinding">템플릿에서 갓 구운 배리언트면 true. 물려받은 값은 템플릿의 잔재라 반드시 덮어야 한다.</param>
+        private PoolItemSO CreatePoolItem(GameObject prefab, string itemName, bool overwriteBinding = false)
         {
             if (!EnsureFolder(folder))
             {
@@ -418,21 +419,28 @@ namespace _Works.CJW.Scripts.Customers.Data.Editor
             string path = AssetDatabase.GenerateUniqueAssetPath($"{folder}/{itemName} Pool Item.asset");
             AssetDatabase.CreateAsset(poolItem, path);
 
-            BindPoolItemToPrefab(prefab, poolItem);
+            BindPoolItemToPrefab(prefab, poolItem, overwriteBinding);
 
             return poolItem;
         }
 
         /// <summary>프리팹의 AbstractCustomer.PoolItem을 채운다. 런타임 Push는 이 값으로 어느 풀에 돌려줄지 찾는다.</summary>
-        private static void BindPoolItemToPrefab(GameObject prefab, PoolItemSO poolItem)
+        private static void BindPoolItemToPrefab(GameObject prefab, PoolItemSO poolItem, bool overwrite)
         {
             if (!prefab.TryGetComponent(out AbstractCustomer customer))
             {
                 return;
             }
 
-            // 이미 다른 풀 항목이 물려 있으면 남의 설정을 덮지 않는다.
-            if (customer.PoolItem != null)
+            if (customer.PoolItem == poolItem)
+            {
+                return;
+            }
+
+            // 사용자가 직접 넣은 프리팹이면 이미 물려 있는 설정을 덮지 않는다.
+            // 반면 템플릿에서 갓 구운 배리언트가 들고 있는 값은 남의 설정이 아니라 템플릿의 잔재다.
+            // 그걸 그대로 두면 새 손님이 전부 템플릿의 풀로 반납되어 종류가 뒤섞인다.
+            if (!overwrite && customer.PoolItem != null)
             {
                 return;
             }
@@ -654,6 +662,9 @@ namespace _Works.CJW.Scripts.Customers.Data.Editor
             PoolItemSO poolItem = PoolItemProperty.objectReferenceValue as PoolItemSO;
             GameObject prefab = poolItem != null ? poolItem.prefab : _prefabField.value as GameObject;
 
+            // 갓 만든 프리팹인지 기억해 둔다. 템플릿에서 물려받은 풀 항목을 덮어도 되는지가 여기서 갈린다.
+            bool freshPrefab = false;
+
             if (prefab != null)
             {
                 // 이미 있는 프리팹은 에셋을 열어 심고 되굽는다.
@@ -663,11 +674,12 @@ namespace _Works.CJW.Scripts.Customers.Data.Editor
             {
                 // 새로 만드는 쪽은 CreateCustomerPrefab이 저장 직전에 심는다.
                 prefab = CreateCustomerPrefab(fileName);
+                freshPrefab = prefab != null;
             }
 
             if (poolItem == null && prefab != null)
             {
-                poolItem = CreatePoolItem(prefab, fileName);
+                poolItem = CreatePoolItem(prefab, fileName, freshPrefab);
 
                 _draftSo.Update();
                 PoolItemProperty.objectReferenceValue = poolItem;
