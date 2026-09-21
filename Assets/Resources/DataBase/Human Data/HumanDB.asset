@@ -15,6 +15,18 @@ MonoBehaviour:
   Sheet1:
   - type: 1
     index: 1
+    contents1: "\uAC00\uB4DD\uC774\uC694"
+    contents2: "50000\uC6D0\uCE58\uC694"
+    contents3: "\uD760\uD760 \uC548\uB155\uD558\uC138\uC694"
+    contents4: "\uC88B\uC740 \uD558\uB8E8 \uBCF4\uB0B4\uC138\uC694"
+    contents5: "\uAE30\uB984\uAC12\uC774 \uC62C\uB790\uB124\uC694"
+    contents6: "\uACE0\uAE09 \uD718\uBC1C\uC720 \uAC00\uB4DD\uC774\uC694"
+    contents7: "\uACBD\uC720 \uAC00\uB4DD\uC774\uC694"
+    contents8: "\uD718\uBC1C\uC720 70000\uC6D0\uCE58\uC694"
+    contents9: "\uC0C8\uB4E4\uC740 \uC9C0\uC800\uADC0\uACE0 \uAF43\uB4E4\uC740 \uD53C\uC5B4\uB098\uACE0\u2026"
+    contents10: "\uC218\uACE0\uD558\uC138\uC694!"
+  - type: 2
+    index: 2
     contents1: 
     contents2: 
     contents3: 
@@ -25,8 +37,8 @@ MonoBehaviour:
     contents8: 
     contents9: 
     contents10: 
-  - type: 2
-    index: 2
+  - type: 1
+    index: 3
     contents1: 
     contents2: 
     contents3: 
