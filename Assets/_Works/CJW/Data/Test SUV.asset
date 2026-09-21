@@ -18,8 +18,15 @@ MonoBehaviour:
   arriveThreshold: 0.5
   customers:
   - {fileID: 11400000, guid: ed118fb1f27eba84aa90bf16f7126a3c, type: 2}
+  - {fileID: 11400000, guid: 609eda10c670162498209c4498d480ab, type: 2}
+  - {fileID: 11400000, guid: fcfc26551792c7040927fc47e04d859d, type: 2}
+  - {fileID: 11400000, guid: 343ee487bb9c3474881e83916f14af2b, type: 2}
   bodyColors:
   - {r: 1, g: 0, b: 0, a: 0}
   - {r: 0.41509432, g: 0.15076537, b: 0.15076537, a: 0}
   - {r: 0.8938236, g: 0, b: 1, a: 0}
+  stateOverrides: []
   spawnWeight: 2
+  references:
+    version: 2
+    RefIds: []

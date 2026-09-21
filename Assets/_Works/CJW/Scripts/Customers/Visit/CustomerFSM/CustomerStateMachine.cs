@@ -134,6 +134,13 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
                         continue;
                     }
 
+                    // 조건은 매 실행 직전에 본다. 방문 중에 맵이 달라져도 따라간다.
+                    if (!state.CanRun())
+                    {
+                        index++;
+                        continue;
+                    }
+
                     RunResult result = await RunOne(state, outer);
 
                     if (outer.IsCancellationRequested)
