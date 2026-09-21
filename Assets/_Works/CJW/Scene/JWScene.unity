@@ -160,11 +160,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 28105991}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &166488014
@@ -208,11 +208,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 166488014}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &205586802
@@ -426,11 +426,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 206790677}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &336491503
@@ -713,6 +713,111 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 12.90853, y: 0, z: -2.32824}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1022473432
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 757970547890689392, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_Name
+      value: Capsule
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 5.46166
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -7.44476
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6727352400563978892, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
+--- !u!1 &1174632397
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1174632399}
+  - component: {fileID: 1174632398}
+  m_Layer: 0
+  m_Name: FightArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1174632398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174632397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5607945e5086ba348b5949c5df2256aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.MapPosition
+  mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
+  type: 7
+  gizmoSize: {x: 1, y: 0.1, z: 1}
+  gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
+--- !u!4 &1174632399
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174632397}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 27.06, y: 0.08333119, z: 5.82}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1083,11 +1188,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1304488402}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &1544321865
@@ -1179,11 +1284,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1722761556}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &1775278942
@@ -1227,13 +1332,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 1775278942}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
+--- !u!1 &1779886949
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1779886951}
+  - component: {fileID: 1779886950}
+  m_Layer: 0
+  m_Name: OilDispenser 2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1779886950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1779886949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
+  mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
+  type: 2
+  gizmoSize: {x: 1, y: 0.1, z: 1}
+  gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
+--- !u!4 &1779886951
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1779886949}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 28.189995, y: 0.08333119, z: 0.81999886}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1820375806
 GameObject:
   m_ObjectHideFlags: 0
@@ -1275,11 +1428,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1820375806}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be168e37cd250cd4ab9368ea99509678, type: 3}
+  m_Script: {fileID: 11500000, guid: ea6cf16895dff314a9f468c276bedb1e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.ParkingSlot
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.RentableMapPosition
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
-  type: 0
+  type: 1
   gizmoSize: {x: 2, y: 0.1, z: 4.5}
   gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
 --- !u!1 &1863309873
@@ -1319,6 +1472,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 38d16dabbf62d824fb355b1a72d59384, type: 2}
   defaultCustomerDataList:
   - {fileID: 11400000, guid: ed118fb1f27eba84aa90bf16f7126a3c, type: 2}
+  - {fileID: 11400000, guid: 609eda10c670162498209c4498d480ab, type: 2}
+  - {fileID: 11400000, guid: fcfc26551792c7040927fc47e04d859d, type: 2}
+  - {fileID: 11400000, guid: 343ee487bb9c3474881e83916f14af2b, type: 2}
   spawnPoint: {fileID: 792902778}
   shopPoint: {fileID: 336491504}
   exitPoint: {fileID: 432048088}
@@ -1470,6 +1626,54 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &2046347229
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2046347231}
+  - component: {fileID: 2046347230}
+  m_Layer: 0
+  m_Name: WaitingLine
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2046347230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2046347229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5607945e5086ba348b5949c5df2256aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.MapPosition
+  mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
+  type: 5
+  gizmoSize: {x: 1, y: 0.1, z: 1}
+  gizmoColor: {r: 0.3, g: 1, b: 0.5, a: 0.5}
+--- !u!4 &2046347231
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2046347229}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 19.56, y: 0.08333119, z: 0.82000005}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1485,3 +1689,7 @@ SceneRoots:
   - {fileID: 1544321867}
   - {fileID: 731816921}
   - {fileID: 825971556}
+  - {fileID: 1022473432}
+  - {fileID: 1779886951}
+  - {fileID: 1174632399}
+  - {fileID: 2046347231}

@@ -5,18 +5,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
 {
-    /// <summary>
-    /// 손님 한 명의 상태들이 공유하는 값. 스코프가 손님이라
-    /// 차 단위 값을 담는 <see cref="VisitContext"/>와는 다르다.
-    ///
-    /// 여기에 넣는 것은 두 가지뿐이다.
-    ///  - 여러 상태가 함께 읽는 참조
-    ///  - 상태 전이를 넘어 살아남아야 하는 값
-    /// 한 상태 안에서만 쓰는 타이머나 커서는 그 상태의 지역변수로 둔다.
-    ///
-    /// sealed인 이유: 손님 종류별로 상속하면 상태 쪽에 다운캐스팅이 생기고 조합 설계가 무너진다.
-    /// 값을 더 붙여야 하면 필드를 추가하고 안 쓰는 손님은 기본값으로 둔다.
-    /// </summary>
+    /// <summary>손님 한 명의 상태들이 공유하는 값. 차 단위 값을 담는 <see cref="VisitContext"/>와는 스코프가 다르다. sealed인 이유는 손님 종류별 상속이 상태 쪽에 다운캐스팅을 만들기 때문이다.</summary>
     public sealed class CustomerContext
     {
         /// <summary> 진상 손님인지 평범한 손님인지 체크 </summary>
@@ -39,6 +28,14 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
 
         /// <summary>전투 대상이나 파손 대상. 인터럽트를 건 쪽이 채워준다.</summary>
         public Transform Target;
+
+        /// <summary>약속으로 맺어진 상대. 짝이 풀리면 null이 되므로, 기다리는 쪽은 이걸 보고 빠져나온다.
+        /// 다른 차의 손님일 수 있어 <see cref="Visit"/>의 손님 목록으로는 찾을 수 없다.</summary>
+        [CanBeNull]
+        public CustomerContext Partner;
+
+        /// <summary>짝과 만나기로 한 지점. <see cref="CustomerRendezvousSO"/>가 둘의 중간으로 정해 양쪽에 같은 값을 넣는다.</summary>
+        public Vector3 MeetPoint;
         /// <summary>이 방문에서 배정받은 좌석 번호. 하차 순서와 승차 좌석에 모두 쓰인다.</summary>
         public int SeatIndex { get; private set; }
         public CustomerDataSO Data => Customer != null ? Customer.Data : null;
@@ -56,14 +53,31 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             SeatIndex = seatIndex;
         }
 
-        /// <summary>
-        /// 풀 반납 시 호출. 풀링에서는 OnDestroy가 거의 불리지 않으므로 여기가 유일한 정리 지점이다.
-        /// 손님 수치(Patience 등)는 다음 스폰의 Setup에서 채워지므로 여기서 건드리지 않는다.
-        /// </summary>
+        /// <summary>풀 반납 시 호출. 풀링에서는 OnDestroy가 거의 불리지 않으므로 여기가 유일한 정리 지점이다.</summary>
         public void Reset()
         {
+            // 상태가 취소로 끊겨 자기 finally를 못 지났을 수 있다. 마지막 안전망으로 여기서 짝을 맞춘다.
+            // 빼먹으면 손님이 반납되어도 그 지점이 점유 상태로 남는다.
+            if (RentedPosition != null)
+            {
+                MapData?.Release(RentedPosition);
+                RentedPosition = null;
+            }
+
+            // 짝도 같은 이유로 끊어 준다. 안 끊으면 상대가 반납된 손님을 계속 기다린다.
+            if (Partner != null)
+            {
+                if (Partner.Partner == this)
+                {
+                    Partner.Partner = null;
+                }
+
+                Partner = null;
+            }
+
             Visit = null;
             Target = null;
+            MeetPoint = Vector3.zero;
             SeatIndex = 0;
         }
     }

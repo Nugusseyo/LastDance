@@ -7,15 +7,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 {
-    /// <summary>
-    /// 손님 머리 위에 말풍선을 띄우고, 말풍선이 스스로 끝날 때까지 기다린다.
-    ///
-    /// 말풍선의 수명은 SpeechBubble이 쥔다. InitializeBubble이 코루틴을 걸고,
-    /// 시간이 다 되면 OnSpeechEnd를 쏜 뒤 스스로 풀에 돌아간다.
-    /// 그래서 이 상태는 Push하지 않는다 — 두 번 넣으면 같은 말풍선이 풀에 둘로 쌓여
-    /// 서로 다른 손님이 같은 오브젝트를 동시에 쓰게 된다.
-    /// 예외는 하나, 말풍선이 코루틴을 시작하지도 못한 경우다. 그때만 이쪽이 치운다.
-    /// </summary>
+    /// <summary>손님 머리 위에 말풍선을 띄우고 스스로 끝날 때까지 기다린다. 말풍선의 수명은 SpeechBubble이 쥐고 스스로 풀에 돌아가므로 이 상태는 Push하지 않는다.</summary>
     [Serializable]
     public sealed class SpeechState : CustomerState
     {

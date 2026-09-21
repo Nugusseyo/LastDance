@@ -2,10 +2,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.MapSystems
 {
-    /// <summary>
-    /// 한 번에 한 명만 쓸 수 있는 지점. 주차 자리나 좌석처럼 배정이 필요한 곳에 쓴다.
-    /// 가게 입구처럼 여럿이 동시에 지나가도 되는 지점은 MapPosition을 그대로 쓰면 된다.
-    /// </summary>
+    /// <summary>한 번에 한 명만 쓸 수 있는 지점. 주차 자리나 좌석처럼 배정이 필요한 곳에 쓴다.</summary>
     public class RentableMapPosition : MapPosition
     {
         /// <summary>대여 중인지 여부. 상태를 바꾸는 것은 MapDataSo뿐이다.</summary>

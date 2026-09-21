@@ -6,24 +6,7 @@ using UnityEngine.AI;
 
 namespace _Works.CJW.Scripts.Cars
 {
-    /// <summary>
-    /// NavMeshAgent를 경로 계산기로만 쓰고, 이동은 Pure Pursuit + 자전거 모델로 직접 굴리는 차량 이동 모듈.
-    /// 에이전트에 이동을 맡기면 경로의 꾫은선을 그대로 따라가며 제자리 회전까지 해버려서 차처럼 보이지 않는다.
-    ///
-    /// 매 프레임 하는 일은 네 가지다.
-    /// 1. 경로 위에서 Lookahead 거리만큼 앞의 목표점을 고른다. (Pure Pursuit)
-    /// 2. 지금 위치·방향에서 그 점에 닿는 원호의 곱률을 구하고, 조향각으로 바꿔 한계 안에 가둔다. (자전거 모델)
-    /// 3. 곱률과 남은 거리로 목표 속도를 정해 가감속한다.
-    /// 4. 회전은 속도에 비례해서만 시키고, 이동은 항상 정면으로만 한다.
-    ///
-    /// 4번이 이 모듈의 전부다. 멈춘 차는 돌지 않고, 차는 옆으로 미끄러지지 않는다.
-    ///
-    /// 구성
-    ///   이 파일            — 인스펙터 값, ICarMoveModule 구현, 매 프레임 순서
-    ///   CarPathTracker    — 경로 코너 관리와 목표점 찾기
-    ///   CarSteeringSolver — 수식(자전거 모델, Pure Pursuit, 속도 상한)
-    ///   ...Gizmos.cs      — 씨 뷰 표시 (에디터 전용)
-    /// </summary>
+    /// <summary>NavMeshAgent를 경로 계산기로만 쓰고, 이동은 Pure Pursuit + 자전거 모델로 직접 굴리는 차량 이동 모듈. 에이전트에 이동을 맡기면 제자리 회전까지 해버려 차처럼 보이지 않기 때문이다.</summary>
     public partial class CarSteeringMoveModule : AbstractModule, ICarMoveModule, IUpdate
     {
         [Header("참조")]
@@ -148,10 +131,7 @@ namespace _Works.CJW.Scripts.Cars
         /// <summary>최소 회전 반경(m). 자전거 모델에서 나오는 이 차의 물리적 한계다.</summary>
         public float MinTurnRadius => CarSteeringSolver.MinTurnRadius(_wheelBase, _maxSteerAngle);
 
-        /// <summary>
-        /// 목적지까지 실제로 닿는 경로인지. SetDestination은 부분 경로에도 true를 돌려주므로,
-        /// 이걸 보지 않으면 차가 닿는 데까지만 가서 거기를 "도착"으로 친다.
-        /// </summary>
+        /// <summary>목적지까지 실제로 닿는 경로인지. SetDestination은 부분 경로에도 true를 돌려주므로 따로 확인해야 한다.</summary>
         public bool HasCompletePath => !_hasDestination || _path.Status == NavMeshPathStatus.PathComplete;
 
         private float ArriveDistance => Mathf.Max(_arriveThreshold, _agent != null ? _agent.stoppingDistance : 0f);
@@ -232,10 +212,7 @@ namespace _Works.CJW.Scripts.Cars
             MoveToInternal(destination);
         }
 
-        /// <summary>
-        /// approachFrom을 먼저 지나 destination에 닿는다. 둘은 하나의 연속된 경로라
-        /// 중간에서 멈추지 않고, 마지막 구간이 직선이라 달리는 동안 방향이 저절로 맞는다.
-        /// </summary>
+        /// <summary>approachFrom을 먼저 지나 destination에 닿는다. 하나의 연속된 경로라 중간에 멈추지 않는다.</summary>
         public void MoveTo(Vector3 destination, Vector3 approachFrom)
         {
             _hasApproach = true;
@@ -310,8 +287,6 @@ namespace _Works.CJW.Scripts.Cars
             // 에이전트는 켜져 있으니 손님들은 여전히 차를 피해 간다.
         }
 
-        /// <summary>매 프레임의 순서. 자세한 계산은 아래 네 메서드에 나눠둔다.</summary>
-        /// <summary>매 프레임의 순서. 자세한 계산은 아래 메서드들에 나눠둔다.</summary>
         /// <summary>매 프레임의 순서. 자세한 계산은 아래 메서드들에 나눠둔다.</summary>
         public void OnUpdate(float dt)
         {
@@ -355,15 +330,7 @@ namespace _Works.CJW.Scripts.Cars
             Integrate(curvature, cursor.y, dt);             // 5. 실제로 움직인다
         }
 
-        /// <summary>
-        /// 자리에 못 붙은 채 끝점을 지났을 때 처음부터 다시 들어온다.
-        ///
-        /// 진입점을 쓰는 경로였다면 그 진입점으로 되돌아간다 — 보통 자리 뒤쪽이므로
-        /// 차는 한 바퀴 돌거나, 후진으로 각을 벌어 다시 진입한다.
-        ///
-        /// 횟수를 제한하는 이유는 분명하다. 자리 앞이 막혔거나 진입선이 말도 안 되면
-        /// 영원히 재시도하게 되고, 그러면 방문이 끝나지 않아 주차 자리가 반납되지 않는다.
-        /// </summary>
+        /// <summary>자리에 못 붙은 채 끝점을 지났을 때 처음부터 다시 들어온다. 횟수를 제한하지 않으면 자리 앞이 막혔을 때 영원히 재시도해 방문이 끝나지 않는다.</summary>
         private void RetryApproach()
         {
             _retryCount++;
@@ -390,15 +357,7 @@ namespace _Works.CJW.Scripts.Cars
             }
         }
 
-        /// <summary>
-        /// 전진과 후진 중 어느 쪽인지 정한다. 기어를 바꾸는 중이면 true를 돌려준다.
-        ///
-        /// 후진은 경로를 따라가는 동작이 아니라 <b>각을 벌기 위한 동작</b>이다.
-        /// 전진으로 목표에 닿을 수 없을 때만 들어가고, 닿을 수 있게 되면 바로 나온다.
-        ///
-        /// 기어를 바로 뒤집지 않고 먼저 세우는 이유는 둘이다.
-        /// 실제 차가 그렇고, 속도 부호가 한 프레임에 뒤집힐 때 생기는 튀을 없앱니다.
-        /// </summary>
+        /// <summary>전진과 후진 중 어느 쪽인지 정한다. 기어를 바꾸는 중이면 true를 돌려준다. 후진은 경로를 따라가는 동작이 아니라 각을 벌기 위한 동작이라, 전진으로 목표에 닿을 수 없을 때만 들어간다.</summary>
         private bool UpdateGear(Vector3 local, float dt)
         {
             bool want;
@@ -439,10 +398,7 @@ namespace _Works.CJW.Scripts.Cars
             return false;
         }
 
-        /// <summary>
-        /// 뒤쪽이 비어 있는지. 후진은 경로를 보고 하는 게 아니라
-        /// 확인하지 않으면 NavMesh 밖으로 밀려나가 거기서 걱치게 된다.
-        /// </summary>
+        /// <summary>뒤쪽이 비어 있는지. 확인하지 않으면 후진 중 NavMesh 밖으로 밀려난다.</summary>
         private bool IsReverseBlocked()
         {
             if (_agent == null || !_agent.isOnNavMesh)
@@ -471,10 +427,7 @@ namespace _Works.CJW.Scripts.Cars
             return lookahead;
         }
 
-        /// <summary>
-        /// 경로 위에서 결눈 점을 고라 차 기준 좌표로 돌려준다.
-        /// 한 번 고른 뒤 각도를 보고, 차가 따라갈 수 없는 거리면 Ld를 늘려 다시 고른다.
-        /// </summary>
+        /// <summary>경로 위에서 목표점을 골라 차 기준 좌표로 돌려준다. 차가 따라갈 수 없는 각이면 Ld를 늘려 다시 고른다.</summary>
         private Vector3 ResolveGoal(Vector3 cursor)
         {
             float lookahead = CurrentLookahead();
@@ -492,14 +445,7 @@ namespace _Works.CJW.Scripts.Cars
             return local;
         }
 
-        /// <summary>
-        /// 목표 곱률을 조향각으로 바꿔 변화율까지 제한하고, 실제 적용된 곱률을 돌려준다.
-        /// 변화율 제한이 있어야 코너 진입에서 곱률이 계단처럼 튀지 않고 부드럽게 이어진다.
-        /// </summary>
-        /// <summary>
-        /// 목표 곱률을 조향각으로 바꿔 변화율까지 제한하고, 실제 적용된 곱률을 돌려준다.
-        /// 변화율 제한이 있어야 코너 진입에서 곱률이 계단처럼 튀지 않고 부드럽게 이어진다.
-        /// </summary>
+        /// <summary>목표 곱률을 조향각으로 바꿔 변화율까지 제한하고, 실제 적용된 곱률을 돌려준다.</summary>
         private float UpdateSteering(Vector3 local, float dt)
         {
             float maxCurvature = CarSteeringSolver.MaxCurvature(_wheelBase, _maxSteerAngle);
@@ -516,11 +462,7 @@ namespace _Works.CJW.Scripts.Cars
             return CarSteeringSolver.SteerToCurvature(_steer, _wheelBase);
         }
 
-        /// <summary>최고 속도·코너 감속·제동거리 중 가장 작은 값을 목표로 잡고 가감속한다.</summary>
-        /// <summary>
-        /// 최고 속도·코너 감속·제동거리 중 가장 작은 값을 목표로 잡고 가감속한다.
-        /// 후진은 목표 속도가 음수다. 가감속 판단을 크기로 하므로 부호가 섞여도 그대로 동작한다.
-        /// </summary>
+        /// <summary>최고 속도·코너 감속·제동거리 중 가장 작은 값을 목표로 잡고 가감속한다. 후진은 목표 속도가 음수다.</summary>
         private void UpdateSpeed(float curvature, float dt, bool shifting)
         {
             float vTarget;
@@ -555,10 +497,7 @@ namespace _Works.CJW.Scripts.Cars
             _speed = Mathf.MoveTowards(_speed, vTarget, rate * dt);
         }
 
-        /// <summary>
-        /// 회전은 속도에 비례해서만(θ̇ = v·κ), 이동은 항상 정면으로만.
-        /// 이 두 줄이 이 모듈의 전부다. 멈춘 차가 못 돌고 게걸음이 불가능한 이유도 여기에 있다.
-        /// </summary>
+        /// <summary>회전은 속도에 비례해서만(θ̇ = v·κ), 이동은 항상 정면으로만.</summary>
         private void Integrate(float curvature, float groundY, float dt)
         {
             float yawRate = _speed * curvature;
@@ -572,14 +511,7 @@ namespace _Works.CJW.Scripts.Cars
             _agent.nextPosition = transform.position;
         }
 
-        /// <summary>
-        /// 더 따라갈 경로가 없을 때 핸들을 중앙으로 되돌리면서 제동해 세운다.
-        /// 그냥 멈춰버리면 조향각이 남아 다음 출발 첫 프레임에 차가 튀다.
-        /// </summary>
-        /// <summary>
-        /// 더 따라갈 경로가 없을 때 핸들을 중앙으로 되돌리면서 제동해 세운다.
-        /// 그냥 멈춰버리면 조향각이 남아 다음 출발 첫 프레임에 차가 튀다.
-        /// </summary>
+        /// <summary>더 따라갈 경로가 없을 때 핸들을 중앙으로 되돌리면서 제동해 세운다.</summary>
         private void Settle(float dt)
         {
             _steer = Mathf.MoveTowards(_steer, 0f, _steerRate * Mathf.Deg2Rad * dt);

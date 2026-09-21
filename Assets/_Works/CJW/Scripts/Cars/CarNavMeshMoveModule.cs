@@ -4,10 +4,7 @@ using UnityEngine.AI;
 
 namespace _Works.CJW.Scripts.Cars
 {
-    /// <summary>
-    /// NavMesh로 움직이는 차량 이동 모듈. 스플라인이나 웨이포인트로 바꾸려면
-    /// ICarMoveModule을 구현한 다른 모듈로 교체하면 된다.
-    /// </summary>
+    /// <summary>NavMesh로 움직이는 차량 이동 모듈. 다른 방식은 ICarMoveModule을 구현한 모듈로 교체하면 된다.</summary>
     public class CarNavMeshMoveModule : AbstractModule, ICarMoveModule
     {
         [SerializeField] private NavMeshAgent agent;

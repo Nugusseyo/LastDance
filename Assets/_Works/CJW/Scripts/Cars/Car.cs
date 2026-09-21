@@ -46,10 +46,7 @@ namespace _Works.CJW.Scripts.Cars
             }
         }
 
-        /// <summary>
-        /// 태울 인원 범위. 좌석 수가 곧 상한이라 어긋날 값이 애초에 없다.
-        /// 좌석이 하나도 없으면 (0, 0)이 나오고, 그 차는 방문을 시작하지 않는다.
-        /// </summary>
+        /// <summary>태울 인원 범위. 좌석 수가 곧 상한이다. 좌석이 없으면 (0, 0)이 나와 그 차는 방문을 시작하지 않는다.</summary>
         public Vector2Int CustomerCountRange
         {
             get
@@ -103,10 +100,7 @@ namespace _Works.CJW.Scripts.Cars
             ApplyBodyColor(data.BodyColors);
         }
 
-        /// <summary>
-        /// 후보 중 하나를 골라 차체 색만 갈아끼운다. MaterialPropertyBlock이라
-        /// 머티리얼 인스턴스가 생기지 않고 SRP Batcher도 그대로 묶인다.
-        /// </summary>
+        /// <summary>후보 중 하나를 골라 차체 색만 갈아끼운다. MaterialPropertyBlock이라 머티리얼 인스턴스가 생기지 않는다.</summary>
         private void ApplyBodyColor(Color[] candidates)
         {
             if (bodyRenderers == null || bodyRenderers.Length == 0)
@@ -187,10 +181,7 @@ namespace _Works.CJW.Scripts.Cars
             _moveModule?.Stop();
         }
 
-        /// <summary>
-        /// 정차 자리 방향으로 조금씩 돌린다. 회전이 다 맞으면 true.
-        /// NavMesh가 회전을 다시 가져가지 않도록 Stop() 뒤에 불러야 한다.
-        /// </summary>
+        /// <summary>정차 자리 방향으로 조금씩 돌린다. 회전이 다 맞으면 true. Stop() 뒤에 불러야 한다.</summary>
         public bool AlignTo(Quaternion target, float dt)
         {
             float step = Mathf.Max(parkingTurnSpeed, 1f) * dt;

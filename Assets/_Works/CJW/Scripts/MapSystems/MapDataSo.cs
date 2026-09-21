@@ -4,14 +4,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.MapSystems
 {
-    /// <summary>
-    /// 맵이 제공하는 지점들의 만남 지점. 좌표를 저장하지는 않는다.
-    /// 실제 위치는 씬의 MapPosition이 갖고 있고, 이 에셋은 누가 있고 누가 비었는지만 안다.
-    /// 쓰는 쪽은 씬에 무엇이 있는지 몰라도 이 에셋 하나만 참조하면 된다.
-    ///
-    /// 좌표를 굽지 않는 이유는 런타임에 맵이 변하기 때문이다.
-    /// 가게를 넓히거나 가구를 옮기면 지점이 생기고 사라지는데, 등록이 그때그때 따라 움직인다.
-    /// </summary>
+    /// <summary>맵이 제공하는 지점들의 등록소. 좌표는 저장하지 않고 씬의 MapPosition이 가진 값을 그대로 쓰며, 이 에셋은 누가 있고 누가 비었는지만 안다.</summary>
     [CreateAssetMenu(fileName = "JW/MapData", menuName = "JW/Map Data", order = 0)]
     public class MapDataSo : ScriptableObject
     {
@@ -86,20 +79,14 @@ namespace _Works.CJW.Scripts.MapSystems
         public IReadOnlyList<MapPosition> GetAll(MapPointType type)
             => _points.TryGetValue(type, out List<MapPosition> list) ? list : Array.Empty<MapPosition>();
 
-        /// <summary>
-        /// 기준 위치에서 가장 가까운, 지금 쓸 수 있는 지점을 찾는다.
-        /// 빌리지는 않으므로 입구처럼 여럿이 함께 쓰는 지점에 적합하다.
-        /// </summary>
+        /// <summary>기준 위치에서 가장 가까운, 지금 쓸 수 있는 지점을 찾는다. 빌리지는 않으므로 입구처럼 여럿이 함께 쓰는 지점에 적합하다.</summary>
         public bool TryGetNearest(MapPointType type, Vector3 from, out MapPosition point)
         {
             point = FindNearestAvailable(type, from);
             return point != null;
         }
 
-        /// <summary>
-        /// 가장 가까운 빈 지점을 빌린다. 빌린 쪽이 반드시 <see cref="Release"/>로 짝을 맞춰야 한다.
-        /// 대여할 수 없는 종류를 넘기면 false가 나온다.
-        /// </summary>
+        /// <summary>가장 가까운 빈 지점을 빌린다. 빌린 쪽이 반드시 <see cref="Release"/>로 짝을 맞춰야 한다.</summary>
         public bool TryRentNearest(MapPointType type, Vector3 from, out RentableMapPosition point)
         {
             point = FindNearestAvailable(type, from) as RentableMapPosition;
