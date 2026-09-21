@@ -1,3 +1,4 @@
+using DevLib.EventChannelSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -5,6 +6,7 @@ namespace _Works.KDH._01.Scripts.Wrench
 {
     public class WheelDetacher : MonoBehaviour
     {
+        [SerializeField] private EventChannelSO systemEvent;
         [SerializeField] private Camera playerCamera;
         [SerializeField] private float detachDistance = 4f;
         [SerializeField] private float aimDotThreshold = 0.9f;
@@ -13,27 +15,17 @@ namespace _Works.KDH._01.Scripts.Wrench
         [SerializeField] private WrenchTool equippedWrench;
         [SerializeField] private float popForce = 5f;
 
+        private WheelCollider[] cachedWheels = new WheelCollider[0];
+        private float nextRefreshTime;
         private float holdTime;
         private GameObject targetWheel;
+        private bool progressShown;
 
         private void Update()
         {
-            Collider[] nearbyWheels = Physics.OverlapSphere(playerCamera.transform.position, detachDistance, wheelLayerMask);
+            RefreshWheelCache();
 
-            GameObject hitWheelObject = null;
-            float bestDot = aimDotThreshold;
-
-            for (int i = 0; i < nearbyWheels.Length; i++)
-            {
-                Vector3 directionToWheel = (nearbyWheels[i].transform.position - playerCamera.transform.position).normalized;
-                float dot = Vector3.Dot(playerCamera.transform.forward, directionToWheel);
-
-                if (dot > bestDot)
-                {
-                    bestDot = dot;
-                    hitWheelObject = nearbyWheels[i].gameObject;
-                }
-            }
+            GameObject hitWheelObject = FindAimedWheel();
 
             if (hitWheelObject == null)
             {
@@ -57,11 +49,79 @@ namespace _Works.KDH._01.Scripts.Wrench
                 {
                     DetachWheel(targetWheel);
                     ResetHold();
+                    return;
                 }
+
+                ShowProgress(holdTime, requiredTime);
             }
             else
             {
                 holdTime = 0f;
+                HideProgress();
+            }
+        }
+
+        private void ShowProgress(float current, float max)
+        {
+            progressShown = true;
+            if (systemEvent == null) return;
+
+            systemEvent.RaiseEvent(WheelEvents.WheelDetachProgressEvent.Init(current, max, true));
+        }
+
+        private void HideProgress()
+        {
+            if (!progressShown) return;
+
+            progressShown = false;
+            if (systemEvent == null) return;
+
+            systemEvent.RaiseEvent(WheelEvents.WheelDetachProgressEvent.Init(0f, 0f, false));
+        }
+
+        private void RefreshWheelCache()
+        {
+            if (Time.time < nextRefreshTime) return;
+
+            nextRefreshTime = Time.time + 0.5f;
+            cachedWheels = FindObjectsByType<WheelCollider>(FindObjectsSortMode.None);
+        }
+
+        private GameObject FindAimedWheel()
+        {
+            Vector3 cameraPosition = playerCamera.transform.position;
+            GameObject bestWheel = null;
+            float bestDot = aimDotThreshold;
+
+            Collider[] nearbyColliders = Physics.OverlapSphere(cameraPosition, detachDistance, wheelLayerMask);
+            for (int i = 0; i < nearbyColliders.Length; i++)
+            {
+                CheckWheel(nearbyColliders[i].gameObject, cameraPosition, ref bestWheel, ref bestDot);
+            }
+
+            for (int i = 0; i < cachedWheels.Length; i++)
+            {
+                if (cachedWheels[i] == null) continue;
+
+                GameObject wheel = cachedWheels[i].gameObject;
+                if (((1 << wheel.layer) & wheelLayerMask) == 0) continue;
+                if ((wheel.transform.position - cameraPosition).sqrMagnitude > detachDistance * detachDistance) continue;
+
+                CheckWheel(wheel, cameraPosition, ref bestWheel, ref bestDot);
+            }
+
+            return bestWheel;
+        }
+
+        private void CheckWheel(GameObject wheel, Vector3 cameraPosition, ref GameObject bestWheel, ref float bestDot)
+        {
+            Vector3 directionToWheel = (wheel.transform.position - cameraPosition).normalized;
+            float dot = Vector3.Dot(playerCamera.transform.forward, directionToWheel);
+
+            if (dot > bestDot)
+            {
+                bestDot = dot;
+                bestWheel = wheel;
             }
         }
 
@@ -71,6 +131,13 @@ namespace _Works.KDH._01.Scripts.Wrench
             if (car == null) return;
 
             wheel.transform.SetParent(null);
+
+            WheelCollider wheelCollider = wheel.GetComponent<WheelCollider>();
+            if (wheelCollider != null)
+            {
+                Destroy(wheelCollider);
+                AddSolidCollider(wheel);
+            }
 
             Rigidbody rb = wheel.GetComponent<Rigidbody>();
             if (rb == null) rb = wheel.AddComponent<Rigidbody>();
@@ -85,10 +152,27 @@ namespace _Works.KDH._01.Scripts.Wrench
             rb.AddForce(outward * popForce, ForceMode.VelocityChange);
         }
 
+        private void AddSolidCollider(GameObject wheel)
+        {
+            SphereCollider sphere = wheel.AddComponent<SphereCollider>();
+
+            Renderer wheelRenderer = wheel.GetComponentInChildren<Renderer>();
+            if (wheelRenderer == null) return;
+
+            Bounds bounds = wheelRenderer.bounds;
+            Vector3 scale = wheel.transform.lossyScale;
+            float maxScale = Mathf.Max(scale.x, scale.y, scale.z);
+            float maxExtent = Mathf.Max(bounds.extents.x, bounds.extents.y, bounds.extents.z);
+
+            sphere.center = wheel.transform.InverseTransformPoint(bounds.center);
+            sphere.radius = maxExtent / maxScale;
+        }
+
         private void ResetHold()
         {
             holdTime = 0f;
             targetWheel = null;
+            HideProgress();
         }
     }
 }
