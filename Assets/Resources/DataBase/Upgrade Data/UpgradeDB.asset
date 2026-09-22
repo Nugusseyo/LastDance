@@ -13,47 +13,113 @@ MonoBehaviour:
   m_Name: UpgradeDB
   m_EditorClassIdentifier: Assembly-CSharp::Resources.DataBase.Upgrade_Data.UpgradeDB
   UpgradeSheet:
-  - index: 0
-    value: "\uD14C\uC2A4\uD2B8 \uC774\uB984"
-    maxlv: 7
-    lv1price: 1
-    lv2price: 2
-    lv3price: 3
-    lv4price: 5
-    lv5price: 7
-    lv6price: 9
-    lv7price: 11
-    lv8price: 12
-    lv9price: 13
-    lv1value: 1
-    lv2value: 2
-    lv3value: 4
-    lv4value: 6
-    lv5value: 8
-    lv6value: 10
-    lv7value: 12
-    lv8value: 13
-    lv9value: 15
-    upgradetype: 1
   - index: 1
-    value: "\uC548\uB155\uD558\uC138\uC6A9"
-    maxlv: 9
-    lv1price: 1
-    lv2price: 2
-    lv3price: 3
-    lv4price: 4
-    lv5price: 5
-    lv6price: 6
-    lv7price: 7
-    lv8price: 8
-    lv9price: 9
-    lv1value: 1
-    lv2value: 2
-    lv3value: 3
-    lv4value: 4
-    lv5value: 5
-    lv6value: 6
-    lv7value: 7
-    lv8value: 8
-    lv9value: 9
-    upgradetype: 3
+    value: "\uC8FC\uC720\uAD6C \uCD94\uAC00"
+    maxlv: 0
+    lv1price: 0
+    lv2price: 0
+    lv3price: 0
+    lv4price: 0
+    lv5price: 0
+    lv6price: 0
+    lv7price: 0
+    lv8price: 0
+    lv9price: 0
+    lv1value: 0
+    lv2value: 0
+    lv3value: 0
+    lv4value: 0
+    lv5value: 0
+    lv6value: 0
+    lv7value: 0
+    lv8value: 0
+    lv9value: 0
+    upgradetype: 0
+  - index: 2
+    value: "\uC8FC\uC720 \uC18D\uB3C4 \uC99D\uAC00"
+    maxlv: 0
+    lv1price: 0
+    lv2price: 0
+    lv3price: 0
+    lv4price: 0
+    lv5price: 0
+    lv6price: 0
+    lv7price: 0
+    lv8price: 0
+    lv9price: 0
+    lv1value: 0
+    lv2value: 0
+    lv3value: 0
+    lv4value: 0
+    lv5value: 0
+    lv6value: 0
+    lv7value: 0
+    lv8value: 0
+    lv9value: 0
+    upgradetype: 0
+  - index: 3
+    value: "\uB3C8 \uBC30\uC728"
+    maxlv: 0
+    lv1price: 0
+    lv2price: 0
+    lv3price: 0
+    lv4price: 0
+    lv5price: 0
+    lv6price: 0
+    lv7price: 0
+    lv8price: 0
+    lv9price: 0
+    lv1value: 0
+    lv2value: 0
+    lv3value: 0
+    lv4value: 0
+    lv5value: 0
+    lv6value: 0
+    lv7value: 0
+    lv8value: 0
+    lv9value: 0
+    upgradetype: 0
+  - index: 4
+    value: "\uBE60\uB978 \uD3D0\uCC28 \uC218\uC218\uB8CC"
+    maxlv: 0
+    lv1price: 0
+    lv2price: 0
+    lv3price: 0
+    lv4price: 0
+    lv5price: 0
+    lv6price: 0
+    lv7price: 0
+    lv8price: 0
+    lv9price: 0
+    lv1value: 0
+    lv2value: 0
+    lv3value: 0
+    lv4value: 0
+    lv5value: 0
+    lv6value: 0
+    lv7value: 0
+    lv8value: 0
+    lv9value: 0
+    upgradetype: 0
+  - index: 5
+    value: "\uD3D0\uCC28 \uBCF4\uB108\uC2A4"
+    maxlv: 0
+    lv1price: 0
+    lv2price: 0
+    lv3price: 0
+    lv4price: 0
+    lv5price: 0
+    lv6price: 0
+    lv7price: 0
+    lv8price: 0
+    lv9price: 0
+    lv1value: 0
+    lv2value: 0
+    lv3value: 0
+    lv4value: 0
+    lv5value: 0
+    lv6value: 0
+    lv7value: 0
+    lv8value: 0
+    lv9value: 0
+    upgradetype: 0

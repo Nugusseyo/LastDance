@@ -497,8 +497,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4287844377
+  m_fontColor: {r: 0.09913135, g: 0.31406018, b: 0.5773585, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -523,7 +523,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 1
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 1024
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
@@ -571,6 +571,8 @@ GameObject:
   - component: {fileID: 2861173201463194600}
   - component: {fileID: 8766743548899208648}
   - component: {fileID: 1735322449252035732}
+  - component: {fileID: 3209223275431120190}
+  - component: {fileID: 7604621281746668637}
   m_Layer: 5
   m_Name: Bars
   m_TagString: Untagged
@@ -636,8 +638,46 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.StoreUI.UpgradeBarInitializer
   barPrefab: {fileID: 1859932034086308545, guid: 4c09e4e6efa1c1f4cb6d485310c50563, type: 3}
-  defaultColor: {r: 0.6528301, g: 0.6528301, b: 0.6528301, a: 1}
-  upgradeColor: {r: 0.5879719, g: 1, b: 0.5641509, a: 1}
+  defaultColor: {r: 0.8014596, g: 0.8806972, b: 0.8867924, a: 1}
+  upgradeColor: {r: 0, g: 0.8117647, b: 1, a: 1}
+--- !u!222 &3209223275431120190
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5029658006472549530}
+  m_CullTransparentMesh: 1
+--- !u!114 &7604621281746668637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5029658006472549530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.98490566, g: 0.98490566, b: 0.98490566, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &5054483606239520945
 GameObject:
   m_ObjectHideFlags: 0
@@ -706,6 +746,8 @@ GameObject:
   - component: {fileID: 583585547714945664}
   - component: {fileID: 1530044802724892663}
   - component: {fileID: 5381866787254901223}
+  - component: {fileID: 9035403251231643848}
+  - component: {fileID: 451983515587834103}
   m_Layer: 5
   m_Name: Left_Area
   m_TagString: Untagged
@@ -780,6 +822,44 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!222 &9035403251231643848
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5578824570057735080}
+  m_CullTransparentMesh: 1
+--- !u!114 &451983515587834103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5578824570057735080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &5733044002013991829
 GameObject:
   m_ObjectHideFlags: 0
@@ -841,7 +921,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 1, b: 0.042949915, a: 1}
+  m_Color: {r: 0.97735846, g: 0.8530733, b: 0.33746523, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -932,6 +1012,7 @@ GameObject:
   - component: {fileID: 5767021970957052929}
   - component: {fileID: 2815554104591824761}
   - component: {fileID: 2531731542846607908}
+  - component: {fileID: 5836200879939004921}
   m_Layer: 5
   m_Name: UpgradeBlock
   m_TagString: Untagged
@@ -958,7 +1039,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 200}
+  m_SizeDelta: {x: 1121.8, y: 200}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &587664296464279490
 CanvasRenderer:
@@ -981,7 +1062,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.85660374, g: 0.85660374, b: 0.85660374, a: 1}
+  m_Color: {r: 0.15294118, g: 0.67058825, b: 0.8862745, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -997,7 +1078,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 3
 --- !u!114 &9030343553440383648
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1010,8 +1091,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
-  m_EffectColor: {r: 0.5773585, g: 0.5773585, b: 0.5773585, a: 1}
-  m_EffectDistance: {x: 6, y: -6}
+  m_EffectColor: {r: 0.5773585, g: 0.5773585, b: 0.5773585, a: 0.7058824}
+  m_EffectDistance: {x: 0, y: -2}
   m_UseGraphicAlpha: 1
 --- !u!114 &5767021970957052929
 MonoBehaviour:
@@ -1071,11 +1152,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54b021733272a574fa6e5766fbf5e3a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.StoreUI.UpgradeBlock
+  buyButton: {fileID: 1859943009742021481}
   titleTmp: {fileID: 2065917231382621962}
   priceTmp: {fileID: 567417935881254121}
   countTmp: {fileID: 1534654659524945051}
   curLevel: 0
   barInitializer: {fileID: 1735322449252035732}
+  storeValueContainer: {fileID: 11400000, guid: 39a6ce942a3bc584083a7ae008f5c063, type: 2}
+  AllowColor: {r: 0, g: 1, b: 0.29411766, a: 1}
+  BlockColor: {r: 0.9529412, g: 0.21568628, b: 0.31764707, a: 1}
+  MaxColor: {r: 0.98039216, g: 0.85490197, b: 0.34117648, a: 1}
+  priceBG: {fileID: 1479960654815482034}
+--- !u!114 &5836200879939004921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5937779128213694716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Mask
+  m_ShowMaskGraphic: 1
 --- !u!1 &6537499793679552780
 GameObject:
   m_ObjectHideFlags: 0
