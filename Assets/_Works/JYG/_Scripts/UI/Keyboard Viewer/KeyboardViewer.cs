@@ -15,24 +15,18 @@ namespace _Works.JYG._Scripts.UI.Keyboard_Viewer
 
         public UnityEvent OnKeyPressed;
 
+        private bool _isActive = false;
+
         private void Update()
         {
-            if (Keyboard.current[targetKey].wasPressedThisFrame)
+            if (_isActive && Keyboard.current[targetKey].wasPressedThisFrame)
             {
                 uiInput.SetEnable(true);
                 playerInput.SetEnable(false);
                 OnKeyPressed?.Invoke();
-
-                uiInput.OnEscapePressed += HandleEscapeKeyPressed;
             }
         }
-
-        private void HandleEscapeKeyPressed()
-        {
-            uiInput.SetEnable(false);
-            playerInput.SetEnable(true);
-            
-            uiInput.OnEscapePressed -= HandleEscapeKeyPressed;
-        }
+        
+        public void SetActive(bool active) => _isActive = active;
     }
 }
