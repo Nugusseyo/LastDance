@@ -1,3 +1,4 @@
+using _Works.JYG._Scripts.Events;
 using DevLib.EventChannelSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,7 +7,7 @@ namespace _Works.KDH._01.Scripts.Wrench
 {
     public class WheelDetacher : MonoBehaviour
     {
-        [SerializeField] private EventChannelSO systemEvent;
+        [SerializeField] private EventChannelSO durationChannel;
         [SerializeField] private Camera playerCamera;
         [SerializeField] private float detachDistance = 4f;
         [SerializeField] private float aimDotThreshold = 0.9f;
@@ -64,9 +65,9 @@ namespace _Works.KDH._01.Scripts.Wrench
         private void ShowProgress(float current, float max)
         {
             progressShown = true;
-            if (systemEvent == null) return;
+            if (durationChannel == null) return;
 
-            systemEvent.RaiseEvent(WheelEvents.WheelDetachProgressEvent.Init(current, max, true));
+            durationChannel.RaiseEvent(UIEvents.DurationEvent.Init(current, max));
         }
 
         private void HideProgress()
@@ -74,9 +75,9 @@ namespace _Works.KDH._01.Scripts.Wrench
             if (!progressShown) return;
 
             progressShown = false;
-            if (systemEvent == null) return;
+            if (durationChannel == null) return;
 
-            systemEvent.RaiseEvent(WheelEvents.WheelDetachProgressEvent.Init(0f, 0f, false));
+            durationChannel.RaiseEvent(UIEvents.DurationEvent.Init(1f, 1f));
         }
 
         private void RefreshWheelCache()

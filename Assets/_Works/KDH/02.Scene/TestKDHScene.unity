@@ -15692,7 +15692,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d59c97e92ce8e2443af6e6d1a1dded4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Wrench.WheelDetacher
-  systemEvent: {fileID: 11400000, guid: d31e526d71d1b444f89007a57798b10f, type: 2}
+  durationChannel: {fileID: 11400000, guid: c6dff33bcde9eda42a4d11c78f80c7ab, type: 2}
   playerCamera: {fileID: 2004992978}
   detachDistance: 4
   aimDotThreshold: 0.9
