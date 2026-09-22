@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d8ee300e9a3643418d7fde61262e189, type: 3}
-  m_Name: Customer Data
+  m_Name: Circler Customer
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.CustomerDataSO
-  poolItem: {fileID: 11400000, guid: cdb25d5902bdea147b12f0acc1c6b9ac, type: 2}
+  poolItem: {fileID: 11400000, guid: 65d3de2b9a5d76140b897c86656bc548, type: 2}
+  <customerType>k__BackingField: 22
   moveSpeed: 3.5
   angularSpeed: 120
   stoppingDistance: 0.2
