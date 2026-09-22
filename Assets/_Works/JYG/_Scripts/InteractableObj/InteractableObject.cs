@@ -16,6 +16,14 @@ namespace _Works.JYG._Scripts.InteractableObj
         private readonly Collider[] playerColliders = new Collider[3];
         private bool isConnected = false;
 
+        [SerializeField] private bool onDisconnectAwake = true;
+
+        private void Awake()
+        {
+            if (onDisconnectAwake)
+                OnDisconnect?.Invoke();
+        }
+
         private void FixedUpdate()
         {
             int count =

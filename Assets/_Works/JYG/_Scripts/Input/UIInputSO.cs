@@ -24,10 +24,7 @@ public class UIInputSO : ScriptableObject, Controls.IUIActions
 
     private void OnDisable()
     {
-        if (_controls != null)
-        {
-            CleanUpInput();
-        }
+        CleanUpInput();
     }
 
     private void CleanUpInput()
@@ -38,7 +35,8 @@ public class UIInputSO : ScriptableObject, Controls.IUIActions
 
         if (_createdInput)
         {
-            _controls.Dispose();    //만들어진 Controls는 Dispose로 제거해줘야 함.
+            if(Application.isPlaying && _controls != null)
+                _controls.Dispose();    //만들어진 Controls는 Dispose로 제거해줘야 함.
             _createdInput = false;
         }
         
