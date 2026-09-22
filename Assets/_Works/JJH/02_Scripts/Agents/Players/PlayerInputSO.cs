@@ -7,6 +7,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players
     [CreateAssetMenu(fileName = "Player Input", menuName = "SO/Player Input")]
     public class PlayerInputSO : ScriptableObject, Controls.IPlayerActions
     {
+        [SerializeField] private UIInputSO uiInputSO;
         public event Action OnAttackKeyPressed;
         public event Action OnThrowAttackKeyPressed;
         public event Action OnInteractKeyPressed;
@@ -28,12 +29,26 @@ namespace _Works.JJH._02_Scripts.Agents.Players
             }
 
             _control.Player.Enable();
+
+            if (uiInputSO != null)
+                uiInputSO.InitializeInput(_control);
         }
 
         private void OnDisable()
         {
             if (_control != null)
                 _control.Player.Disable();
+        }
+
+        public void SetEnable(bool enable)
+        {
+            if (_control != null)
+            {
+                if (enable)
+                    _control.Player.Enable();
+                else
+                    _control.Player.Disable();
+            }
         }
 
         public void OnLook(InputAction.CallbackContext context)

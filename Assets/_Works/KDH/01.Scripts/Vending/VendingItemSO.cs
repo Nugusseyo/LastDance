@@ -1,4 +1,5 @@
 using UnityEngine;
+using ItemTypeEnum = _Works.KDH._01.Scripts.ItemType.ItemType;
 
 namespace _Works.KDH._01.Scripts.Vending
 {
@@ -7,5 +8,6 @@ namespace _Works.KDH._01.Scripts.Vending
     {
         [field: SerializeField] public string ItemName { get; private set; }
         [field: SerializeField] public GameObject ItemPrefab { get; private set; }
+        [field: SerializeField] public ItemTypeEnum ItemType { get; private set; }
     }
 }

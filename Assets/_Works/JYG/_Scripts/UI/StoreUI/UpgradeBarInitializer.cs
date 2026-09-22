@@ -35,8 +35,8 @@ namespace _Works.JYG._Scripts.UI.StoreUI
                 index = _barRendererList.Count - 1;
             }
 
-            int maxCount = _barRendererList.Count - 1;
-            _barRendererList[maxCount - index].color = isUpgrade ? upgradeColor : defaultColor;
+            //int maxCount = _barRendererList.Count - 1;
+            _barRendererList[index].color = isUpgrade ? upgradeColor : defaultColor;
         }
     }
 }
