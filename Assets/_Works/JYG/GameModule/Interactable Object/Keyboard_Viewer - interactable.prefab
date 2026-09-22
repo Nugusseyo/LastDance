@@ -92,6 +92,30 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: b3a9385e0bd001f4c9697df92d18cec7, type: 3}
+    - target: {fileID: 2864408810556666501, guid: 3f7c420f73b48fb48926623744bfd9f1, type: 3}
+      propertyPath: OnKeyPressed.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2864408810556666501, guid: 3f7c420f73b48fb48926623744bfd9f1, type: 3}
+      propertyPath: OnKeyPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2864408810556666501, guid: 3f7c420f73b48fb48926623744bfd9f1, type: 3}
+      propertyPath: OnKeyPressed.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2864408810556666501, guid: 3f7c420f73b48fb48926623744bfd9f1, type: 3}
+      propertyPath: OnKeyPressed.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: InvokeOpen
+      objectReference: {fileID: 0}
+    - target: {fileID: 2864408810556666501, guid: 3f7c420f73b48fb48926623744bfd9f1, type: 3}
+      propertyPath: OnKeyPressed.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: _Works.JYG._Scripts.UI.PanelUI, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2864408810556666501, guid: 3f7c420f73b48fb48926623744bfd9f1, type: 3}
+      propertyPath: OnKeyPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 7234147678378141546, guid: 3f7c420f73b48fb48926623744bfd9f1, type: 3}
       propertyPath: m_Name
       value: Keyboard Viewer
@@ -99,40 +123,24 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7234147678378141546, guid: 3f7c420f73b48fb48926623744bfd9f1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3737415877367372777}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3f7c420f73b48fb48926623744bfd9f1, type: 3}
 --- !u!224 &969883989390411524 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 586410625162434838, guid: 3f7c420f73b48fb48926623744bfd9f1, type: 3}
   m_PrefabInstance: {fileID: 384742220276047378}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &7003726336780155256 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7234147678378141546, guid: 3f7c420f73b48fb48926623744bfd9f1, type: 3}
+--- !u!114 &8775366663798156769 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8979821958134264819, guid: 3f7c420f73b48fb48926623744bfd9f1, type: 3}
   m_PrefabInstance: {fileID: 384742220276047378}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3737415877367372777
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7003726336780155256}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 430c4d1ba180cdb47af7348064cec04c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.PanelUI
-  fadeTime: 0.5
-  Open:
-    m_PersistentCalls:
-      m_Calls: []
-  Close:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1001 &7528329917590208440
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -164,11 +172,11 @@ PrefabInstance:
     - target: {fileID: 4947033763518449063, guid: 90fa4180a9f5653459b729f9192959bc, type: 3}
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 3737415877367372777}
+      objectReference: {fileID: 8775366663798156769}
     - target: {fileID: 4947033763518449063, guid: 90fa4180a9f5653459b729f9192959bc, type: 3}
       propertyPath: OnDisconnect.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 3737415877367372777}
+      objectReference: {fileID: 8775366663798156769}
     - target: {fileID: 4947033763518449063, guid: 90fa4180a9f5653459b729f9192959bc, type: 3}
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2

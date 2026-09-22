@@ -12058,6 +12058,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
+--- !u!114 &2680572877814268380 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7209973187966235253, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
+  m_PrefabInstance: {fileID: 2680572877814268379}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 430c4d1ba180cdb47af7348064cec04c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.PanelUI
 --- !u!1001 &5053586909236059620
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12123,6 +12134,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2492335169732390039, guid: 17a159a37235e964688073d54409f79e, type: 3}
+      propertyPath: OnKeyPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2680572877814268380}
     - target: {fileID: 4596055699096922344, guid: 17a159a37235e964688073d54409f79e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 29.52
