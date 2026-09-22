@@ -11,7 +11,8 @@ namespace _Works.JJH._02_Scripts.Agents.Modules
         {
             base.Initialize(owner);
 
-            Animator = GetComponent<Animator>();
+            // 손님처럼 Animator가 visual 자식에 있는 프리팹도 있다. 같은 오브젝트면 이쪽이 먼저 잡힌다.
+            Animator = GetComponentInChildren<Animator>(true);
         }
 
         public void SetVisualPos(Vector3 fixedPos)

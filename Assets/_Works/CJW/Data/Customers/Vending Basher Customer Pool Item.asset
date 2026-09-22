@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f61c1a0d4e44ac1be7cdd2389d5879d, type: 3}
-  m_Name: TestCustomer
+  m_Name: Vending Basher Customer Pool Item
   m_EditorClassIdentifier: PoolRuntime::DevLib.ObjectPool.Runtime.PoolItemSO
-  poolingName: TestCustomer
-  prefab: {fileID: 757970547890689392, guid: 29f1d1d3dc4834f4d9d7b350bc7907f1, type: 3}
-  initCount: 0
+  poolingName: Vending Basher Customer
+  prefab: {fileID: 4634951246902043942, guid: 0e596dc8acd9ba94f9cde82e28e01474, type: 3}
+  initCount: 5

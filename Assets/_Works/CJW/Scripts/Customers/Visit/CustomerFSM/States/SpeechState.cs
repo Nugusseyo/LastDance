@@ -40,7 +40,11 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
             // 이벤트는 await할 수 없으므로 플래그로 바꿔 문다.
             bool ended = false;
-            void OnSpeechEnd() => ended = true;
+            void OnSpeechEnd()
+            {
+                
+                ended = true;
+            }
 
             bubble.OnSpeechEnd += OnSpeechEnd;
 
