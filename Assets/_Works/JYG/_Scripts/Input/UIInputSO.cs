@@ -32,6 +32,7 @@ public class UIInputSO : ScriptableObject, Controls.IUIActions
 
     private void CleanUpInput()
     {
+        if (_controls == null) return;
         _controls.UI.RemoveCallbacks(this);
         _controls.UI.Disable();
 
