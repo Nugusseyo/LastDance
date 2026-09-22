@@ -593,6 +593,88 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1353961638728443372, guid: 28726ac19d6627c44b75629aa98f1835, type: 3}
   m_PrefabInstance: {fileID: 59811990}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &64420458
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 64420459}
+  - component: {fileID: 64420462}
+  - component: {fileID: 64420461}
+  - component: {fileID: 64420460}
+  m_Layer: 0
+  m_Name: SellZone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &64420459
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64420458}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0.3, z: 0.6}
+  m_LocalScale: {x: 0.99999976, y: 1, z: 0.99999976}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1037241806}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &64420460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64420458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1daf18253bcecc4bac2c9d1fcb89507, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Car.SellZone
+  partSeller: {fileID: 64420461}
+--- !u!114 &64420461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64420458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 826f7f55f649665459c4a355201206d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Car.PartSeller
+  defaultPrice: 50
+  walletEffect: {fileID: 0}
+--- !u!65 &64420462
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64420458}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.5, y: 1.5, z: 1.5}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!134 &76055207
 PhysicsMaterial:
   m_ObjectHideFlags: 0
@@ -3004,6 +3086,19 @@ Transform:
   - {fileID: 1068450455}
   m_Father: {fileID: 472651432}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!134 &305913355
+PhysicsMaterial:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  serializedVersion: 2
+  m_DynamicFriction: 0.6
+  m_StaticFriction: 0.6
+  m_Bounciness: 0
+  m_FrictionCombine: 0
+  m_BounceCombine: 0
 --- !u!1 &306266803
 GameObject:
   m_ObjectHideFlags: 0
@@ -11975,6 +12070,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1420969519}
+  - {fileID: 64420459}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!64 &1037241807
@@ -11984,7 +12080,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1037241805}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 305913355}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -15702,6 +15798,7 @@ MonoBehaviour:
   handDetachTime: 6
   equippedWrench: {fileID: 0}
   popForce: 5
+  playerGrab: {fileID: 1961894818}
 --- !u!1 &1385084648
 GameObject:
   m_ObjectHideFlags: 0
@@ -22145,6 +22242,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1384516685}
   m_SourcePrefab: {fileID: 100100000, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+--- !u!114 &1961894818 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3776359205087358665, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+  m_PrefabInstance: {fileID: 1961894817}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7319a979095f01141967d3e21ba77713, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.PlayerWeaponModule
 --- !u!1 &1970520529
 GameObject:
   m_ObjectHideFlags: 0
@@ -24509,6 +24617,7 @@ GameObject:
   m_Component:
   - component: {fileID: 644048170865780009}
   - component: {fileID: 644048170866080010}
+  - component: {fileID: 644048170866080012}
   m_Layer: 0
   m_Name: Car4
   m_TagString: Car
@@ -24553,6 +24662,24 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &644048170866080012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 644048170866080009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15a66550fd3f2144ba07301922417cb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Car.CarSeller
+  carBasePrice: 300
+  wheelDefaultPrice: 50
+  wheelLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  walletEffect: {fileID: 0}
 --- !u!4 &646843996050370816
 Transform:
   m_ObjectHideFlags: 0
@@ -24710,6 +24837,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7403753631397357023}
   - component: {fileID: 1058258626}
+  - component: {fileID: 7403753631397357024}
   m_Layer: 0
   m_Name: SUV
   m_TagString: Car
@@ -27828,6 +27956,24 @@ Transform:
   - {fileID: 3649191008168224471}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7403753631397357024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 996061677990301046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15a66550fd3f2144ba07301922417cb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Car.CarSeller
+  carBasePrice: 300
+  wheelDefaultPrice: 50
+  wheelLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  walletEffect: {fileID: 0}
 --- !u!1 &7411467722479325124
 GameObject:
   m_ObjectHideFlags: 0

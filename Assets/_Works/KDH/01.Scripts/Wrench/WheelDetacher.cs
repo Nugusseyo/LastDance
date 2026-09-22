@@ -1,3 +1,4 @@
+using _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons;
 using _Works.JYG._Scripts.Events;
 using DevLib.EventChannelSystem;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace _Works.KDH._01.Scripts.Wrench
         [SerializeField] private float handDetachTime = 6f;
         [SerializeField] private WrenchTool equippedWrench;
         [SerializeField] private float popForce = 5f;
+        [SerializeField] private PlayerGrabModule playerGrab;
 
         private WheelCollider[] cachedWheels = new WheelCollider[0];
         private float nextRefreshTime;
@@ -24,6 +26,7 @@ namespace _Works.KDH._01.Scripts.Wrench
 
         private void Update()
         {
+            RefreshEquippedWrench();
             RefreshWheelCache();
 
             GameObject hitWheelObject = FindAimedWheel();
@@ -60,6 +63,17 @@ namespace _Works.KDH._01.Scripts.Wrench
                 holdTime = 0f;
                 HideProgress();
             }
+        }
+
+        private void RefreshEquippedWrench()
+        {
+            if (playerGrab == null || playerGrab.CurrentGrabObject == null)
+            {
+                equippedWrench = null;
+                return;
+            }
+
+            equippedWrench = playerGrab.CurrentGrabObject.GetComponent<WrenchTool>();
         }
 
         private void ShowProgress(float current, float max)
@@ -128,45 +142,7 @@ namespace _Works.KDH._01.Scripts.Wrench
 
         private void DetachWheel(GameObject wheel)
         {
-            Transform car = wheel.transform.parent;
-            if (car == null) return;
-
-            wheel.transform.SetParent(null);
-
-            WheelCollider wheelCollider = wheel.GetComponent<WheelCollider>();
-            if (wheelCollider != null)
-            {
-                Destroy(wheelCollider);
-                AddSolidCollider(wheel);
-            }
-
-            Rigidbody rb = wheel.GetComponent<Rigidbody>();
-            if (rb == null) rb = wheel.AddComponent<Rigidbody>();
-
-            rb.isKinematic = false;
-            rb.useGravity = true;
-
-            Vector3 outward = wheel.transform.position - car.position;
-            outward.y = 0f;
-            if (outward.sqrMagnitude > 0.001f) outward.Normalize();
-
-            rb.AddForce(outward * popForce, ForceMode.VelocityChange);
-        }
-
-        private void AddSolidCollider(GameObject wheel)
-        {
-            SphereCollider sphere = wheel.AddComponent<SphereCollider>();
-
-            Renderer wheelRenderer = wheel.GetComponentInChildren<Renderer>();
-            if (wheelRenderer == null) return;
-
-            Bounds bounds = wheelRenderer.bounds;
-            Vector3 scale = wheel.transform.lossyScale;
-            float maxScale = Mathf.Max(scale.x, scale.y, scale.z);
-            float maxExtent = Mathf.Max(bounds.extents.x, bounds.extents.y, bounds.extents.z);
-
-            sphere.center = wheel.transform.InverseTransformPoint(bounds.center);
-            sphere.radius = maxExtent / maxScale;
+            WheelPopper.Pop(wheel, popForce);
         }
 
         private void ResetHold()
