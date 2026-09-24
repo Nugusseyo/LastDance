@@ -16,7 +16,7 @@ namespace _Works.JYG._Scripts.Data_Container.Money
             set
             {
                 if (value == _value) return;
-                OnValueChanged?.Invoke(_value, value);
+                OnValueChanged?.Invoke(value, _value);
                 OnRawValueChanged?.Invoke(value);
                 _value = value;
             }

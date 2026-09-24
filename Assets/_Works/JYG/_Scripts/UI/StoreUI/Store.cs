@@ -130,7 +130,7 @@ namespace _Works.JYG._Scripts.UI.StoreUI
              }
              catch (Exception e)
              {
-                 Debug.LogError("상점 정보 저장에 실패했습니다.");
+                 Debug.LogError("상점 정보 저장에 실패했습니다." + e.Message);
              }
          }
 
