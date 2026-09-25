@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC548\uB155\uD558\uC2DC\uC694"
+  m_text: Error!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ee4f058e6929b8644b7e3e64f679107e, type: 2}
   m_sharedMaterial: {fileID: -8386875356381616900, guid: ee4f058e6929b8644b7e3e64f679107e, type: 2}
@@ -202,7 +202,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1.68K$
+  m_text: Loading
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ee4f058e6929b8644b7e3e64f679107e, type: 2}
   m_sharedMaterial: {fileID: -8386875356381616900, guid: ee4f058e6929b8644b7e3e64f679107e, type: 2}
@@ -488,7 +488,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC548\uB155\uD558\uC138\uC694"
+  m_text: 'Error : Loading Failed'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ee4f058e6929b8644b7e3e64f679107e, type: 2}
   m_sharedMaterial: {fileID: -8386875356381616900, guid: ee4f058e6929b8644b7e3e64f679107e, type: 2}
