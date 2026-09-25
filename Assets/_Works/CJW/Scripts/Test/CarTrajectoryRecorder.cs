@@ -19,6 +19,11 @@ namespace _Works.CJW.Scripts.Test
             public float Steer;
             public Vector3 Destination;
             public bool HasPath;
+            public float Avoid;
+            public int Blocker;
+            public float Y;
+            public float GroundY;
+            public float Bottom;
         }
 
         [Tooltip("샘플 간격(초). 0이면 매 프레임.")]
@@ -30,7 +35,14 @@ namespace _Works.CJW.Scripts.Test
         /// <summary>도메인 리로드 전까지 유지되는 기록. 외부에서 execute_code로 읽어간다.</summary>
         public static readonly List<Sample> Samples = new List<Sample>();
 
+        [Tooltip("비워두지 않으면 이 경로(프로젝트 루트 기준)에 CSV를 주기적으로 덮어쓴다. 에디터 밖에서 기록을 읽을 때 쓴다.")]
+        [SerializeField] private string dumpFile = "Temp/car_trajectory.csv";
+
+        [Tooltip("파일로 내보내는 간격(초).")]
+        [SerializeField] private float dumpInterval = 2f;
+
         private float _timer;
+        private float _dumpTimer;
 
         private void Awake()
         {
@@ -49,6 +61,21 @@ namespace _Works.CJW.Scripts.Test
 
             _timer = interval;
             Capture();
+
+            if (string.IsNullOrEmpty(dumpFile))
+            {
+                return;
+            }
+
+            _dumpTimer -= interval;
+            if (_dumpTimer > 0f)
+            {
+                return;
+            }
+
+            _dumpTimer = dumpInterval;
+            string path = System.IO.Path.Combine(Application.dataPath, "..", dumpFile);
+            System.IO.File.WriteAllText(path, Dump());
         }
 
         private void Capture()
@@ -65,19 +92,27 @@ namespace _Works.CJW.Scripts.Test
 
                 CarSteeringMoveModule move = car.GetComponent<CarSteeringMoveModule>();
                 NavMeshAgent agent = car.GetComponent<NavMeshAgent>();
+                ICarTrafficSensor traffic = car.GetModule<ICarTrafficSensor>();
+                ICarTrafficSensor blocker = traffic?.Blocker;
 
                 Vector3 forward = car.transform.forward;
 
                 Samples.Add(new Sample
                 {
                     Time = Time.time,
-                    CarId = car.GetInstanceID(),
+                    CarId = car.gameObject.GetInstanceID(),
                     Position = car.transform.position,
                     Heading = Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg,
                     Speed = move != null ? move.Speed : 0f,
                     Steer = move != null ? move.SteerAngleDeg : 0f,
                     Destination = agent != null && agent.hasPath ? agent.destination : Vector3.zero,
-                    HasPath = agent != null && agent.hasPath
+                    HasPath = agent != null && agent.hasPath,
+                    Avoid = traffic != null ? traffic.AvoidanceOffset.magnitude : 0f,
+                    Blocker = blocker is Component c ? c.gameObject.GetInstanceID() : 0,
+                    Y = car.transform.position.y,
+                    GroundY = Physics.Raycast(car.transform.position + Vector3.up * 2f, Vector3.down, out RaycastHit gh, 6f, 1 << 7)
+                        ? gh.point.y : float.NaN,
+                    Bottom = LowestBottom(car)
                 });
             }
 
@@ -87,11 +122,28 @@ namespace _Works.CJW.Scripts.Test
             }
         }
 
+        /// <summary>차 자신의 렌더러 중 가장 낮은 곳(바퀴 바닥). 탄 손님은 좌석에 붙어 있으니 빼고 본다.</summary>
+        private static float LowestBottom(Car car)
+        {
+            float lowest = float.PositiveInfinity;
+            foreach (Renderer r in car.GetComponentsInChildren<Renderer>())
+            {
+                if (r.GetComponentInParent<Customers.AbstractCustomer>() != null)
+                {
+                    continue;
+                }
+
+                lowest = Mathf.Min(lowest, r.bounds.min.y);
+            }
+
+            return lowest;
+        }
+
         /// <summary>기록을 CSV로 뽑는다. carId가 0이면 전부, 아니면 그 차만.</summary>
         public static string Dump(int carId = 0, float fromTime = 0f, float toTime = float.MaxValue, int stride = 1)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("t,car,x,z,hdg,v,steer\n");
+            sb.Append("t,car,x,z,hdg,v,steer,avoid,blocker,dx,dz,y,gy,bottom\n");
 
             int written = 0;
             for (int i = 0; i < Samples.Count; i++)
@@ -122,7 +174,14 @@ namespace _Works.CJW.Scripts.Test
                   .Append(s.Position.z.ToString("F2")).Append(',')
                   .Append(s.Heading.ToString("F0")).Append(',')
                   .Append(s.Speed.ToString("F2")).Append(',')
-                  .Append(s.Steer.ToString("F0")).Append('\n');
+                  .Append(s.Steer.ToString("F0")).Append(',')
+                  .Append(s.Avoid.ToString("F2")).Append(',')
+                  .Append(s.Blocker).Append(',')
+                  .Append(s.Destination.x.ToString("F1")).Append(',')
+                  .Append(s.Destination.z.ToString("F1")).Append(',')
+                  .Append(s.Y.ToString("F3")).Append(',')
+                  .Append(s.GroundY.ToString("F3")).Append(',')
+                  .Append(s.Bottom.ToString("F3")).Append('\n');
             }
 
             return sb.ToString();

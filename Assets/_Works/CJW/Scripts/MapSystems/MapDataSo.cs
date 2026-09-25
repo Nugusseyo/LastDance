@@ -86,10 +86,125 @@ namespace _Works.CJW.Scripts.MapSystems
             return point != null;
         }
 
+        /// <summary>쓸 수 있는 지점 중 하나를 무작위로 고른다. "가는 곳은 랜덤"인 손님이 쓰는 조회다.
+        /// 후보가 몇 개 없을 때 치우치지 않도록 가중치 없이 균등하게 뽑는다.</summary>
+        public bool TryGetRandom(MapPointType type, out MapPosition point)
+        {
+            point = null;
+
+            if (!_points.TryGetValue(type, out List<MapPosition> list))
+            {
+                return false;
+            }
+
+            // 뽑은 뒤에 쓸 수 없는 걸 발견하면 다시 뽑아야 한다. 후보를 먼저 세어 한 번에 고른다.
+            int available = 0;
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i] != null && list[i].IsAvailable)
+                {
+                    available++;
+                }
+            }
+
+            if (available == 0)
+            {
+                return false;
+            }
+
+            int pick = UnityEngine.Random.Range(0, available);
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                MapPosition candidate = list[i];
+                if (candidate == null || !candidate.IsAvailable)
+                {
+                    continue;
+                }
+
+                if (pick == 0)
+                {
+                    point = candidate;
+                    return true;
+                }
+
+                pick--;
+            }
+
+            return false;
+        }
+
+        /// <summary>등록된 순서로 index번째 지점을 돌려준다. 범위를 넘으면 처음으로 돌아가므로 순회에 그대로 쓸 수 있다.
+        /// 점유 여부는 보지 않는다 — 경유지처럼 여럿이 함께 지나는 지점을 위한 조회다.</summary>
+        public bool TryGetAt(MapPointType type, int index, out MapPosition point)
+        {
+            point = null;
+
+            if (index < 0 || !_points.TryGetValue(type, out List<MapPosition> list) || list.Count == 0)
+            {
+                return false;
+            }
+
+            // 목록에 파괴된 지점이 섞여 있을 수 있다. 순환시킨 자리부터 살아 있는 첫 지점을 고른다.
+            int start = index % list.Count;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                MapPosition candidate = list[(start + i) % list.Count];
+                if (candidate != null)
+                {
+                    point = candidate;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>가장 가까운 빈 지점을 빌린다. 빌린 쪽이 반드시 <see cref="Release"/>로 짝을 맞춰야 한다.</summary>
         public bool TryRentNearest(MapPointType type, Vector3 from, out RentableMapPosition point)
         {
             point = FindNearestAvailable(type, from) as RentableMapPosition;
+            if (point == null)
+            {
+                return false;
+            }
+
+            point.SetOccupied(true);
+            Changed?.Invoke();
+            return true;
+        }
+
+        /// <summary>빈 지점 중 score가 가장 높은 곳을 빌린다. 거리만으로 고를 수 없을 때(막힌 자리는 피하기 등) 쓴다.
+        /// 빌린 쪽이 반드시 <see cref="Release"/>로 짝을 맞춰야 한다.</summary>
+        public bool TryRentBest(MapPointType type, Func<RentableMapPosition, float> score, out RentableMapPosition point)
+        {
+            point = null;
+
+            if (score == null || !_points.TryGetValue(type, out List<MapPosition> list))
+            {
+                return false;
+            }
+
+            float bestScore = float.NegativeInfinity;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i] is not RentableMapPosition candidate || !candidate.IsAvailable)
+                {
+                    continue;
+                }
+
+                float value = score(candidate);
+                if (point != null && value <= bestScore)
+                {
+                    continue;
+                }
+
+                bestScore = value;
+                point = candidate;
+            }
+
             if (point == null)
             {
                 return false;
@@ -115,6 +230,10 @@ namespace _Works.CJW.Scripts.MapSystems
         /// <summary>가장 가까운 자리를 빌린다. 다 찼으면 false.</summary>
         public bool TryRentParkingSlot(Vector3 from, out RentableMapPosition slot)
             => TryRentNearest(MapPointType.ParkingSlot, from, out slot);
+
+        /// <summary>score가 가장 높은 빈 자리를 빌린다. 다 찼으면 false.</summary>
+        public bool TryRentParkingSlot(Func<RentableMapPosition, float> score, out RentableMapPosition slot)
+            => TryRentBest(MapPointType.ParkingSlot, score, out slot);
 
         /// <summary>빌린 자리를 돌려준다. 빌린 쪽이 반드시 짝을 맞춰 부른다.</summary>
         public void ReleaseParkingSlot(RentableMapPosition slot) => Release(slot);

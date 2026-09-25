@@ -1,3 +1,5 @@
+using _Works.JJH._02_Scripts.Agents.Modules;
+using DevLib.AnimatorSystem;
 using DevLib.ModuleSystem;
 using UnityEngine;
 
@@ -10,9 +12,18 @@ namespace _Works.Shared.Boarding
     public abstract class BoardingModule : AbstractModule, IBoardable
     {
         public bool IsBoarded { get; private set; }
+        [SerializeField] private HashDataSO seatParam;
+        private IRenderer _renderer;
 
         /// <summary>실제로 좌석에 붙일 트랜스폼. 모듈이 자식에 달려 있어도 몸통이 움직여야 한다.</summary>
         protected Transform Body => _owner != null ? _owner.transform : transform;
+
+        public override void Initialize(ModuleOwner owner)
+        {
+            base.Initialize(owner);
+            _renderer = owner.GetModule<IRenderer>();
+            Debug.Assert(_renderer != null, $"<color=red>{gameObject.name} does not have a renderer!</color>");
+        }
 
         public void Board(Transform seat)
         {
@@ -25,11 +36,12 @@ namespace _Works.Shared.Boarding
 
             // 물리·내비를 먼저 끊어야 좌석에 붙이는 순간 튀지 않는다.
             OnBoarded();
-
+            
+            _renderer.PlayClip(seatParam.HashValue, 0.2f, 0.1f);
             Transform body = Body;
             body.SetParent(seat, false);
             body.localPosition = Vector3.zero;
-            body.localRotation = Quaternion.identity;
+            body.localRotation = Quaternion.LookRotation(seat.forward, seat.up);
         }
 
         public void Unboard(Vector3 landingPosition)

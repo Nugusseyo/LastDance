@@ -30,12 +30,29 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// 자리 회전 그대로일 수도, 180도 뒤집힌 것일 수도 있다.</summary>
         public Quaternion TargetRotation = Quaternion.identity;
 
+        /// <summary>순회 연출이 지금 몇 번째 경유지를 향하고 있는지. 상태 인스턴스를 동시 방문 여러 대가 나눠 쓰므로
+        /// 커서도 방문마다 따로 있어야 한다 — 상태의 필드에 두면 두 대가 서로의 순서를 밀어낸다.</summary>
+        public int PatrolIndex;
+
+        /// <summary>지금 경유지를 향해 달린 시간(초). 길이 막힌 경유지에서 매 프레임 다음으로 넘어가며 헛도는 걸 막는다.</summary>
+        public float PatrolPointElapsed;
+
+        /// <summary>Leaving 전용. 자리에서 곧게 빠져나오는 중인지. 빠져나온 뒤에 퇴장 지점으로 목적지를 바꾼다.</summary>
+        public bool Departing;
+
+        /// <summary>Leaving 전용. 곧게 빠져나올 지점.</summary>
+        public Vector3 DepartPoint;
+
         /// <summary>단계가 바뀔 때마다 진행 상태만 되돌린다. 방문 전체 값(차·지점)은 건드리지 않는다.</summary>
         public void ResetPhaseProgress()
         {
             PhaseElapsed = 0f;
             Aligning = false;
             TargetRotation = Quaternion.identity;
+            PatrolIndex = 0;
+            PatrolPointElapsed = 0f;
+            Departing = false;
+            DepartPoint = Vector3.zero;
         }
 
         public void Clear()

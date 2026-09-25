@@ -34,6 +34,12 @@ namespace _Works.CJW.Scripts.Cars
         /// <summary>진입점을 지나 마지막 직선 구간을 달리는 중인지.</summary>
         public bool OnFinalLeg => _onFinalLeg;
 
+        /// <summary>아직 진입점을 지나지 않아 마지막 직선 구간이 남아 있는지.</summary>
+        public bool HasPendingFinalLeg => _hasFinalPoint;
+
+        /// <summary>마지막 직선 구간이 시작되는 진입점.</summary>
+        public Vector3 ViaPoint => _viaPoint;
+
         /// <summary>코너가 둘 이상 있어야 따라갈 선분이 생긴다.</summary>
         public bool HasPath => _cornerCount >= 2;
 
