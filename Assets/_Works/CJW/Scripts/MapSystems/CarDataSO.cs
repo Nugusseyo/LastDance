@@ -41,7 +41,14 @@ namespace _Works.CJW.Scripts.MapSystems
         [Tooltip("여러 차 중 하나를 뽑을 때의 가중치. 0이면 뽑히지 않는다.")]
         [SerializeField, Min(0f)] private float spawnWeight = 1f;
 
+        [Tooltip("이 차가 동시에 몇 대까지 나올 수 있는지. 0이면 제한 없음. " +
+                 "입구를 막는 차처럼 한 지점을 함께 쓰는 차가 둘 나오면 서로 부딪히므로 1로 둔다.")]
+        [SerializeField, Min(0)] private int maxConcurrent;
+
         public PoolItemSO PoolItem => poolItem;
+
+        /// <summary>동시에 나올 수 있는 최대 대수. 0이면 제한 없음.</summary>
+        public int MaxConcurrent => maxConcurrent;
         public float BoardingInterval => boardingInterval;
         public float MoveSpeed => moveSpeed;
         public float ArriveThreshold => arriveThreshold;

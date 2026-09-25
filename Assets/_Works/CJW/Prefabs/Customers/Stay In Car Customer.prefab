@@ -1503,7 +1503,6 @@ GameObject:
   - component: {fileID: 4795235956229561678}
   - component: {fileID: 2876735463361945510}
   - component: {fileID: 812945885149484152}
-  - component: {fileID: 9160046452925627945}
   m_Layer: 0
   m_Name: Stay In Car Customer
   m_TagString: Untagged
@@ -1524,6 +1523,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4862380941981681260}
   - {fileID: 3058959612039956042}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1635,28 +1635,6 @@ MonoBehaviour:
         poolManager: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
         bubbleItem: {fileID: 11400000, guid: 2a00163c0ed52214a828e00935dbf2e5, type: 2}
         offset: {x: 0, y: 2.2, z: 0}
---- !u!114 &9160046452925627945
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2165922732805641989}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48f324a9389b79940aed03761faf58d3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Movement.NavigationMover
-  agent: {fileID: 102127318752237865}
-  animator: {fileID: 636787097756570431}
-  walkClip: {fileID: 11400000, guid: 8365dde92a2040b5b3924206557cd0e3, type: 2}
-  idleClip: {fileID: 11400000, guid: 4aa00dabdbbb49f284c98aa9587ac5ff, type: 2}
-  clipCrossFade: 0.15
-  useRootMotion: 1
-  useRootRotation: 0
-  turnSpeed: 0
-  readyGrace: 1
-  resyncDistance: 1
 --- !u!1 &2184472911524055395
 GameObject:
   m_ObjectHideFlags: 0
@@ -5321,6 +5299,60 @@ Transform:
   - {fileID: 9214990614455305454}
   m_Father: {fileID: 3058959612039956042}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6056690002955640199
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4862380941981681260}
+  - component: {fileID: 5782034929310072071}
+  m_Layer: 0
+  m_Name: MoveModule
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4862380941981681260
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6056690002955640199}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5320552507604566265}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5782034929310072071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6056690002955640199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48f324a9389b79940aed03761faf58d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Movement.NavigationMover
+  agent: {fileID: 102127318752237865}
+  animator: {fileID: 636787097756570431}
+  walkClip: {fileID: 11400000, guid: 8365dde92a2040b5b3924206557cd0e3, type: 2}
+  idleClip: {fileID: 11400000, guid: 52427c781a7a85e42ae271f9ce99e467, type: 2}
+  clipCrossFade: 0.15
+  useRootMotion: 1
+  useRootRotation: 0
+  turnSpeed: 0
+  readyGrace: 1
+  resyncDistance: 1
 --- !u!1 &6237897227402176632
 GameObject:
   m_ObjectHideFlags: 0

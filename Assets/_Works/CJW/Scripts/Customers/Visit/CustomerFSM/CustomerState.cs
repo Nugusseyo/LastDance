@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using _Works.CJW.Scripts.Customers.Animation;
 using _Works.CJW.Scripts.Customers.Movement;
+using _Works.CJW.Scripts.MapSystems;
 using DevLib.AnimatorSystem;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
 {
@@ -58,6 +61,129 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
                 MoveResult.Timeout => VisitOutcome.Timeout,
                 _ => VisitOutcome.Blocked
             };
+        }
+
+        /// <summary>경로 계산용 공용 버퍼. 상태 탐색은 메인 스레드에서만 일어나므로 하나를 돌려 쓴다.
+        /// 필드 초기화로 만들면 직렬화 도중에 생성돼 Unity가 막으므로, 처음 쓸 때 만든다.</summary>
+        private static NavMeshPath _reachPath;
+
+        /// <summary>이 종류의 지점 중 지금 걸어서 끝까지 닿는 가장 가까운 곳(경로 길이 기준)을 찾는다.
+        /// 세워 둔 차가 NavMesh를 깎아 줄지어 서면 벽이 되므로, 직선으로 가까운 지점이 그 벽 너머일 수 있다.</summary>
+        protected bool TryGetReachablePoint(MapPointType type, out MapPosition point)
+        {
+            point = null;
+            NavMeshAgent agent = Ctx.Customer.Agent;
+            if (Ctx.MapData == null || agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
+            {
+                return false;
+            }
+
+            _reachPath ??= new NavMeshPath();
+            IReadOnlyList<MapPosition> points = Ctx.MapData.GetAll(type);
+            float best = float.MaxValue;
+
+            for (int i = 0; i < points.Count; i++)
+            {
+                MapPosition candidate = points[i];
+                if (candidate == null || !candidate.IsAvailable)
+                {
+                    continue;
+                }
+
+                if (!agent.CalculatePath(candidate.Position, _reachPath) || _reachPath.status != NavMeshPathStatus.PathComplete)
+                {
+                    continue;
+                }
+
+                float length = PathLength(_reachPath);
+                if (length < best)
+                {
+                    best = length;
+                    point = candidate;
+                }
+            }
+
+            return point != null;
+        }
+
+        /// <summary>닿는 지점이 나올 때까지 <paramref name="wait"/>초 동안 다시 찾아본다. 벽을 이룬 차가 떠나면 길이 열린다.
+        /// 끝내 없으면 직선으로 가장 가까운 지점을 돌려준다 — 가다 막히더라도 그쪽으로 향하는 게 제자리보다 낫다.</summary>
+        protected async UniTask<MapPosition> WaitForReachablePoint(MapPointType type, float wait, CancellationToken ct)
+        {
+            const float retryInterval = 0.5f;
+            float deadline = Time.time + wait;
+
+            while (true)
+            {
+                if (TryGetReachablePoint(type, out MapPosition point))
+                {
+                    return point;
+                }
+
+                if (Time.time >= deadline)
+                {
+                    return Ctx.MapData != null && Ctx.MapData.TryGetNearest(type, Ctx.Customer.transform.position, out point)
+                        ? point
+                        : null;
+                }
+
+                await UniTask.Delay(TimeSpan.FromSeconds(retryInterval), cancellationToken: ct);
+            }
+        }
+
+        private static readonly MapPointType[] PointTypes = (MapPointType[])Enum.GetValues(typeof(MapPointType));
+
+        /// <summary><paramref name="from"/>에서 걸어서 끝까지 닿는 맵 지점의 수. 주차 자리는 차가 서 있어 막히므로 세지 않는다.
+        /// 어느 쪽에 내려야 갇히지 않는지 비교할 때 쓴다 — 벽 안쪽에 갇힌 자리는 이 값이 작다.</summary>
+        protected int CountReachablePoints(Vector3 from)
+        {
+            NavMeshAgent agent = Ctx.Customer.Agent;
+            if (Ctx.MapData == null || agent == null)
+            {
+                return 0;
+            }
+
+            var filter = new NavMeshQueryFilter { agentTypeID = agent.agentTypeID, areaMask = agent.areaMask };
+            if (!NavMesh.SamplePosition(from, out NavMeshHit start, 2f, filter))
+            {
+                return 0;
+            }
+
+            _reachPath ??= new NavMeshPath();
+            int count = 0;
+
+            foreach (MapPointType type in PointTypes)
+            {
+                if (type is MapPointType.None or MapPointType.ParkingSlot)
+                {
+                    continue;
+                }
+
+                IReadOnlyList<MapPosition> points = Ctx.MapData.GetAll(type);
+                for (int i = 0; i < points.Count; i++)
+                {
+                    if (points[i] != null
+                        && NavMesh.CalculatePath(start.position, points[i].Position, filter, _reachPath)
+                        && _reachPath.status == NavMeshPathStatus.PathComplete)
+                    {
+                        count++;
+                    }
+                }
+            }
+
+            return count;
+        }
+
+        private static float PathLength(NavMeshPath path)
+        {
+            Vector3[] corners = path.corners;
+            float length = 0f;
+            for (int i = 1; i < corners.Length; i++)
+            {
+                length += Vector3.Distance(corners[i - 1], corners[i]);
+            }
+
+            return length;
         }
 
         /// <summary>연출 클립을 <paramref name="duration"/>초 동안 재생하는 공용 절차.

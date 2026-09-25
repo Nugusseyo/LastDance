@@ -18,9 +18,32 @@ namespace DevLib.ObjectPool.Runtime
 
             foreach (PoolItemSO item in itemList)
             {
+                // 항목 하나가 비어 있다고 예외로 끊기면 뒤의 풀이 전부 만들어지지 않는다. 건너뛰고 이름을 남긴다.
+                if (item == null)
+                {
+                    Debug.LogError($"[PoolManager] {name}의 itemList에 비어 있는 항목이 있어 건너뜁니다.", this);
+                    continue;
+                }
+
+                if (item.prefab == null)
+                {
+                    Debug.LogError($"[PoolManager] {item.name}의 prefab이 비어 있어 건너뜁니다.", item);
+                    continue;
+                }
+
+                if (_pools.ContainsKey(item))
+                {
+                    Debug.LogError($"[PoolManager] {item.name}이(가) itemList에 두 번 들어 있어 건너뜁니다.", item);
+                    continue;
+                }
+
                 IPoolable poolable = item.prefab.GetComponent<IPoolable>();
-                Debug.Assert(poolable != null, $"Poolable component not found: {item.prefab.name}");
-                
+                if (poolable == null)
+                {
+                    Debug.LogError($"[PoolManager] {item.prefab.name}에 IPoolable 컴포넌트가 없어 풀을 만들지 않습니다.", item.prefab);
+                    continue;
+                }
+
                 Pool pool = new Pool(item, _rootTrm, item.initCount);
                 _pools.Add(item, pool);
             }

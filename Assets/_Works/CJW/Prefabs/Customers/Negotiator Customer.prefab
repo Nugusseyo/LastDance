@@ -188,7 +188,9 @@ PrefabInstance:
       propertyPath: managedReferences[4377106815191875687].waitTimeout
       value: 30
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5790812639602798014, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+    - {fileID: 1849533345801159971, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -196,6 +198,16 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 4924220749974728583}
   m_SourcePrefab: {fileID: 100100000, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+--- !u!4 &2827777916453235352 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3755322571624575713, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+  m_PrefabInstance: {fileID: 1379188847666255993}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5751207205444449937 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6697899966989151976, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+  m_PrefabInstance: {fileID: 1379188847666255993}
+  m_PrefabAsset: {fileID: 0}
 --- !u!95 &7367463639401576798 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 8439079218824929575, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}

@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6abc8fe6aa241d1a6a0b57e94272df0, type: 3}
+  m_Name: Circler Car
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.CarDataSO
+  poolItem: {fileID: 11400000, guid: aad0cb14499e4e64899bc5c133d29f38, type: 2}
+  boardingInterval: 0.4
+  moveSpeed: 5
+  arriveThreshold: 0.5
+  customers:
+  - {fileID: 11400000, guid: 9a6262fdb6760684b9bf637525b4f5d1, type: 2}
+  bodyColors:
+  - {r: 1, g: 0.85, b: 0, a: 1}
+  stateOverrides:
+  - rid: 1000
+  spawnWeight: 0.5
+  maxConcurrent: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 1000
+      type: {class: CirclingState, ns: _Works.CJW.Scripts.Customers.Visit.States, asm: Assembly-CSharp}
+      data:
+        mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
+        patrolPoint: 12
+        lapTimeout: 60
+        pointTimeout: 20

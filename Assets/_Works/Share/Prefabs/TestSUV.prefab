@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 5053594897345949319}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.91, y: 0, z: -0.33}
+  m_LocalPosition: {x: -2.6, y: 0, z: -0.231}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -56,7 +56,7 @@ Transform:
   m_GameObject: {fileID: 6848683501601477859}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.72, y: 0, z: -0.4}
+  m_LocalPosition: {x: -0.504, y: 0, z: -0.28}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -74,6 +74,8 @@ GameObject:
   - component: {fileID: 322598751937098675}
   - component: {fileID: 7923200295318655933}
   - component: {fileID: 1201033255657940018}
+  - component: {fileID: 3258948878037891588}
+  - component: {fileID: 3085645793791751695}
   m_Layer: 0
   m_Name: TestSUV
   m_TagString: Untagged
@@ -90,7 +92,7 @@ Transform:
   m_GameObject: {fileID: 8015753301047892956}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.6, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -138,7 +140,7 @@ MonoBehaviour:
   _arrivalRadius: 1
   _maxApproachRetries: 2
   _avoidancePriority: 0
-  _wheelBase: 2.5
+  _wheelBase: 1.75
   _maxSteerAngle: 40
   _steerRate: 140
   _accel: 6
@@ -150,11 +152,21 @@ MonoBehaviour:
   _pathRefreshInterval: 0.4
   _viaSwitchDistance: 4
   _finalLegLookahead: 2.5
-  _finalLegSpeed: 2.5
+  _finalLegSpeed: 3.5
   _reverseSpeed: 2
   _maxReverseDistance: 6
   _minReverseDistance: 1.2
   _reverseClearance: 2.5
+  _minGap: 1.5
+  _comfortBrakeAccel: 3
+  _sensorRange: 6
+  _groundMask:
+    serializedVersion: 2
+    m_Bits: 128
+  _rideHeightOverride: -1
+  _backoffDelay: 1.5
+  _backoffStuckTime: 6
+  _backoffDistance: 3
 --- !u!195 &1201033255657940018
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -163,8 +175,8 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8015753301047892956}
   m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 1.8
+  m_AgentTypeID: -334000983
+  m_Radius: 1.26
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -173,10 +185,72 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 1.9
+  m_Height: 1.33
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &3258948878037891588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8015753301047892956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cc899f859222a946930c0daefa3a1eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Cars.CarTrafficSensorModule
+  footprint: {fileID: 0}
+  fallbackHalfSize: {x: 1, y: 2.3}
+  laneMargin: 0.3
+  enableBypass: 1
+  bypassSideMargin: 0.5
+  maxBypassOffset: 4
+  bypassShiftSpeed: 1.5
+  bypassReturnGap: 1.5
+  maxBypassTime: 8
+  bypassRetryInterval: 0.3
+  predictionTime: 1.5
+  bodyLaneRange: 2.5
+  ownCarveAllowance: 1
+  sideSampleRadius: 0.5
+  debugBypass: 1
+--- !u!114 &3085645793791751695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8015753301047892956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e283b56463f05840bf31b57fb033174, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Cars.CarWheelModule
+  wheels:
+  - transform: {fileID: 2814589650671639629}
+    spinAxis: {x: 1, y: 0, z: 0}
+    steerAxis: {x: 0, y: 1, z: 0}
+    steer: 1
+    radius: 0
+  - transform: {fileID: 2814589650671639617}
+    spinAxis: {x: 1, y: 0, z: 0}
+    steerAxis: {x: 0, y: 1, z: 0}
+    steer: 1
+    radius: 0
+  - transform: {fileID: 2814589650671639631}
+    spinAxis: {x: 1, y: 0, z: 0}
+    steerAxis: {x: 0, y: 1, z: 0}
+    steer: 0
+    radius: 0
+  - transform: {fileID: 2814589650671639619}
+    spinAxis: {x: 1, y: 0, z: 0}
+    steerAxis: {x: 0, y: 1, z: 0}
+    steer: 0
+    radius: 0
+  steerVisualScale: 1
+  steerFollowSpeed: 360
 --- !u!1 &8049125052074737424
 GameObject:
   m_ObjectHideFlags: 0
@@ -202,7 +276,7 @@ Transform:
   m_GameObject: {fileID: 8049125052074737424}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.78487396, y: 0, z: -0.48}
+  m_LocalPosition: {x: 0.5494118, y: 0, z: -0.336}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -235,7 +309,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4946324914327826651}
@@ -251,7 +325,7 @@ NavMeshObstacle:
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1.52, y: 1.405, z: 3.67}
-  m_MoveThreshold: 0
+  m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 1.14, z: -0.63}
@@ -269,8 +343,20 @@ PrefabInstance:
       value: Car2
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a446810b4feee0342962f7375c74f6a0, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: a446810b4feee0342962f7375c74f6a0, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: a446810b4feee0342962f7375c74f6a0, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: a446810b4feee0342962f7375c74f6a0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.2
+      value: 0.14
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a446810b4feee0342962f7375c74f6a0, type: 3}
       propertyPath: m_LocalPosition.y
@@ -313,9 +399,29 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a446810b4feee0342962f7375c74f6a0, type: 3}
+--- !u!4 &2814589650671639617 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400010, guid: a446810b4feee0342962f7375c74f6a0, type: 3}
+  m_PrefabInstance: {fileID: 2814589650671240907}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2814589650671639619 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400008, guid: a446810b4feee0342962f7375c74f6a0, type: 3}
+  m_PrefabInstance: {fileID: 2814589650671240907}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2814589650671639627 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: a446810b4feee0342962f7375c74f6a0, type: 3}
+  m_PrefabInstance: {fileID: 2814589650671240907}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2814589650671639629 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400006, guid: a446810b4feee0342962f7375c74f6a0, type: 3}
+  m_PrefabInstance: {fileID: 2814589650671240907}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2814589650671639631 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400004, guid: a446810b4feee0342962f7375c74f6a0, type: 3}
   m_PrefabInstance: {fileID: 2814589650671240907}
   m_PrefabAsset: {fileID: 0}
 --- !u!23 &2814589650673540779 stripped

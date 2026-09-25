@@ -92,8 +92,11 @@ PrefabInstance:
       propertyPath: managedReferences[4377106815191875690].condition
       value: -2
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedComponents:
+    - {fileID: 5790812639602798014, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+    - {fileID: 1849533345801159971, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+    m_RemovedGameObjects:
+    - {fileID: 938392233331149581, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
@@ -105,5 +108,15 @@ NavMeshAgent:
 --- !u!95 &1765003118236847357 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 8439079218824929575, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+  m_PrefabInstance: {fileID: 7882193432524238298}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3571519028561904434 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6697899966989151976, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+  m_PrefabInstance: {fileID: 7882193432524238298}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6448794925138337595 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3755322571624575713, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
   m_PrefabInstance: {fileID: 7882193432524238298}
   m_PrefabAsset: {fileID: 0}

@@ -144,7 +144,9 @@ PrefabInstance:
       propertyPath: managedReferences[4377106815191875668].condition
       value: -2
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5790812639602798014, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+    - {fileID: 1849533345801159971, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -152,6 +154,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 5369252933812456644}
   m_SourcePrefab: {fileID: 100100000, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+--- !u!1 &929596833304471662 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6697899966989151976, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+  m_PrefabInstance: {fileID: 5770571194513081990}
+  m_PrefabAsset: {fileID: 0}
 --- !u!95 &2668539163900192673 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 8439079218824929575, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}

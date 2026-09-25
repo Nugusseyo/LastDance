@@ -175,6 +175,46 @@ namespace _Works.CJW.Scripts.MapSystems
             return true;
         }
 
+        /// <summary>빈 지점 중 score가 가장 높은 곳을 빌린다. 거리만으로 고를 수 없을 때(막힌 자리는 피하기 등) 쓴다.
+        /// 빌린 쪽이 반드시 <see cref="Release"/>로 짝을 맞춰야 한다.</summary>
+        public bool TryRentBest(MapPointType type, Func<RentableMapPosition, float> score, out RentableMapPosition point)
+        {
+            point = null;
+
+            if (score == null || !_points.TryGetValue(type, out List<MapPosition> list))
+            {
+                return false;
+            }
+
+            float bestScore = float.NegativeInfinity;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i] is not RentableMapPosition candidate || !candidate.IsAvailable)
+                {
+                    continue;
+                }
+
+                float value = score(candidate);
+                if (point != null && value <= bestScore)
+                {
+                    continue;
+                }
+
+                bestScore = value;
+                point = candidate;
+            }
+
+            if (point == null)
+            {
+                return false;
+            }
+
+            point.SetOccupied(true);
+            Changed?.Invoke();
+            return true;
+        }
+
         /// <summary>빌린 지점을 돌려준다. 이미 파괴된 지점을 넘겨도 안전하다.</summary>
         public void Release(RentableMapPosition point)
         {
@@ -190,6 +230,10 @@ namespace _Works.CJW.Scripts.MapSystems
         /// <summary>가장 가까운 자리를 빌린다. 다 찼으면 false.</summary>
         public bool TryRentParkingSlot(Vector3 from, out RentableMapPosition slot)
             => TryRentNearest(MapPointType.ParkingSlot, from, out slot);
+
+        /// <summary>score가 가장 높은 빈 자리를 빌린다. 다 찼으면 false.</summary>
+        public bool TryRentParkingSlot(Func<RentableMapPosition, float> score, out RentableMapPosition slot)
+            => TryRentBest(MapPointType.ParkingSlot, score, out slot);
 
         /// <summary>빌린 자리를 돌려준다. 빌린 쪽이 반드시 짝을 맞춰 부른다.</summary>
         public void ReleaseParkingSlot(RentableMapPosition slot) => Release(slot);

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d8ee300e9a3643418d7fde61262e189, type: 3}
   m_Name: Entrance Blocker Customer
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.CustomerDataSO
-  poolItem: {fileID: 11400000, guid: e7dea3b9ae680bd47828ac1a228907e6, type: 2}
+  poolItem: {fileID: 11400000, guid: ab006801092c78a4193644fd5692d72f, type: 2}
   <customerType>k__BackingField: 21
   moveSpeed: 3.5
   angularSpeed: 120

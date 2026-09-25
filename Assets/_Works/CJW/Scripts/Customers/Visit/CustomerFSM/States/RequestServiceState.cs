@@ -27,6 +27,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("그 지점까지 걸어갈 때의 한계 시간(초).")]
         [SerializeField, Min(0f)] private float moveTimeout = 15f;
 
+        [Tooltip("걸어서 닿는 지점이 없을 때 다시 찾아볼 시간(초). 줄지어 선 차가 길을 막았다가 떠나면 열린다.")]
+        [SerializeField, Min(0f)] private float reachWait = 5f;
+
         [Tooltip("켜면 요구하는 동안 자기 차를 돌아본다. 바퀴를 갈아 달라는 손님이 차를 등지고 서 있지 않게 한다.")]
         [SerializeField] private bool faceCar = true;
 
@@ -60,7 +63,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                     return VisitOutcome.Failed;
                 }
 
-                if (Ctx.MapData.TryGetNearest(requestAt, customer.transform.position, out MapPosition point))
+                MapPosition point = await WaitForReachablePoint(requestAt, reachWait, ct);
+                if (point != null)
                 {
                     VisitOutcome moved = await MoveAndWait(point.Position, moveTimeout, ct);
 

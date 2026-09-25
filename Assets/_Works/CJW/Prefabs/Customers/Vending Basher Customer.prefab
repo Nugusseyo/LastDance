@@ -48,6 +48,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4465516880626282336, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: agent
+      value: 
+      objectReference: {fileID: 6860834792424631050}
+    - target: {fileID: 4465516880626282336, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 6235817353815154972}
     - target: {fileID: 4559870543567499094, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: <PoolItem>k__BackingField
       value: 
@@ -181,14 +189,11 @@ PrefabInstance:
       value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875678].carLayers.m_Bits
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: managedReferences[4377106815191875678].hitClips.Array.size
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5790812639602798014, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:

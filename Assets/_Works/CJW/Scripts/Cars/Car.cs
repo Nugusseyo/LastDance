@@ -197,6 +197,7 @@ namespace _Works.CJW.Scripts.Cars
             Data = null;
             Stop();
             ClearBodyColor();
+            GetModule<ICarWheelModule>()?.ResetPose();
         }
 
         private void EnsureSeatCache()

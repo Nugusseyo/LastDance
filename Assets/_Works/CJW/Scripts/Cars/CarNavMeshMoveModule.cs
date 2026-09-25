@@ -16,6 +16,12 @@ namespace _Works.CJW.Scripts.Cars
 
         private bool _hasDestination;
 
+        /// <summary>에이전트 속도를 차체 정면으로 투영한 값. 뒤로 밀리면 음수다.</summary>
+        public float Speed => agent != null ? Vector3.Dot(agent.velocity, transform.forward) : 0f;
+
+        /// <summary>NavMeshAgent는 제자리 회전을 하므로 조향각이 없다.</summary>
+        public float SteerAngleDeg => 0f;
+
         /// <summary>부분 경로면 목적지에 닿지 못한다. 경로 계산 중에는 판정을 미룬다.</summary>
         public bool HasCompletePath =>
             !_hasDestination || agent == null || agent.pathPending ||

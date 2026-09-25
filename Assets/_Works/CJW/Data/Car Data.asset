@@ -17,10 +17,15 @@ MonoBehaviour:
   moveSpeed: 6
   arriveThreshold: 0.5
   customers:
-  - {fileID: 11400000, guid: ed118fb1f27eba84aa90bf16f7126a3c, type: 2}
   - {fileID: 11400000, guid: 609eda10c670162498209c4498d480ab, type: 2}
   - {fileID: 11400000, guid: fcfc26551792c7040927fc47e04d859d, type: 2}
   - {fileID: 11400000, guid: 343ee487bb9c3474881e83916f14af2b, type: 2}
+  - {fileID: 11400000, guid: 4713db57dfca30848b861309b363c8a9, type: 2}
+  - {fileID: 11400000, guid: b74294e87b10cac45b8fa6d51edcdb29, type: 2}
+  - {fileID: 11400000, guid: 2f0e85eec0836564a913045f49628f89, type: 2}
+  - {fileID: 11400000, guid: 1f7d6bcd2df198f44a77fca89a962fb4, type: 2}
+  - {fileID: 11400000, guid: 083bf14bc4458ee46a9e99d8eb93d884, type: 2}
+  - {fileID: 11400000, guid: ba1207fad234cca468845e9affabf361, type: 2}
   bodyColors:
   - {r: 1, g: 0, b: 0, a: 0}
   - {r: 0.41509432, g: 0.15076537, b: 0.15076537, a: 0}
