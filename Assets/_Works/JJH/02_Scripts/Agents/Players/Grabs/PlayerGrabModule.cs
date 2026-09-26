@@ -1,5 +1,6 @@
 ﻿using _Works.JJH._02_Scripts.Items;
 using _Works.KDH._01.Scripts.Car;
+using _Works.KDH._01.Scripts.Wrench;
 using DevLib.ModuleSystem;
 using UnityEngine;
 
@@ -45,16 +46,15 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             }
 
             if (partDetacher != null
-                && _player.Sensor.FindItem(_player.Camera.CameraTrans, partDetacher.PartLayerMask,
-                                                                pickupDistance, out Collider partCollider))
+              && _player.Sensor.FindItem(_player.Camera.CameraTrans, partDetacher.PartLayerMask,
+                                                              pickupDistance, out Collider partCollider))
             {
                 GrabItem part = partCollider.GetComponent<GrabItem>();
 
                 if (part == null)
                     return;
 
-                if (part.transform.parent != null
-                    && !partDetacher.TryDetachPart(part))
+                if (!partDetacher.TryDetachPart(part))
                     return;
 
                 EquipItem(part);
@@ -152,6 +152,26 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             Destroy(CurrentGrabObject);
 
             ClearCurrentItem();
+        }
+
+        public void UpdateDetachHold()
+        {
+            if (partDetacher == null || !partDetacher.IsDetaching)
+                return;
+
+            bool holding = _player.PlayerInput != null && _player.PlayerInput.IsInteractHeld;
+
+            if (!holding)
+            {
+                partDetacher.CancelDetach();
+                return;
+            }
+
+            WrenchTool wrench = CurrentGrabObject != null
+                                                ? CurrentGrabObject.GetComponent<WrenchTool>()
+                                                : null;
+
+            partDetacher.TickDetach(Time.deltaTime, wrench);
         }
     }
 }

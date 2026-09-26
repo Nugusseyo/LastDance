@@ -17,7 +17,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         public Vector2 MoveDirection { get; private set; }
         public Vector2 LookDirection { get; private set; }
         public bool IsSprinting { get; private set; }
-
+        public bool IsInteractHeld { get; private set; }
 
         private Controls _control;
 
@@ -86,6 +86,11 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         {
             if (context.performed)
                 OnInteractKeyPressed?.Invoke();
+
+            if (context.started)
+                IsInteractHeld = true;
+            else if (context.canceled)
+                IsInteractHeld = false;
         }
 
         public void OnUse(InputAction.CallbackContext context)
