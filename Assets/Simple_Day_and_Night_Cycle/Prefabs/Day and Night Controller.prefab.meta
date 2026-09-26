@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1dce2846dc915b44ea1a12401fe517e1
+timeCreated: 1467600747
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 66647
+  packageName: Simple Day And Night Cycle System
+  packageVersion: 1.3
+  assetPath: Assets/Simple_Day_and_Night_Cycle/Prefabs/Day and Night Controller.prefab
+  uploadId: 435921

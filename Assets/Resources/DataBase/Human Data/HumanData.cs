@@ -7,6 +7,8 @@ namespace Resources.DataBase.Human_Data
     public class HumanData
     {
         public HumanType type;      //손님의 타입
+        public BubbleType printType;//말풍선 종류
+        public float delayTime;     //다음 말풍선까지 걸리는 시간
         public int index;           //손님 인덱스 (진상 손님 인덱스)
         public string contents1;
         public string contents2;
@@ -45,5 +47,12 @@ namespace Resources.DataBase.Human_Data
         None,
         Good,
         Bad
+    }
+
+    public enum BubbleType //엑셀에 소문자로 적혀있다. 나중에 고칠 것.
+    {
+        None,
+        Random,     //랜덤으로 출력
+        InOrder,    //정렬된 순서대로 출력
     }
 }

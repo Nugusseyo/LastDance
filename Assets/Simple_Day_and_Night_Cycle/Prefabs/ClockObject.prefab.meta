@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4404dc86a617bc64fb8d5cd6ad74a06a
+timeCreated: 1467602275
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 66647
+  packageName: Simple Day And Night Cycle System
+  packageVersion: 1.3
+  assetPath: Assets/Simple_Day_and_Night_Cycle/Prefabs/ClockObject.prefab
+  uploadId: 435921

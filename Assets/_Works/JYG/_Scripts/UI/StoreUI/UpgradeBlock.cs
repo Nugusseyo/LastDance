@@ -57,6 +57,9 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             
             _moneyManager = moneyManager;
             _moneyManager.OnValueChanged += HandlePriceChanged;
+            
+            if (_moneyManager != null)
+                HandlePriceChanged(_moneyManager.Value, _moneyManager.Value);
         }
         
         
@@ -89,9 +92,11 @@ namespace _Works.JYG._Scripts.UI.StoreUI
                 barInitializer.SetColor(i, true);
             }
 
-            UpdateUI(item);
-
             SetStatusWithLevel();
+            UpdateUI(item);
+            
+            if (_moneyManager != null)
+                HandlePriceChanged(_moneyManager.Value, _moneyManager.Value);
         }
         
         private void UpdateUI(StoreItem item)
@@ -102,13 +107,11 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             {
                 priceBG.color = MaxColor;
                 buyButton.enabled = false;
+                priceTmp.text = Max;
             }
 
-            if (item.price != CurItem.price)
-            {
-                priceTmp.text = TextConvert.Get(item.price, "$");
-                countTmp.text = GetStringWithUpgradeType(item.value.ValueType, item.value.Value);
-            }
+            priceTmp.text = TextConvert.Get(item.price, "$");
+            countTmp.text = GetStringWithUpgradeType(item.value.ValueType, item.value.Value);
         }
 
         private void SetStatusWithLevel()

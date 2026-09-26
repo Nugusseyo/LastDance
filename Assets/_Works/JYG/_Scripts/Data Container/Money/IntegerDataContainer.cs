@@ -10,15 +10,21 @@ namespace _Works.JYG._Scripts.Data_Container.Money
         public event IDataContainer<int>.OnValueChangedEvent OnValueChanged;    //T밸류(int) 변경 시 동작하는 액션
         private int _value;
 
+        public int maxValue = int.MaxValue;
+        public int minValue = int.MinValue;
+
         public int Value
         {
             get => _value;
             set
             {
-                if (value == _value) return;
-                OnValueChanged?.Invoke(_value, value);
-                OnRawValueChanged?.Invoke(value);
-                _value = value;
+                int clampedValue = Mathf.Clamp(value, minValue, maxValue);
+                
+                if (clampedValue == _value) return;
+
+                OnValueChanged?.Invoke(clampedValue, _value);
+                OnRawValueChanged?.Invoke(clampedValue);
+                _value = clampedValue;
             }
         }
 

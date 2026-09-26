@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 499e6abcb00b6124099c27b8ff89e054
+timeCreated: 1467598137
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 66647
+  packageName: Simple Day And Night Cycle System
+  packageVersion: 1.3
+  assetPath: Assets/Simple_Day_and_Night_Cycle/Materials/GroundMat.mat
+  uploadId: 435921
