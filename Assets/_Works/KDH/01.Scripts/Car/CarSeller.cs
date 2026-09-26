@@ -7,6 +7,7 @@ namespace _Works.KDH._01.Scripts.Car
     {
         [SerializeField] private int carBasePrice = 300;
         [SerializeField] private int wheelDefaultPrice = 50;
+        [SerializeField] private int RefuelingPrice = 50;
         [SerializeField] private LayerMask wheelLayerMask;
         [SerializeField] private WalletEffect walletEffect;
 

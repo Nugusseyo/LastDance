@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 400000}
+  - component: {fileID: 6100197147113689421}
+  - component: {fileID: 4107087869424140854}
   m_Layer: 0
   m_Name: Remake8
   m_TagString: Untagged
@@ -36,6 +38,39 @@ Transform:
   - {fileID: 6648945190263005628}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6100197147113689421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15a66550fd3f2144ba07301922417cb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Car.CarSeller
+  carBasePrice: 1000
+  wheelDefaultPrice: 100
+  wheelLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  walletEffect: {fileID: 0}
+--- !u!114 &4107087869424140854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2664f1de01756f4db7fd39b247e77ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarStraightMover
+  speed: 5
+  wheels: []
+  wheelRadius: 0.35
 --- !u!1 &100002
 GameObject:
   m_ObjectHideFlags: 0
@@ -197,13 +232,64 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5538234380392222844, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8796286293657400593}
+    - targetCorrespondingSourceObject: {fileID: 5538234380392222844, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7653499798165890131}
   m_SourcePrefab: {fileID: 100100000, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
 --- !u!4 &1472067191328220033 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1979704105652135512, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
   m_PrefabInstance: {fileID: 1086642026732520921}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4886201060752184741 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5538234380392222844, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+  m_PrefabInstance: {fileID: 1086642026732520921}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &8796286293657400593
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4886201060752184741}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &7653499798165890131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4886201060752184741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
+  <CurrentItemData>k__BackingField: {fileID: 0}
 --- !u!1001 &1489080597726225377
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -275,13 +361,64 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5538234380392222844, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 658158807708710907}
+    - targetCorrespondingSourceObject: {fileID: 5538234380392222844, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1106814918517572048}
   m_SourcePrefab: {fileID: 100100000, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
 --- !u!4 &1140277735816611257 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1979704105652135512, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
   m_PrefabInstance: {fileID: 1489080597726225377}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6373020330122261405 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5538234380392222844, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+  m_PrefabInstance: {fileID: 1489080597726225377}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &658158807708710907
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6373020330122261405}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &1106814918517572048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6373020330122261405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
+  <CurrentItemData>k__BackingField: {fileID: 0}
 --- !u!1001 &5110161385222466685
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -353,8 +490,59 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5538234380392222844, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4102366533862943881}
+    - targetCorrespondingSourceObject: {fileID: 5538234380392222844, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6273930466576106594}
   m_SourcePrefab: {fileID: 100100000, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+--- !u!1 &734423632221584385 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5538234380392222844, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+  m_PrefabInstance: {fileID: 5110161385222466685}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &4102366533862943881
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734423632221584385}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &6273930466576106594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734423632221584385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
+  <CurrentItemData>k__BackingField: {fileID: 0}
 --- !u!4 &6742912087092972069 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1979704105652135512, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
@@ -431,8 +619,59 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5538234380392222844, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6462764171883397471}
+    - targetCorrespondingSourceObject: {fileID: 5538234380392222844, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3701527668662230217}
   m_SourcePrefab: {fileID: 100100000, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+--- !u!1 &857756345733896088 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5538234380392222844, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
+  m_PrefabInstance: {fileID: 5133151438623213540}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &6462764171883397471
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857756345733896088}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &3701527668662230217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857756345733896088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
+  <CurrentItemData>k__BackingField: {fileID: 0}
 --- !u!4 &6648945190263005628 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1979704105652135512, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
