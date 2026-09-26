@@ -51,7 +51,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             Transform anchor = Ctx.Customer.transform;
             bubble.transform.position = anchor.position + offset;
 
-            bubble.InitializeBubble(Ctx.Customer.HumanType);
+            bubble.InitializeBubble(Ctx.Customer.HumanType, 0);
             Debug.Log("[SpeechState] 말풍선 시작", Ctx.Customer);
 
             while (!ended)
