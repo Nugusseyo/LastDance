@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
+namespace _Works.JJH._02_Scripts.Items
 {
-    [CreateAssetMenu(fileName = "Weapon Data", menuName = "SO/Item/Weapon")]
+    [CreateAssetMenu(fileName = "Weapon Data", menuName = "Scriptable Objects/Item/Weapon", order = 0)]
     public class WeaponItemSO : ItemDataSO
     {
         [field: SerializeField] public int Damage { get; private set; }

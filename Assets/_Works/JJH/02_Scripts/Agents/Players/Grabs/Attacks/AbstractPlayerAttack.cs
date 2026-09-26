@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
+namespace _Works.JJH._02_Scripts.Agents.Players.Grabs.Attacks
 {
     public abstract class AbstractPlayerAttack : MonoBehaviour
     {

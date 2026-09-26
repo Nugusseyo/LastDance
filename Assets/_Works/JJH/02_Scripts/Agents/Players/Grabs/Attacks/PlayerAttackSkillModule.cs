@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
+namespace _Works.JJH._02_Scripts.Agents.Players.Grabs.Attacks
 {
     public class PlayerAttackSkillModule : AbstractModule, IPlayerAttackSkill
     {

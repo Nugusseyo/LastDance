@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 21db5cb4169cb0c4fb0bc8e8086b8afc, type: 3}
-  m_Name: Weapon Data
+  m_Name: Wrench
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.WeaponItemSO
   <Damage>k__BackingField: 15
   <AttackCooltime>k__BackingField: 5

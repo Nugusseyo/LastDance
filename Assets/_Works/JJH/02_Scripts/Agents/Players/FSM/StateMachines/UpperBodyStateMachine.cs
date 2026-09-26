@@ -7,12 +7,14 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines
         private UpperIdleState _idleState;
         private UpperGrabState _grabState;
         private UpperAttackState _attackState;
+        private UpperUseState _useState;
 
         public UpperBodyStateMachine(Player player)
         {
             _idleState = new UpperIdleState(player, this);
             _grabState = new UpperGrabState(player, this);
             _attackState = new UpperAttackState(player, this);
+            _useState = new UpperUseState(player, this);
         }
 
         public void Initialize()

@@ -44,9 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a23ef90de9a9b454fb831da0159cb2be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Modules.PlayerMover
-  moveSpeed: 3
-  runSpeed: 6
+  <MoveSpeed>k__BackingField: 3
+  <RunSpeed>k__BackingField: 6
   staminaDrainRate: 0.25
   staminaRecoveryRate: 0.15
   stamina: 1
   uiChannel: {fileID: 11400000, guid: 48de6d3688cded849a436f36b9079ff6, type: 2}
+  itemEffectChannel: {fileID: 11400000, guid: 96d2e87518c0a72489435762b197cf91, type: 2}

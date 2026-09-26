@@ -9,7 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2800116296563679786}
-  - component: {fileID: 2968128457620754085}
+  - component: {fileID: 1430146756119896115}
+  - component: {fileID: 271766282271763797}
   m_Layer: 0
   m_Name: PlayerGrabModule
   m_TagString: Untagged
@@ -32,7 +33,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2968128457620754085
+--- !u!114 &1430146756119896115
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,10 +42,38 @@ MonoBehaviour:
   m_GameObject: {fileID: 1640332462097447401}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7319a979095f01141967d3e21ba77713, type: 3}
+  m_Script: {fileID: 11500000, guid: 14b868c94a91f9e4abf24c7f2dd18e9e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.PlayerWeaponModule
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Grabs.PlayerGrabModule
   weaponLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 32768
   weaponHoldPoint: {fileID: 0}
+  pickupDistance: 4
+  partDetacher: {fileID: 271766282271763797}
+--- !u!114 &271766282271763797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640332462097447401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72b6e2bec38aa0841b730436ec236537, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.PartDetacher
+  partLayerMask:
+    serializedVersion: 2
+    m_Bits: 32512
+  wheelLayerMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  popForce: 5
+  upForce: 3
+  collapseTiltAngle: 5
+  collapseDuration: 0.15
+  pickupDistance: 4

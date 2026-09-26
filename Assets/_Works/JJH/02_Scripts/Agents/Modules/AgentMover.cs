@@ -6,8 +6,8 @@ namespace _Works.JJH._02_Scripts.Agents.Modules
     public class AgentMover : AbstractModule, IMover
     {
         [Header("Speed")]
-        [SerializeField] private float moveSpeed = 3f;
-        [SerializeField] private float runSpeed = 6f;
+        [field: SerializeField] public float MoveSpeed { get; set; } = 3f;
+        [field: SerializeField] public float RunSpeed { get; set; } = 6f;
 
         private Rigidbody _rigidbody;
 
@@ -20,12 +20,12 @@ namespace _Works.JJH._02_Scripts.Agents.Modules
 
         public void Move(Vector3 direction)
         {
-            SetVelocity(direction, moveSpeed);
+            SetVelocity(direction, MoveSpeed);
         }
 
         public virtual void Run(Vector3 direction)
         {
-            SetVelocity(direction, runSpeed);
+            SetVelocity(direction, RunSpeed);
         }
 
         public void Stop()

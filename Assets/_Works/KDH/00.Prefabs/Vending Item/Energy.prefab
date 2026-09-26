@@ -9,8 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3134795198222028371}
-  - component: {fileID: 4130468379560267579}
   - component: {fileID: 4542088793085179779}
+  - component: {fileID: 7565331319319253675}
+  - component: {fileID: 2479902521868471265}
+  - component: {fileID: 8353675711090692751}
   m_Layer: 0
   m_Name: Energy
   m_TagString: Untagged
@@ -36,7 +38,72 @@ Transform:
   - {fileID: 601363462472389399}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &4130468379560267579
+--- !u!114 &4542088793085179779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 148702010015571901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98d739e3100163c42b396f999e1c4456, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.ItemType.EnergyDrinkEffect
+  eventChannel: {fileID: 11400000, guid: 96d2e87518c0a72489435762b197cf91, type: 2}
+  itemSO: {fileID: 11400000, guid: 42b4ca239dfb5c04a9b7cb8c376002a7, type: 2}
+--- !u!114 &7565331319319253675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 148702010015571901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
+  <CurrentItemData>k__BackingField: {fileID: 11400000, guid: 42b4ca239dfb5c04a9b7cb8c376002a7, type: 2}
+  UseEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4542088793085179779}
+        m_TargetAssemblyTypeName: _Works.KDH._01.Scripts.ItemType.EnergyDrinkEffect,
+          Assembly-CSharp
+        m_MethodName: Apply
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!64 &2479902521868471265
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 148702010015571901}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5447040849830592693, guid: f2f378121613dc144a153addaad78074, type: 3}
+--- !u!54 &8353675711090692751
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -63,21 +130,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &4542088793085179779
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 148702010015571901}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98d739e3100163c42b396f999e1c4456, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.ItemType.EnergyDrinkEffect
-  eventChannel: {fileID: 11400000, guid: 96d2e87518c0a72489435762b197cf91, type: 2}
-  speedMultiplier: 1.5
-  duration: 5
 --- !u!1001 &1140186546321601788
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -201,7 +253,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 4875907273765177850, guid: 4bf39f506b1d5ee4caf537ccfe018a7c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4bf39f506b1d5ee4caf537ccfe018a7c, type: 3}

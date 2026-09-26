@@ -36,6 +36,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM
 
             _player.PlayerInput.OnAttackKeyPressed += HandleAttackKeyPressed;
             _player.PlayerInput.OnThrowAttackKeyPressed += HandleAttackKeyPressed;
+            _player.PlayerInput.OnUseKeyPressed += HandleUseKeyPressed;
         }
 
         private void OnDestroy()
@@ -44,12 +45,19 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM
             {
                 _player.PlayerInput.OnAttackKeyPressed -= HandleAttackKeyPressed;
                 _player.PlayerInput.OnThrowAttackKeyPressed -= HandleAttackKeyPressed;
+                _player.PlayerInput.OnUseKeyPressed -= HandleUseKeyPressed;
             }
         }
 
         private void HandleAttackKeyPressed()
         {
             UpperBody.ChangeState<UpperAttackState>();
+        }
+
+        private void HandleUseKeyPressed()
+        {
+            if (_player.Grab.CurrentItem != null)
+                UpperBody.ChangeState<UpperUseState>();
         }
 
         private void Update()

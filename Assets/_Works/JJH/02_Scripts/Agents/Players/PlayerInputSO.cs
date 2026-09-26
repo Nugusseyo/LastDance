@@ -4,14 +4,15 @@ using UnityEngine.InputSystem;
 
 namespace _Works.JJH._02_Scripts.Agents.Players
 {
-    [CreateAssetMenu(fileName = "Player Input", menuName = "SO/Player Input")]
+    [CreateAssetMenu(fileName = "Player Input", menuName = "Scriptable Objects/Player Input")]
     public class PlayerInputSO : ScriptableObject, Controls.IPlayerActions
     {
         [SerializeField] private UIInputSO uiInputSO;
+
         public event Action OnAttackKeyPressed;
         public event Action OnThrowAttackKeyPressed;
         public event Action OnInteractKeyPressed;
-        public event Action OnChangeWeaponKeyPressed;
+        public event Action OnUseKeyPressed;
 
         public Vector2 MoveDirection { get; private set; }
         public Vector2 LookDirection { get; private set; }
@@ -87,10 +88,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players
                 OnInteractKeyPressed?.Invoke();
         }
 
-        public void OnChangeWeapon(InputAction.CallbackContext context)
+        public void OnUse(InputAction.CallbackContext context)
         {
             if (context.performed)
-                OnChangeWeaponKeyPressed?.Invoke();
+                OnUseKeyPressed?.Invoke();
         }
     }
 }
