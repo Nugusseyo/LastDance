@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40bd5ff9d61f2bd41b718da8f1380642, type: 3}
+  m_Name: ReviewDB
+  m_EditorClassIdentifier: Assembly-CSharp::Resources.DataBase.Review_Data.ReviewDB
+  ReviewSheet:
+  - index: 1
+    type: 1
+    content: "\uC5EC\uAE30.\uC8FC\uC720\uC18C\uAC00.\uCC38.\uD130\uAC00.\uC88B\uB124\uC694.^^"
+  - index: 2
+    type: 1
+    content: "G\u3154\u3141\uB9C8 T.\uBE0C@\uC774 \uC8FC#\uC720!\uC18C \uD3FC \uCA4C\uB124.
+      \uAC80\uC0C9\uCC3D\uC5D0 \uAC80\uC0C9 \u3131\u3131"
+  - index: 3
+    type: 2
+    content: "\uC8FC\uC720\uC18C\uC5D0\uC11C \uAE30\uB984 \uB0C4\uC0C8\uAC00 \uB098\uC694."
+  - index: 4
+    type: 2
+    content: "\uC5EC\uAE30 \uAE30\uB984\uAC12\uC774 \uBB3C\uBCF4\uB2E4 \uBE44\uC300\uB4EF
+      \u314B\u314B"
+  - index: 5
+    type: 3
+    content: "\uC5EC\uAE34 \uCC38\uAE30\uB984\uC73C\uB85C \uAE30\uB984 \uCC44\uC6B0\uB098\uBCA0"
+  NameSheet:
+  - name: "\uC870\uC724\uADDC"
+  - name: "\uB178\uD604\uC6B0"
+  - name: "\uB9C8\uC774\uD074"
+  - name: "\uC7AD\uC2A8"
+  - name: "\uBE4C\uB9AC\uC9C4"
+  - name: NotMyLove
