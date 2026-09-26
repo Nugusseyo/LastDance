@@ -21,6 +21,8 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
         private WaitForSeconds destroyWait;                 //WaitForSeconds를 캐싱해놓고 씀.
         public event Action OnSpeechEnd;    //SpeechBubble이 사라질 때 실행되는 Action
 
+        private Coroutine _speechCoroutine;
+
         private void Awake()
         {
             humanDB = UnityEngine.Resources.Load<HumanDB>("DataBase/Human Data/HumanDB");   //휴먼 데이터의 Resource를 들고온다. 경로가 틀리면 큰일 남.
@@ -53,7 +55,7 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
             }
         }
 
-        public void InitializeBubble(HumanType humanType)   //버블을 소환하고싶으면 해당 함수를 호출해라.
+        public void InitializeBubble(HumanType humanType, int index)   //버블을 소환하고싶으면 해당 함수를 호출해라.
         {
             if (tmp == null)
             {
@@ -61,25 +63,72 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
                 return;
             }
 
-            var list = humanDBs[humanType];
-            if (list == null)
+            if (!humanDBs.TryGetValue(humanType, out var list) || list == null || list.Count == 0)
             {
                 Debug.LogWarning($"해당 human상태에 맞는 데이터가 존재하지 않습니다. : {humanType}");
                 return;
             }
-            List<string> stringList = list[0].Item2.GetStrings();   //지금은 Good손님, Bad손님으로 나눠서 무조건 0번 인덱스를 쓴다. 세부 진상 대사는 정우랑 얘기해서 추가해야함.
-            Debug.Log(stringList.Count);
-            int randIndex =  UnityEngine.Random.Range(0, stringList.Count); //랜덤 대사 인덱스 정하기
-            tmp.text = stringList[randIndex];                               //출력
 
-            StartCoroutine(DestroyBubble());                          //n초 후 사라지게 만드는 코루틴 실행
+            // 전달받은 index와 일치하는 데이터를 찾고, 없을 경우 0번 인덱스의 데이터를 기본값으로 사용
+            HumanData data = list.FirstOrDefault(x => x.Item1 == index).Item2 ?? list[0].Item2;
+            List<string> stringList = data.GetStrings();   //content들을 모두 리스트화 시킴.
+
+            if (stringList == null || stringList.Count == 0)
+            {
+                Debug.LogWarning($"[SpeechBubble] 출력할 대사 데이터가 비어있습니다. : {humanType}, Index: {index}");
+                return;
+            }
+
+            if (_speechCoroutine != null)
+            {
+                StopCoroutine(_speechCoroutine);
+            }
+
+            _speechCoroutine = StartCoroutine(CoShowSpeechProcess(data, stringList));
         }
 
-        private IEnumerator DestroyBubble()
+        private IEnumerator CoShowSpeechProcess(HumanData data, List<string> stringList)
         {
-            yield return destroyWait;
+            WaitForSeconds wait = new WaitForSeconds(Mathf.Max(0.05f, data.delayTime));
+            int totalCount = stringList.Count;
+
+            switch (data.printType)
+            {
+                case BubbleType.InOrder:
+                    for (int i = 0; i < totalCount; i++)
+                    {
+                        tmp.text = stringList[i]; //출력
+                        yield return wait;
+                    }
+                    break;
+
+                case BubbleType.Random:
+                    for (int i = 0; i < totalCount; i++)
+                    {
+                        int randIndex = UnityEngine.Random.Range(0, stringList.Count); //랜덤 대사 인덱스 정하기
+                        tmp.text = stringList[randIndex]; //출력
+                        yield return wait;
+                    }
+                    break;
+
+                default:
+                    tmp.text = stringList[0]; //출력
+                    yield return wait;
+                    break;
+            }
+
             OnSpeechEnd?.Invoke();
             poolManager.Push(this);
+            _speechCoroutine = null;
+        }
+
+        private void OnDisable()
+        {
+            if (_speechCoroutine != null)
+            {
+                StopCoroutine(_speechCoroutine);
+                _speechCoroutine = null;
+            }
         }
 
         private void OnDestroy()
@@ -92,6 +141,11 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
         public GameObject GameObject => gameObject;
         public void ResetItem()
         {
+            if (_speechCoroutine != null)
+            {
+                StopCoroutine(_speechCoroutine);
+                _speechCoroutine = null;
+            }
             tmp.text = "";
         }
         #endregion
