@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 05ec5cf00ca181d45a42ba1870e148c3
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 66647
+  packageName: Simple Day And Night Cycle System
+  packageVersion: 1.3
+  assetPath: Assets/Simple_Day_and_Night_Cycle/(EXAMPLEONLY)CharacterAssets/Characters/FirstPersonCharacter/Scripts/FirstPersonController_EXAMPLE.cs
+  uploadId: 435921

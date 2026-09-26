@@ -31,6 +31,12 @@ namespace _Works.JYG._Scripts.UI.StoreUI
                  Debug.LogError("UpgradeDB를 찾지 못했습니다. : " + gameObject.name);
                  return;
              }
+
+             if (itemList.Count > 0)
+             {
+                 Debug.Log("<color=red>itemList는 디버깅용 직렬화 필드임에도 불구하고 값이 할당됨. 제거</color>");
+                 itemList.Clear();
+             }
              
              LoadListInitialize();  // 저장된 LoadList 값을 불러온다.
              InitializeBlock();
@@ -53,7 +59,7 @@ namespace _Works.JYG._Scripts.UI.StoreUI
              {
                  if (upgradeDict.TryGetValue(data.index, out UpgradeBlock block))
                  {
-                     // 세이브 데이터를 메모리 itemList에도 반영하여 세이브 데이터 유실 방지
+                     // 세이브 데이터를 메모리 itemList에도 반영하여 세이브 데이터 유실 방지한다
                      int targetIdx = itemList.FindIndex(x => x.index == data.index);
                      if (targetIdx != -1) itemList[targetIdx] = data;
 
@@ -66,28 +72,30 @@ namespace _Works.JYG._Scripts.UI.StoreUI
          {
              foreach (UpgradeData data in upgradeDB.UpgradeSheet)
              {
-                 itemList.Add(new StoreItem
+                 List<UpgradeDataWrapper> wrapper= data.GetNormalizedValue();
+                 StoreItem item = new StoreItem
                  (
                      data.index,
                      data.maxlv,
                      0,
                      data.value,
-                     data.lv1price,
-                     new UpgradeValue(data.upgradetype, data.lv1value)
-                 ));
-             }
-             
-             if(upgradeContentParent != null)
-                 foreach (StoreItem item in itemList)   //블럭의 수만큼 foreach 돌려준다.
+                     wrapper[0].price,
+                     new UpgradeValue(data.upgradetype, wrapper[0].value)
+                 );
+                 
+                 itemList.Add(item);
+
+                 if (upgradeContentParent != null)
                  {
                      UpgradeBlock block = Instantiate(upgradeBlock, upgradeContentParent);
-                     int itemIdx = item.index;
+                     int itemIdx = data.index;
                      block.UpgradeInit(item,
-                         upgradeDB.UpgradeSheet[item.index].GetNormalizedValue(),
+                         wrapper,
                          () => TryUpgradeItem(itemIdx),
-                                moneyManager);   //Block Init에서는 레벨 칸 갯수, 이벤트 연결 작업을 해준다.
-                     upgradeDict.Add(item.index, block);
+                         moneyManager);   //Block Init에서는 레벨 칸 갯수, 이벤트 연결 작업을 해준다.
+                     upgradeDict.Add(data.index, block);
                  }
+             }
          }
 
          private void LoadListInitialize()
@@ -130,16 +138,16 @@ namespace _Works.JYG._Scripts.UI.StoreUI
              }
              catch (Exception e)
              {
-                 Debug.LogError("상점 정보 저장에 실패했습니다.");
+                 Debug.LogError("상점 정보 저장에 실패했습니다." + e.Message);
              }
          }
 
          public void TryUpgradeItem(int index)
          {
-             if (index < 0 || index >= itemList.Count)
-                 return;
+             int listIdx = itemList.FindIndex(x => x.index == index);
+             if (listIdx == -1) return;
              
-             StoreItem curItem = itemList[index];
+             StoreItem curItem = itemList[listIdx];
              if(!CanUpgradeItem(curItem))
              {
                  Debug.Log("아이템 구매에 실패했습니다.");
@@ -147,7 +155,7 @@ namespace _Works.JYG._Scripts.UI.StoreUI
              }
              UpgradeBlock block = upgradeDict[curItem.index];
              StoreItem upgradeItem = block.GetUpgradeStoreItem();
-             itemList[index] = upgradeItem;
+             itemList[listIdx] = upgradeItem;
              moneyManager.Value -= curItem.price;
              block.UpgradeRequest(upgradeItem, false);
          }

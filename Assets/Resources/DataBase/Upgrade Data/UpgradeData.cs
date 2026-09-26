@@ -22,6 +22,7 @@ namespace Resources.DataBase.Upgrade_Data
         public int lv8price;
         public int lv9price;
 
+        public float lv0value; //기본값
         public float lv1value; //업그레이드 시 증가하는 밸류
         public float lv2value;
         public float lv3value;
@@ -39,7 +40,7 @@ namespace Resources.DataBase.Upgrade_Data
             // Add : 저장된 값 그대로 반환
             List<UpgradeDataWrapper> listValue = new()
             {
-                new UpgradeDataWrapper(lv1price, 0),
+                new UpgradeDataWrapper(lv1price, lv0value),
                 new UpgradeDataWrapper(lv2price, lv1value),
                 new UpgradeDataWrapper(lv3price, lv2value),
                 new UpgradeDataWrapper(lv4price, lv3value),
