@@ -10,6 +10,7 @@ namespace _Works.JYG._Scripts.UI.Data.Money
     {
         [SerializeField] private IntegerDataContainer moneyManager;
         [SerializeField] private MoneyTextViewer moneyViewerPrefab;
+        [SerializeField] private Transform textViewerParent;
         private IObjectPool<MoneyTextViewer> _moneyTextViewerPool;
 
         [SerializeField] private Transform moveGoal;
@@ -57,7 +58,7 @@ namespace _Works.JYG._Scripts.UI.Data.Money
         private MoneyTextViewer HandleCreateViewer()
         {
             MoneyTextViewer textViewer 
-                = Instantiate(moneyViewerPrefab)
+                = Instantiate(moneyViewerPrefab, textViewerParent)
                     .GetComponent<MoneyTextViewer>();
             
             textViewer.transform.SetParent(transform);
