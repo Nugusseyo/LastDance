@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1b9c48d0f3bb9f4e9a2d7acd7d83d16, type: 3}
-  m_Name: Energy_Drink
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Items.UseItemSO
-  <Multiplier>k__BackingField: 1.5
-  <Duration>k__BackingField: 5
+  m_Script: {fileID: 11500000, guid: 862382d3b2da47a8a7bb8b1d0367f47d, type: 3}
+  m_Name: USE hash
+  m_EditorClassIdentifier: AnimatorSystem_assembly::DevLib.AnimatorSystem.HashDataSO
+  <HashName>k__BackingField: USE
+  <HashValue>k__BackingField: 35032769

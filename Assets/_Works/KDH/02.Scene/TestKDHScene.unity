@@ -22237,9 +22237,41 @@ PrefabInstance:
       propertyPath: weaponHoldPoint
       value: 
       objectReference: {fileID: 1097041098}
+    - target: {fileID: 1044937706905305183, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+      propertyPath: itemLayer.m_Bits
+      value: 32768
+      objectReference: {fileID: 0}
     - target: {fileID: 1732737491634738388, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 2241439272018745770, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+      propertyPath: AnimationEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2241439272018745770, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+      propertyPath: AnimationEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2241439272018745770, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+      propertyPath: AnimationEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1961894821}
+    - target: {fileID: 2241439272018745770, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+      propertyPath: AnimationEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2241439272018745770, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+      propertyPath: AnimationEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: DestroyCurrentItem
+      objectReference: {fileID: 0}
+    - target: {fileID: 2241439272018745770, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+      propertyPath: AnimationEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: _Works.JJH._02_Scripts.Agents.Players.Grabs.PlayerGrabModule, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2241439272018745770, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+      propertyPath: AnimationEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 2408768361399251289, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
       propertyPath: partLayerMask.m_Bits
@@ -22297,6 +22329,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6986551459229170339, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+      propertyPath: useHash
+      value: 
+      objectReference: {fileID: 11400000, guid: 61aab571c84a7f641b2575b034497a5c, type: 2}
     m_RemovedComponents:
     - {fileID: 6876454383325807737, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
     - {fileID: 2408768361399251289, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
@@ -22315,6 +22351,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72b6e2bec38aa0841b730436ec236537, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.PartDetacher
+--- !u!114 &1961894821 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1044937706905305183, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+  m_PrefabInstance: {fileID: 1961894817}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14b868c94a91f9e4abf24c7f2dd18e9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Grabs.PlayerGrabModule
 --- !u!1 &1970520529
 GameObject:
   m_ObjectHideFlags: 0

@@ -19,7 +19,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines
 
         public void Initialize()
         {
-            SetState(_idleState, _grabState, _attackState);
+            SetState(_idleState, _grabState, _attackState, _useState);
 
             ChangeState<UpperIdleState>();
         }
