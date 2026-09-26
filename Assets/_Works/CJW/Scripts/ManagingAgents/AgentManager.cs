@@ -4,6 +4,9 @@ using UnityEngine;
 namespace _Works.CJW.Scripts.ManagingAgents
 {
     /// <summary>씬의 모든 틱 대상을 한 곳에서 돌린다. 타입이 달라도 IUpdate / IFixedUpdate만 구현하면 등록된다.</summary>
+    // 다른 오브젝트가 OnEnable에서 등록 이벤트를 보내기 전에 구독이 끝나 있어야 한다.
+    // 순서를 보장하지 않으면 씬에 따라 먼저 깨어난 쪽의 등록이 조용히 사라진다.
+    [DefaultExecutionOrder(-1000)]
     public class AgentManager : MonoBehaviour
     {
         [Tooltip("등록/해제 요청이 오가는 이벤트 채널.")]

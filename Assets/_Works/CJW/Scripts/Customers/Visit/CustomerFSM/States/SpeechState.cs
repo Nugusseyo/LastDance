@@ -56,6 +56,12 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
             while (!ended)
             {
+                // 플레이 종료처럼 말풍선이나 손님이 먼저 파괴되면 더 따라다닐 대상이 없다.
+                if (bubble == null || anchor == null)
+                {
+                    return VisitOutcome.Done;
+                }
+
                 bubble.transform.position = anchor.position + offset;
 
                 // 인터럽트나 Phase 전환이면 여기서 취소로 빠져나간다.

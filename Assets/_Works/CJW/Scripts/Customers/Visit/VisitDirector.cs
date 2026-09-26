@@ -44,23 +44,49 @@ namespace _Works.CJW.Scripts.Customers.Visit
         [Tooltip("방문이 끝난 차량이 빠져나갈 위치.")]
         [SerializeField] private Transform exitPoint;
 
+        [Header("주차 자리 배정")]
+        [Tooltip("자리로 들어가는 직선을 계산할 진입점 거리(m). ArrivingState의 approachDistance와 같은 값이어야 판단이 맞는다.")]
+        [SerializeField, Min(0f)] private float approachDistance = ParkingApproach.DefaultDistance;
+
+        [Tooltip("진입 직선 위에 이 반경(m) 안으로 차가 있으면 막힌 자리로 본다.")]
+        [SerializeField, Min(0f)] private float approachClearRadius = ParkingApproach.DefaultClearRadius;
+
+        [Tooltip("이미 다른 방문이 빌린 자리가 진입 직선에서 이 거리(m) 안에 있으면 막힌 자리로 본다. " +
+                 "그 차가 아직 도착 전이어도 곧 그 자리에 선다. 차 반길이 정도로 둔다.")]
+        [SerializeField, Min(0f)] private float occupiedSlotRadius = 2f;
+
+        [Tooltip("진입점까지 오는 길도 같은 줄 앞쪽 자리를 지난다. 진입점에서 이만큼(m) 더 바깥까지 빌린 자리가 있는지 본다.")]
+        [SerializeField, Min(0f)] private float approachCorridorExtra = 9f;
+
+        [Tooltip("ArrivingState의 allowBackIn과 같은 값이어야 한다. 끄면 자리 정면 진입만 막혔는지 본다.")]
+        [SerializeField] private bool allowBackIn = ParkingApproach.DefaultAllowBackIn;
+
         [Header("설정")]
         [SerializeField] private float spawnInterval = 8f;
+        [Tooltip("스폰 지점에서 이 반경(m) 안에 차가 있으면 빠질 때까지 스폰을 미룬다. 앞차가 막혀 줄이 스폰 지점까지 밀렸을 때 겹쳐 나오지 않게 한다.")]
+        [SerializeField, Min(0f)] private float spawnClearRadius = 3f;
         [SerializeField] private int maxConcurrentVisits = 3;
         [Tooltip("0보다 크면 그 시간 뒤에 자동으로 출발시킨다. 청소 시스템 연결 전 확인용.")]
         [SerializeField] private float autoDepartSeconds;
 
         private readonly List<ActiveVisit> _activeVisits = new();
         private readonly Stack<VisitSession> _sessionPool = new();
-        /// <summary>한 차에 태울 수 있는 주유 손님의 최대 인원.</summary>
-        private const int MaxRefuelingPerCar = 1;
 
         private readonly List<AbstractCustomer> _spawnBuffer = new();
 
         /// <summary>조건으로 후보를 좁힐 때 쓰는 임시 목록. 스폰마다 새로 할당하지 않으려고 들고 있는다.</summary>
         private readonly List<CustomerDataSO> _pickBuffer = new();
 
+        /// <summary>이번 방문에서 이미 태운 특수 역할(<see cref="CustomerRoles.RoleOf"/>로 묶은 값). None(일반 손님)은 역할이 아니므로 여기 들어가지 않고, 여럿 태울 수 있다.</summary>
+        private readonly HashSet<CustomerType> _takenRoles = new();
+
         private float _spawnTimer;
+
+        /// <summary>자리 점수 함수. 스폰마다 람다를 새로 만들지 않으려고 한 번만 묶어둔다.</summary>
+        private Func<RentableMapPosition, float> _slotScorer;
+
+        /// <summary>진입 직선이 막히지 않은 자리에 주는 가산점. 거리 점수(수십 m)보다 충분히 커서 항상 먼저 뽑힌다.</summary>
+        private const float ClearApproachBonus = 100000f;
 
         public int ActiveVisitCount => _activeVisits.Count;
 
@@ -123,6 +149,14 @@ namespace _Works.CJW.Scripts.Customers.Visit
             if (!mapData.HasFreeParkingSlot)
                 return;
 
+            // 스폰 지점이 막혀 있어도 마찬가지로 타이머를 남겨둔다.
+            if (!CarTraffic.IsAreaClear(spawnPoint.position, spawnClearRadius))
+                return;
+
+            // 빈 자리가 있어도 가는 길이 막혀 있거나 다른 차의 진입로 위라면 보내지 않는다. 보내면 누군가 도중에 선다.
+            if (!HasGoodFreeSlot())
+                return;
+
             _spawnTimer = spawnInterval;
             BeginVisit();
         }
@@ -170,13 +204,14 @@ namespace _Works.CJW.Scripts.Customers.Visit
         public VisitSession BeginVisit()
         {
             // 자리부터 잡는다. 풀에서 차를 꺼낸 뒤에 실패하면 되돌릴 것이 늘어난다.
-            if (!mapData.TryRentParkingSlot(spawnPoint.position, out RentableMapPosition slot))
+            _slotScorer ??= ScoreSlot;
+            if (!mapData.TryRentParkingSlot(_slotScorer, out RentableMapPosition slot))
             {
                 Debug.LogWarning("[VisitDirector] 빈 주차 자리가 없어 방문을 시작하지 못했습니다.", this);
                 return null;
             }
 
-            CarDataSO carData = WeightedPicker.Pick(carDataList, data => data.SpawnWeight);
+            CarDataSO carData = WeightedPicker.Pick(AvailableCarData(), data => data.SpawnWeight);
             if (carData == null || carData.PoolItem == null)
             {
                 Debug.LogError("[VisitDirector] 뽑을 수 있는 차 데이터가 없습니다. CarDataSO의 풀 항목과 가중치를 확인하세요.", this);
@@ -194,6 +229,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
             car.Setup(carData);
             car.transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
+            // 바퀴를 바닥에 맞추는 건 이동 모듈이 출발(MoveTo)할 때 한다. 스폰 지점의 높이는 신경 쓰지 않아도 된다.
 
             if (!TrySpawnCustomers(car, carData))
             {
@@ -223,9 +259,165 @@ namespace _Works.CJW.Scripts.Customers.Visit
             return session;
         }
 
+        private readonly List<CarDataSO> _carPickBuffer = new();
+
+        /// <summary>동시 대수 제한(CarDataSO.MaxConcurrent)에 걸리지 않은 차 종류만 추린다.</summary>
+        private List<CarDataSO> AvailableCarData()
+        {
+            _carPickBuffer.Clear();
+
+            for (int i = 0; i < carDataList.Length; i++)
+            {
+                CarDataSO data = carDataList[i];
+                if (data == null)
+                {
+                    continue;
+                }
+
+                if (data.MaxConcurrent > 0 && CountActive(data) >= data.MaxConcurrent)
+                {
+                    continue;
+                }
+
+                _carPickBuffer.Add(data);
+            }
+
+            return _carPickBuffer;
+        }
+
+        private int CountActive(CarDataSO data)
+        {
+            int count = 0;
+            for (int i = 0; i < _activeVisits.Count; i++)
+            {
+                Car car = _activeVisits[i].Session.Car;
+                if (car != null && car.Data == data)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        /// <summary>자리 점수. 진입 직선이 막히지 않은 자리가 먼저고, 그중에서는 스폰 지점에서 먼(안쪽) 자리가 먼저다.
+        /// 입구 쪽 자리부터 채우면 뒤에 온 차가 그 차를 지나 안쪽으로 들어가야 해서, 자리 앞 직선에서 서로 막힌다.</summary>
+        private float ScoreSlot(RentableMapPosition slot)
+        {
+            Vector3 delta = slot.Position - spawnPoint.position;
+            delta.y = 0f;
+
+            float score = delta.magnitude;
+
+            if (IsGoodSlot(slot))
+            {
+                score += ClearApproachBonus;
+            }
+
+            return score;
+        }
+
+        /// <summary>지금 이 자리에 차를 보내도 아무도 멈춰 세우지 않는지. 진입 직선이 비어 있고,
+        /// 아직 들어오는 중인 다른 차가 이 자리를 지나가야 하는 상황도 아니어야 한다.</summary>
+        private bool IsGoodSlot(RentableMapPosition slot) => HasClearApproach(slot) && !IsOnArrivingPath(slot);
+
+        /// <summary>빈 자리 중 좋은 자리가 하나라도 있는지. 없으면 스폰을 미룬다 — 억지로 보내면 다른 차 앞에서 서게 된다.</summary>
+        private bool HasGoodFreeSlot()
+        {
+            IReadOnlyList<MapPosition> slots = mapData.GetAll(MapPointType.ParkingSlot);
+            for (int i = 0; i < slots.Count; i++)
+            {
+                if (slots[i] is RentableMapPosition slot && slot.IsAvailable && IsGoodSlot(slot))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>아직 자리로 들어오는 중인 방문의 진입 직선 위에 이 자리가 놓였는지.
+        /// 한 줄로 늘어선 자리에서는 안쪽 자리로 가는 차가 바깥 자리를 지나가야 하므로, 그 차가 들어갈 때까지 바깥 자리를 비워 둔다.</summary>
+        private bool IsOnArrivingPath(RentableMapPosition slot)
+        {
+            for (int i = 0; i < _activeVisits.Count; i++)
+            {
+                ActiveVisit visit = _activeVisits[i];
+                if (visit.Session.Phase != VisitPhase.Arriving || visit.Slot == null)
+                {
+                    continue;
+                }
+
+                // 입구를 막거나 도는 차는 빌린 자리로 가지 않는다.
+                if (visit.Session.Car != null && visit.Session.Car.Data != null && visit.Session.Car.Data.StateOverrides != null)
+                {
+                    continue;
+                }
+
+                if (!ParkingApproach.TryGetPoint(visit.Slot.Position, ParkingApproach.ForwardIn(visit.Slot.Rotation),
+                                                 approachDistance, ParkingApproach.DefaultSampleRadius, out Vector3 approach))
+                {
+                    continue;
+                }
+
+                if (CarTraffic.PlanarDistanceToSegment(slot.Position, Corridor(approach, visit.Slot.Position), visit.Slot.Position) < occupiedSlotRadius)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>앞쪽·뒤쪽 진입 중 하나라도 직선이 비어 있는지. 서 있는 차와, 이미 빌려 가서 곧 차가 설 자리를 모두 본다.</summary>
+        private bool HasClearApproach(RentableMapPosition slot)
+        {
+            return IsApproachClear(slot, ParkingApproach.ForwardIn(slot.Rotation))
+                   || (allowBackIn && IsApproachClear(slot, ParkingApproach.BackIn(slot.Rotation)));
+        }
+
+        private bool IsApproachClear(RentableMapPosition slot, Quaternion rotation)
+        {
+            if (!ParkingApproach.TryGetPoint(slot.Position, rotation, approachDistance,
+                                             ParkingApproach.DefaultSampleRadius, out Vector3 approach))
+            {
+                return false;
+            }
+
+            if (!ParkingApproach.IsLegClear(approach, slot.Position, approachClearRadius))
+            {
+                return false;
+            }
+
+            IReadOnlyList<MapPosition> slots = mapData.GetAll(MapPointType.ParkingSlot);
+            for (int i = 0; i < slots.Count; i++)
+            {
+                if (slots[i] is not RentableMapPosition other || other == slot || !other.IsOccupied)
+                {
+                    continue;
+                }
+
+                if (CarTraffic.PlanarDistanceToSegment(other.Position, Corridor(approach, slot.Position), slot.Position) < occupiedSlotRadius)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>진입점에서 자리 반대쪽으로 approachCorridorExtra만큼 더 늘린 점. 진입점까지 오는 길도 같은 줄 앞쪽을 지나므로 함께 본다.</summary>
+        private Vector3 Corridor(Vector3 approach, Vector3 slotPosition)
+        {
+            Vector3 dir = approach - slotPosition;
+            dir.y = 0f;
+            return dir.sqrMagnitude < 1e-6f ? approach : approach + dir.normalized * approachCorridorExtra;
+        }
+
         private bool TrySpawnCustomers(Car car, CarDataSO carData)
         {
             _spawnBuffer.Clear();
+            _takenRoles.Clear();
 
             // 차가 자기 손님 목록을 들고 있으면 그쪽이 우선. 없으면 디렉터의 기본 목록을 쓴다.
             CustomerDataSO[] pool = carData.Customers ?? defaultCustomerDataList;
@@ -246,11 +438,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
             int count = Random.Range(customerRange.x, customerRange.y + 1);
 
             // 좌석마다 독립으로 뽑으면 한 차의 구성이 통제되지 않는다. 이미 태운 사람을 보고 후보를 좁힌다.
-            int refuelingTaken = 0;
-
             for (int i = 0; i < count; i++)
             {
-                CustomerDataSO customerData = PickForSeat(pool, refuelingTaken);
+                CustomerDataSO customerData = PickForSeat(pool);
 
                 if (customerData == null)
                 {
@@ -280,9 +470,11 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 customer.transform.position = car.transform.position;
                 _spawnBuffer.Add(customer);
 
-                if (IsRefueling(customerData))
+                // None(일반 손님)은 역할이 아니라서 중복 허용. 특수 역할만 한 번 태우면 다음 좌석 후보에서 제외한다.
+                CustomerType role = CustomerRoles.RoleOf(customerData.customerType);
+                if (role != CustomerType.None)
                 {
-                    refuelingTaken++;
+                    _takenRoles.Add(role);
                 }
             }
 
@@ -295,37 +487,35 @@ namespace _Works.CJW.Scripts.Customers.Visit
             return true;
         }
 
-        /// <summary>좌석 하나를 채울 손님을 뽑는다. 이미 태운 구성을 보고 후보를 좁힌 뒤 추첨한다.
+        /// <summary>좌석 하나를 채울 손님을 뽑는다. 이미 태운 역할(None 제외)은 후보에서 빼고 추첨한다.
+        /// 이렇게 하면 한 차 안에서 같은 역할(예: 주유 손님)이 둘 이상 겹치는 일이 없다.
         /// 조건을 만족하는 후보가 없으면 null을 돌려주고, 부르는 쪽이 인원을 줄인다.</summary>
-        private CustomerDataSO PickForSeat(CustomerDataSO[] pool, int refuelingTaken)
+        private CustomerDataSO PickForSeat(CustomerDataSO[] pool)
         {
-            if (refuelingTaken < MaxRefuelingPerCar)
-            {
-                return WeightedPicker.Pick(pool, data => data.SpawnWeight);
-            }
-
-            // 주유 손님의 가중치만 0으로 만들면 안 된다. 후보가 전부 주유 손님이면 합이 0이 되어
+            // 이미 태운 역할의 가중치만 0으로 만들면 안 된다. 후보가 전부 그 역할이면 합이 0이 되어
             // WeightedPicker가 균등 추첨으로 물러나고, 결국 걸러내려던 손님을 돌려준다.
             // 목록에서 아예 빼야 조건이 지켜진다.
             _pickBuffer.Clear();
 
             for (int i = 0; i < pool.Length; i++)
             {
-                if (pool[i] != null && !IsRefueling(pool[i]))
+                CustomerDataSO data = pool[i];
+                if (data == null)
                 {
-                    _pickBuffer.Add(pool[i]);
+                    continue;
                 }
+
+                // 종류가 아니라 역할로 거른다. 주유 손님(내리는 쪽·차에 남는 쪽)은 한 차에 하나만 탄다.
+                CustomerType role = CustomerRoles.RoleOf(data.customerType);
+                if (role != CustomerType.None && _takenRoles.Contains(role))
+                {
+                    continue;
+                }
+
+                _pickBuffer.Add(data);
             }
 
             return WeightedPicker.Pick(_pickBuffer, data => data.SpawnWeight);
-        }
-
-        /// <summary>주유기를 차지하러 가는 손님인지. 주유기 수가 한정돼 있어 한 차가 여럿 태우면
-        /// 다른 차 손님이 계속 대기열로 밀린다. 주유기를 쓰는 종류가 늘면 여기에 더한다.
-        /// (차 안에 머무는 StayInCar는 주유기를 차지하지 않으므로 여기 들어가지 않는다.)</summary>
-        private static bool IsRefueling(CustomerDataSO data)
-        {
-            return data != null && data.customerType == CustomerType.Refueling;
         }
 
         private void ReturnSpawnBuffer()

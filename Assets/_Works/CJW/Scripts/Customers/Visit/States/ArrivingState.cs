@@ -1,6 +1,6 @@
 using System;
+using _Works.CJW.Scripts.Cars;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace _Works.CJW.Scripts.Customers.Visit.States
 {
@@ -9,10 +9,17 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
     public sealed class ArrivingState : VisitState
     {
         [Tooltip("정차 지점 앞에 두는 진입점까지의 거리(m). 여길 먼저 찍고 자리 정면으로 곧게 들어와 도착 시 방향이 맞아 있게 한다.")]
-        [SerializeField, Min(0f)] private float approachDistance = 9f;
+        [SerializeField, Min(0f)] private float approachDistance = ParkingApproach.DefaultDistance;
 
         [Tooltip("진입점을 NavMesh 위에서 찾을 때 허용할 오차(m).")]
-        [SerializeField, Min(0f)] private float approachSampleRadius = 2f;
+        [SerializeField, Min(0f)] private float approachSampleRadius = ParkingApproach.DefaultSampleRadius;
+
+        [Tooltip("진입점에서 자리까지의 직선 위에 이 반경(m) 안으로 차가 있으면 그 방향으로는 들어가지 않는다. 차 반폭에 여유를 더한 값.")]
+        [SerializeField, Min(0f)] private float approachClearRadius = ParkingApproach.DefaultClearRadius;
+
+        [Tooltip("켜면 자리 뒤쪽에서 후면 주차로도 들어온다. 끄면 모든 차가 자리 정면 한 방향으로만 들어와 일방통행이 된다. " +
+                 "양방향을 허용하면 접근로 하나에서 들어오는 차끼리 마주쳐 멈춘다.")]
+        [SerializeField] private bool allowBackIn = ParkingApproach.DefaultAllowBackIn;
 
         [Tooltip("이 단계에 머물 수 있는 한계 시간(초). 없으면 막힌 세션이 주차 자리를 영영 반납하지 않아 스폰까지 멈춘다.")]
         [SerializeField, Min(0f)] private float phaseTimeout = 45f;
@@ -28,11 +35,33 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
             // 진입 방향을 하나로 못 박으면, 반대편에서 온 차는 자리에 선 뒤
             // 제자리에서 한 바퀴 돌아야 한다. 전면·후면 주차가 상관없으므로
             // 지금 위치에서 가까운 쪽으로 들어가고, 그때의 방향을 그대로 목표로 삼는다.
-            Quaternion forwardIn = context.ArrivalRotation;
-            Quaternion backIn = context.ArrivalRotation * Quaternion.Euler(0f, 180f, 0f);
+            Quaternion forwardIn = ParkingApproach.ForwardIn(context.ArrivalRotation);
+            Quaternion backIn = ParkingApproach.BackIn(context.ArrivalRotation);
 
-            bool hasForward = TryGetApproachPoint(context.ArrivalPoint, forwardIn, out Vector3 forwardApproach);
-            bool hasBack = TryGetApproachPoint(context.ArrivalPoint, backIn, out Vector3 backApproach);
+            Vector3 backApproach = default;
+            bool hasForward = ParkingApproach.TryGetPoint(context.ArrivalPoint, forwardIn, approachDistance,
+                                                          approachSampleRadius, out Vector3 forwardApproach);
+            bool hasBack = allowBackIn &&
+                           ParkingApproach.TryGetPoint(context.ArrivalPoint, backIn, approachDistance,
+                                                       approachSampleRadius, out backApproach);
+
+            // 마지막 직선은 NavMesh를 보지 않고 추월도 하지 않는다. 그 위에 차가 서 있으면 뒤에서 영영 기다리므로
+            // 막히지 않은 쪽이 있으면 거리와 상관없이 그쪽으로 들어간다.
+            ICarTrafficSensor self = context.Car.GetModule<ICarTrafficSensor>();
+            bool forwardClear = hasForward &&
+                                ParkingApproach.IsLegClear(forwardApproach, context.ArrivalPoint, approachClearRadius, self);
+            bool backClear = hasBack &&
+                             ParkingApproach.IsLegClear(backApproach, context.ArrivalPoint, approachClearRadius, self);
+
+            if (forwardClear != backClear)
+            {
+                hasForward = forwardClear;
+                hasBack = backClear;
+            }
+            else if (!forwardClear && (hasForward || hasBack))
+            {
+                Debug.LogWarning($"[Arriving] {context.Car.name}의 자리로 들어가는 직선이 양쪽 다 다른 차에 막혀 있습니다. 가까운 쪽으로 들어가 기다립니다.", context.Car);
+            }
 
             if (hasForward && hasBack)
             {
@@ -62,21 +91,6 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
             // 양쪽 진입점을 다 못 잡으면 곧장 자리로 간다. 방향은 AlignTo가 마저 맞춘다.
             context.TargetRotation = forwardIn;
             context.Car.MoveTo(context.ArrivalPoint);
-        }
-
-        /// <summary>자리에서 rotation 정면으로 물러난 진입점을 NavMesh 위에서 찾는다.</summary>
-        private bool TryGetApproachPoint(Vector3 arrivalPoint, Quaternion rotation, out Vector3 point)
-        {
-            Vector3 candidate = arrivalPoint - rotation * Vector3.forward * approachDistance;
-
-            if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, approachSampleRadius, NavMesh.AllAreas))
-            {
-                point = hit.position;
-                return true;
-            }
-
-            point = candidate;
-            return false;
         }
 
         /// <summary>높이를 무시한 거리의 제곱. 어느 쪽이 가까운지만 보면 되므로 제곱근을 쓰지 않는다.</summary>

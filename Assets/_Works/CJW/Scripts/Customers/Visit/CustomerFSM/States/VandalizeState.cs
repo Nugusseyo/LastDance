@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using _Works.CJW.Scripts.Cars;
@@ -39,8 +40,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("OtherCar일 때 둘러볼 반경(m).")]
         [SerializeField, Min(0f)] private float searchRadius = 25f;
 
-        [Tooltip("OtherCar일 때 차를 찾을 레이어. 전부 켜 두면 엉뚱한 콜라이더까지 훑는다.")]
-        [SerializeField] private LayerMask carLayers = ~0;
+        [Tooltip("대상이 없을 때 다시 찾아볼 시간(초). 주차장에 남의 차가 한 대도 없을 때 곧 들어올 차를 기다린다. 0이면 바로 넘어간다.")]
+        [SerializeField, Min(0f)] private float targetWaitTimeout = 10f;
 
         [Header("접근")]
         [Tooltip("대상에서 이만큼 떨어져 선다(m). 0이면 대상 한가운데로 파고들어 몸이 겹친다.")]
@@ -65,15 +66,11 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("한 대의 세기. 맞는 쪽이 이 값을 어떻게 쓸지는 그쪽이 정한다.")]
         [SerializeField, Min(0f)] private float power = 1f;
 
-        /// <summary>차를 찾을 때 쓰는 공용 버퍼. 상태 인스턴스마다 들면 손님 종류 수만큼 배열이 생기고,
-        /// 탐색은 메인 스레드에서만 일어나므로 하나를 돌려 쓴다.</summary>
-        private static readonly Collider[] SearchBuffer = new Collider[16];
-
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
         {
             AbstractCustomer customer = Ctx.Customer;
 
-            Transform target = ResolveTarget();
+            Transform target = await WaitForTarget(ct);
             if (target == null)
             {
                 // 때릴 게 없다고 방문을 세우지는 않는다. 다음 행동으로 넘긴다.
@@ -165,6 +162,34 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             return target.position + toCustomer.normalized * standoff;
         }
 
+        /// <summary>대상을 찾고, 없으면 <see cref="targetWaitTimeout"/> 동안 다시 찾아본다.
+        /// 남의 차를 때리는 손님은 혼자 온 순간이면 때릴 차가 없어서 곧바로 할 일을 잃기 때문이다.</summary>
+        private async UniTask<Transform> WaitForTarget(CancellationToken ct)
+        {
+            const float retryInterval = 0.5f;
+            float deadline = Time.time + targetWaitTimeout;
+
+            while (true)
+            {
+                Transform target = ResolveTarget();
+                if (target != null)
+                {
+                    return target;
+                }
+
+                if (Time.time >= deadline)
+                {
+                    // 닿는 자판기가 끝내 없으면 가장 가까운 쪽으로라도 간다. 가다 막혀도 제자리보다 낫다.
+                    return source == TargetSource.MapPoint && Ctx.MapData != null
+                           && Ctx.MapData.TryGetNearest(targetPoint, Ctx.Customer.transform.position, out MapPosition nearest)
+                        ? nearest.transform
+                        : null;
+                }
+
+                await UniTask.Delay(TimeSpan.FromSeconds(retryInterval), cancellationToken: ct);
+            }
+        }
+
         private Transform ResolveTarget()
         {
             switch (source)
@@ -182,34 +207,32 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                         return null;
                     }
 
-                    return Ctx.MapData.TryGetNearest(targetPoint, Ctx.Customer.transform.position, out MapPosition point)
-                        ? point.transform
-                        : null;
+                    return TryGetReachablePoint(targetPoint, out MapPosition point) ? point.transform : null;
             }
         }
 
         /// <summary>주변에서 자기가 타고 온 차가 아닌 차를 하나 찾는다. 가장 가까운 차를 고르므로
-        /// 옆자리에 선 차가 있으면 그쪽으로 간다.</summary>
+        /// 옆자리에 선 차가 있으면 그쪽으로 간다. 물리 탐색 대신 <see cref="CarTraffic"/>에 등록된 차만 본다 —
+        /// 차가 Default 레이어라 콜라이더로 훑으면 바닥·건물에 버퍼가 먼저 차서 정작 차를 놓친다.</summary>
         private Transform FindOtherCar()
         {
             AbstractCustomer customer = Ctx.Customer;
             Car ownCar = Ctx.Visit?.Car;
-
-            int count = Physics.OverlapSphereNonAlloc(
-                customer.transform.position, searchRadius, SearchBuffer, carLayers, QueryTriggerInteraction.Ignore);
+            Vector3 origin = customer.transform.position;
+            float maxDistance = searchRadius * searchRadius;
 
             Car best = null;
             float bestDistance = float.MaxValue;
 
-            for (int i = 0; i < count; i++)
+            IReadOnlyList<ICarTrafficSensor> sensors = CarTraffic.Sensors;
+            for (int i = 0; i < sensors.Count; i++)
             {
-                Collider hit = SearchBuffer[i];
-                if (hit == null)
+                if (sensors[i] is not Component sensor)
                 {
                     continue;
                 }
 
-                Car car = hit.GetComponentInParent<Car>();
+                Car car = sensor.GetComponentInParent<Car>();
 
                 // 자기가 타고 온 차를 때리면 방문 내내 제자리다. 남의 차만 고른다.
                 if (car == null || car == ownCar)
@@ -217,22 +240,14 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                     continue;
                 }
 
-                float distance = (car.transform.position - customer.transform.position).sqrMagnitude;
-                if (distance >= bestDistance)
+                float distance = (car.transform.position - origin).sqrMagnitude;
+                if (distance > maxDistance || distance >= bestDistance)
                 {
                     continue;
                 }
 
                 bestDistance = distance;
                 best = car;
-            }
-
-            if (best == null && count >= SearchBuffer.Length)
-            {
-                // 버퍼가 꽉 차면 그 너머의 차는 아예 보이지 않는다. 반경이 너무 넓다는 신호다.
-                Debug.LogWarning(
-                    $"[{nameof(VandalizeState)}] 주변 콜라이더가 {SearchBuffer.Length}개를 넘어 일부만 살펴봤습니다. " +
-                    $"{nameof(searchRadius)}를 줄이거나 {nameof(carLayers)}를 좁히세요.", customer);
             }
 
             return best != null ? best.transform : null;

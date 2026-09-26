@@ -11,6 +11,12 @@ namespace _Works.CJW.Scripts.Cars
 
         bool IsArrived { get; }
 
+        /// <summary>차체 정면 기준 속도(m/s). 후진이면 음수다. 바퀴를 굴릴 때 쓴다.</summary>
+        float Speed { get; }
+
+        /// <summary>앞바퀴 조향각(도). 양수면 오른쪽. 조향을 흉내 내지 않는 이동 수단은 0을 돌려준다.</summary>
+        float SteerAngleDeg { get; }
+
         void MoveTo(Vector3 destination);
 
         /// <summary>approachFrom을 먼저 지나 destination에 닿는다. 구현이 지원하지 않으면 그냥 destination으로 가도 된다.</summary>

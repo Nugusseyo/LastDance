@@ -37,7 +37,7 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
             {
                 if (humanDBs.TryGetValue(data.type, out List<(int, HumanData)> list))   //해당 타입에 대한 List가 있으면 들고 온다.
                 {
-                    if (list.Select(x => x.Item1 == data.index).Any())      //대본 index가 이미 엑셀 파일에 있으면 경고해준다.
+                    if (list.Any(x => x.Item1 == data.index))      //대본 index가 이미 엑셀 파일에 있으면 경고해준다.
                     {
                         Debug.LogWarning("같은 Type, 같은 Index의 데이터가 이미 존재합니다.\n" +
                                          "나중의 데이터가 덮어씌워져 적용 됩니다.");

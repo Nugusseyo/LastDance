@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using _Works.CJW.Scripts.Customers.Animation;
@@ -47,6 +48,9 @@ namespace _Works.CJW.Scripts.Customers.Movement
         [Tooltip("하차 직후처럼 Agent가 아직 살아나지 않았을 때 기다려 주는 시간(초).")]
         [SerializeField, Min(0f)] private float readyGrace = 1f;
 
+        [Tooltip("받은 경로를 잃었을 때 다시 요청해 보는 시간(초). 옆에 선 차가 NavMesh를 새로 깎으면 방금 받은 경로가 버려진다.")]
+        [SerializeField, Min(0f)] private float pathRetry = 1.5f;
+
         [Tooltip("몸통과 Agent가 이만큼(m) 벌어지면 Agent를 몸통 자리로 옮긴다. 풀에서 꺼내 순간이동했을 때를 위한 안전장치.")]
         [SerializeField, Min(0.1f)] private float resyncDistance = 1f;
 
@@ -90,7 +94,7 @@ namespace _Works.CJW.Scripts.Customers.Movement
 
             if (agent == null && owner != null)
             {
-                agent = owner.GetComponentInChildren<NavMeshAgent>(true);
+                agent = owner.GetComponentInParent<NavMeshAgent>(true);
             }
 
             // 애니메이터는 렌더러 모듈이 들고 있다. 모듈이 없는 프리팹만 계층에서 직접 찾는다.
@@ -101,7 +105,7 @@ namespace _Works.CJW.Scripts.Customers.Movement
 
             if (animator == null && owner != null)
             {
-                animator = owner.GetComponentInChildren<Animator>(true);
+                animator = owner.GetComponentInParent<Animator>(true);
             }
 
             if (agent == null)
@@ -194,6 +198,12 @@ namespace _Works.CJW.Scripts.Customers.Movement
         /// <summary>이동을 접는다. 경로를 비우고 걷기 애니메이션도 바로 내린다.</summary>
         public void Stop()
         {
+            // 플레이 종료처럼 오브젝트가 먼저 파괴되고 취소가 뒤늦게 도착하면 여기로 들어온다. 건드릴 게 없다.
+            if (this == null)
+            {
+                return;
+            }
+
             if (IsReady && agent.hasPath)
             {
                 agent.ResetPath();
@@ -221,28 +231,74 @@ namespace _Works.CJW.Scripts.Customers.Movement
                 await UniTask.Yield(PlayerLoopTiming.Update, ct);
             }
 
-            MoveTo(destination);
-
-            // SetDestination 직후 같은 프레임에는 pathPending이 아직 false이고
-            // remainingDistance가 0이라 IsArrived가 곧바로 true가 된다. 한 프레임 양보한다.
-            await UniTask.NextFrame(ct);
-            await UniTask.WaitWhile(() => IsReady && agent.pathPending, cancellationToken: ct);
-
-            if (!IsReady || !agent.hasPath)
+            // 이미 목적지에 서 있다. 경로가 없는 게 정상이므로 막힌 것으로 보지 않는다.
+            if (IsNear(destination))
             {
-                return MoveResult.Blocked;
+                return MoveResult.Done;
+            }
+
+            // 옆에 선 차가 막 NavMesh를 깎으면 방금 받은 경로가 버려지고 목적지가 제자리로 돌아간다.
+            // 한 번 실패로 포기하지 않고 잠깐 다시 요청한다.
+            float retryUntil = Time.time + pathRetry;
+            while (true)
+            {
+                MoveTo(destination);
+
+                // SetDestination 직후 같은 프레임에는 pathPending이 아직 false이고
+                // remainingDistance가 0이라 IsArrived가 곧바로 true가 된다. 한 프레임 양보한다.
+                await UniTask.NextFrame(ct);
+                await UniTask.WaitWhile(() => IsReady && agent.pathPending, cancellationToken: ct);
+
+                if (IsReady && agent.hasPath)
+                {
+                    break;
+                }
+
+                if (!IsReady || Time.time > retryUntil)
+                {
+                    return MoveResult.Blocked;
+                }
+
+                await UniTask.Delay(TimeSpan.FromSeconds(PathRetryInterval), cancellationToken: ct);
             }
 
             float deadline = timeout > 0f ? Time.time + timeout : float.MaxValue;
 
+            // 경로를 잃고 다시 요청했는지. 다시 요청해도 경로가 안 나오면 목적지가 NavMesh 밖이라
+            // 지금 선 곳이 갈 수 있는 끝이다(좌석처럼 차 안에 있는 목적지). 그때는 도착으로 본다.
+            bool requested = false;
+
             try
             {
-                while (!IsArrived)
+                while (true)
                 {
                     // 걷는 도중에 태워졌거나 NavMesh 밖으로 밀려났다. 영영 도착하지 못하므로 여기서 끊는다.
                     if (!IsReady)
                     {
                         return MoveResult.Blocked;
+                    }
+
+                    if (agent.pathPending)
+                    {
+                        // 다시 요청한 경로를 계산하는 중이다.
+                    }
+                    else if (agent.hasPath)
+                    {
+                        requested = false;
+                        if (IsArrived)
+                        {
+                            return MoveResult.Done;
+                        }
+                    }
+                    else if (requested || IsNear(destination))
+                    {
+                        return MoveResult.Done;
+                    }
+                    else
+                    {
+                        // 경로를 잃으면 remainingDistance가 0이 되어 도착한 것처럼 보인다. 멀리 있으면 한 번 다시 요청한다.
+                        requested = true;
+                        MoveTo(destination);
                     }
 
                     if (Time.time > deadline)
@@ -252,14 +308,23 @@ namespace _Works.CJW.Scripts.Customers.Movement
 
                     await UniTask.Yield(PlayerLoopTiming.Update, ct);
                 }
-
-                return MoveResult.Done;
             }
             finally
             {
                 // 취소로 끊겨도 여기는 반드시 지난다. 빼먹으면 손님이 선 자리에서 걷는 애니메이션을 계속 돌린다.
                 Stop();
             }
+        }
+
+        private const float PathRetryInterval = 0.2f;
+
+        /// <summary>목적지에 이미 닿았다고 볼 만큼 가까운지. 높이는 무시한다 — 지점이 바닥보다 떠 있어도 같은 자리로 본다.</summary>
+        private bool IsNear(Vector3 destination)
+        {
+            Vector3 delta = destination - agent.nextPosition;
+            delta.y = 0f;
+            float reach = agent.stoppingDistance + agent.radius;
+            return delta.sqrMagnitude <= reach * reach;
         }
 
         /// <summary>애니메이터와 같은 GameObject에 붙은 <see cref="RootMotionRelay"/>가 OnAnimatorMove에서 불러준다.</summary>
