@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9a6d707da10deb348994dc4699551756
+timeCreated: 1523149263
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 66647
+  packageName: Simple Day And Night Cycle System
+  packageVersion: 1.3
+  assetPath: Assets/Simple_Day_and_Night_Cycle/Models/Materials/Grass.mat
+  uploadId: 435921
