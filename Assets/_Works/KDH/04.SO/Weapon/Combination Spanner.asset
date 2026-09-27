@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7630131a6334544982fc7774b2edec5, type: 3}
+  m_Name: Combination Spanner
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Vending.VendingItemSO
+  <ItemName>k__BackingField: Combination Spanner
+  <ItemPrefab>k__BackingField: {fileID: 8543221693165310462, guid: 19b3ab02e6bea7e49858908dc2c17f66, type: 3}
+  <ItemType>k__BackingField: 5

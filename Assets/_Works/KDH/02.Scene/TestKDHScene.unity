@@ -28044,6 +28044,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6832c02434774ba48a9b2c8f7ac2f77e, type: 2}
   - {fileID: 11400000, guid: e405049591786824f921ca80e564d24f, type: 2}
   - {fileID: 11400000, guid: 1900197248f73d54fb25c61d6becaa11, type: 2}
+  - {fileID: 11400000, guid: 575171ec18c149e1b50cfd5eae433342, type: 2}
+  - {fileID: 11400000, guid: b933b27044f24803a0359d7ef4784a42, type: 2}
+  - {fileID: 11400000, guid: 7e514b4b688e48909ff11bdd7a002bb8, type: 2}
+  - {fileID: 11400000, guid: 6e371c8484224f498986fd32cdb05765, type: 2}
+  - {fileID: 11400000, guid: 81bbf941ed5945eaa67bb68af41bdc90, type: 2}
+  - {fileID: 11400000, guid: d5899e3904b346758ff2a27a96fc7bee, type: 2}
+  - {fileID: 11400000, guid: 056deb7bed5349e487362aee51feb08f, type: 2}
   vendingPoint: {fileID: 1895226917}
   systemEvent: {fileID: 11400000, guid: d31e526d71d1b444f89007a57798b10f, type: 2}
 --- !u!4 &5514653542796558776
