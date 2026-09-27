@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using _Works.JYG._Scripts.Data_Container.Money;
+using _Works.JYG._Scripts.Events;
+using DevLib.EventChannelSystem;
 using Resources.DataBase.Upgrade_Data;
 using UnityEngine;
 
@@ -9,6 +11,7 @@ namespace _Works.JYG._Scripts.UI.StoreUI
 {
     public class Store : MonoBehaviour
     {
+        [SerializeField] private EventChannelSO eventChannel;
          [SerializeField] private IntegerDataContainer moneyManager;
          
          [SerializeField] private Transform upgradeContentParent;    //업그레이드 블럭을 만들 때, 부모가 될 대상이다.
@@ -150,7 +153,7 @@ namespace _Works.JYG._Scripts.UI.StoreUI
              StoreItem curItem = itemList[listIdx];
              if(!CanUpgradeItem(curItem))
              {
-                 Debug.Log("아이템 구매에 실패했습니다.");
+                 eventChannel.RaiseEvent(UIEvents.MessageEvent.Init("돈이 부족합니다!"));
                  return;
              }
              UpgradeBlock block = upgradeDict[curItem.index];

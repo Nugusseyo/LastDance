@@ -176,7 +176,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             item.SetGrabState();
 
             CurrentGrabObject.transform.SetParent(weaponHoldPoint, true);
-            CurrentGrabObject.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            CurrentGrabObject.transform.SetLocalPositionAndRotation(item.HoldPositionOffset, item.HoldRotationOffset);
+            CurrentGrabObject.transform.localScale = item.HoldScale;
 
             ApplyWeaponSpeedModifier(item);
         }
@@ -199,6 +200,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             currentItemTransform.SetParent(null);
             currentItemTransform.SetPositionAndRotation(itemPosition, itemRotation);
 
+            CurrentItem.RestoreOriginalScale();
             CurrentItem.SetPhysicsState();
 
             EquipItem(item);
@@ -210,6 +212,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                 return;
 
             CurrentItem.transform.SetParent(null);
+            CurrentItem.RestoreOriginalScale();
             CurrentItem.SetPhysicsState();
 
             CurrentItem = null;
@@ -221,7 +224,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
         public void ClearCurrentItem()
         {
             if (CurrentItem != null)
+            {
+                CurrentItem.RestoreOriginalScale();
                 CurrentItem.SetPhysicsState();
+            }
 
             CurrentItem = null;
             CurrentGrabObject = null;
@@ -253,6 +259,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                 if (!station.TryAttachNozzle(nozzle))
                     return false;
 
+                CurrentItem.RestoreOriginalScale();
                 CurrentItem = null;
                 CurrentGrabObject = null;
                 ResetWeaponSpeedModifier();
@@ -266,6 +273,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             if (!partDetacher.TryAttachWheel(CurrentItem, _player.Camera.CameraTrans))
                 return false;
 
+            CurrentItem.RestoreOriginalScale();
             CurrentItem = null;
             CurrentGrabObject = null;
             ResetWeaponSpeedModifier();
