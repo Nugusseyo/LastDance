@@ -190,7 +190,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return;
             }
 
-            reviewChannel.RaiseEvent(UIEvents.ReviewEvent.IncreaseValue(amount, type));
+            reviewChannel.RaiseEvent(UIEvents.ReviewEvent.Review(amount, type));
         }
     }
 }
