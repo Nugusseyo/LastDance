@@ -51,7 +51,7 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
                     humanDBs.Add(data.type, new List<(int, HumanData)>());              //List가 존재하지 않아 새로 만든다.
                     humanDBs[data.type].Add((data.index, data));                        //데이터를 안에 넣어준다.
                 }
-                Debug.Log($"Added Data : {data.type}, {data.index}, {data.contents1}");
+                //Debug.Log($"Added Data : {data.type}, {data.index}, {data.contents1}");
             }
         }
 

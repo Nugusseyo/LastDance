@@ -36,6 +36,7 @@ namespace _Works.JYG._Scripts.Data_Container.Money
                 _scrapItem = block.GetUpgradeStoreItem();
             }
         }
+
         private void OnDestroy()
         {
             if (eventChannel != null)

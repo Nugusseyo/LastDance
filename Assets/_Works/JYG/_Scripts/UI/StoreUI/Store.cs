@@ -12,6 +12,7 @@ namespace _Works.JYG._Scripts.UI.StoreUI
     public class Store : MonoBehaviour
     {
         [SerializeField] private EventChannelSO eventChannel;
+        [SerializeField] private EventChannelSO upgradeEventChannel;
          [SerializeField] private IntegerDataContainer moneyManager;
          
          [SerializeField] private Transform upgradeContentParent;    //업그레이드 블럭을 만들 때, 부모가 될 대상이다.
@@ -67,6 +68,7 @@ namespace _Works.JYG._Scripts.UI.StoreUI
                      if (targetIdx != -1) itemList[targetIdx] = data;
 
                      block.UpgradeRequest(data, true);
+                     upgradeEventChannel.RaiseEvent(UpgradeEvent.UpgradeItem.Init(data.index, data));
                  }
              }
          }
@@ -161,6 +163,8 @@ namespace _Works.JYG._Scripts.UI.StoreUI
              itemList[listIdx] = upgradeItem;
              moneyManager.Value -= curItem.price;
              block.UpgradeRequest(upgradeItem, false);
+             if(upgradeEventChannel != null)
+                upgradeEventChannel.RaiseEvent(UpgradeEvent.UpgradeItem.Init(index, upgradeItem));
          }
          private bool CanUpgradeItem(StoreItem item) => moneyManager.Value >= item.price && item.maxlevel > item.curLevel;
 

@@ -101,3 +101,4 @@ MonoBehaviour:
     m_Bits: 262144
   fuelDuration: 5
   durationChannel: {fileID: 11400000, guid: c6dff33bcde9eda42a4d11c78f80c7ab, type: 2}
+  upgradeChannel: {fileID: 11400000, guid: 235701934ee346f42adc444787d22a25, type: 2}

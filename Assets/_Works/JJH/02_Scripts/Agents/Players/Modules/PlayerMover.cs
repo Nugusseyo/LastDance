@@ -2,6 +2,7 @@
 using _Works.JYG._Scripts.Events;
 using _Works.KDH._01.Scripts.ItemType;
 using DevLib.EventChannelSystem;
+using DevLib.SoundSystem;
 using System;
 using UnityEngine;
 
@@ -18,6 +19,11 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
         [SerializeField] private EventChannelSO uiChannel;
         [SerializeField] private EventChannelSO itemEffectChannel;
 
+        [Header("Sound")]
+        [SerializeField] private EventChannelSO soundChannel;
+        [SerializeField] private SoundClipSo runSoundClip;
+        [SerializeField] private int runSoundChannelNumber = 10;
+
         public float Stamina
         {
             get { return stamina; }
@@ -30,6 +36,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
         public bool CanRun => stamina > 0f && _sprintReleased;
 
         private bool _sprintReleased = true;
+        private bool _isRunSoundPlaying = false;
 
         private float _speedMultiplier = 1f;
         private float _speedBoostTimer;
@@ -80,13 +87,19 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
         public void UpdateSprintState(bool isSprinting)
         {
             if (!isSprinting)
+            {
                 _sprintReleased = true;
+                StopRunSound();
+            }
         }
 
         public override void Run(Vector3 direction)
         {
             if (!CanRun)
+            {
+                StopRunSound();
                 return;
+            }
 
             ConsumeStamina();
 
@@ -94,10 +107,12 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
             {
                 Stamina = 0f;
                 _sprintReleased = false;
+                StopRunSound();
                 return;
             }
 
             base.Run(direction);
+            PlayRunSound();
         }
 
         public void RecoverStamina()
@@ -105,5 +120,27 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
 
         private void ConsumeStamina()
             => Stamina = Mathf.Clamp01(stamina - staminaDrainRate * Time.deltaTime);
+
+        private void PlayRunSound()
+        {
+            if (_isRunSoundPlaying || runSoundClip == null)
+                return;
+
+
+            soundChannel.RaiseEvent(SoundEvents.PlaySoundEvent.Init(transform.position, runSoundClip,
+                                                                                                            runSoundChannelNumber, transform));
+
+            _isRunSoundPlaying = true;
+        }
+
+        private void StopRunSound()
+        {
+            if (!_isRunSoundPlaying)
+                return;
+
+            soundChannel.RaiseEvent(SoundEvents.StopSoundEvent.Init(runSoundChannelNumber));
+
+            _isRunSoundPlaying = false;
+        }
     }
 }

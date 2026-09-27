@@ -1706,6 +1706,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.StoreUI.Store
   eventChannel: {fileID: 11400000, guid: 01ba2cac045ca0441ac68c1592a25d57, type: 2}
+  upgradeEventChannel: {fileID: 11400000, guid: 235701934ee346f42adc444787d22a25, type: 2}
   moneyManager: {fileID: 11400000, guid: e2d9677edeb7e28419dd3296b34645f6, type: 2}
   upgradeContentParent: {fileID: 6357726610246223432}
   upgradeBlock: {fileID: 2531731542846607908, guid: c3a7937fc12249a49bd63d6790b0c479, type: 3}

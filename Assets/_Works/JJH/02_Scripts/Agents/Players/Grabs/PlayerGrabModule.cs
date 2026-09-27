@@ -2,7 +2,9 @@
 using _Works.JJH._02_Scripts.Objects;
 using _Works.KDH._01.Scripts.Car;
 using _Works.KDH._01.Scripts.Wrench;
+using DevLib.EventChannelSystem;
 using DevLib.ModuleSystem;
+using DevLib.SoundSystem;
 using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
@@ -25,6 +27,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
         [Header("Fuel")]
         [SerializeField] private FuelInjector fuelInjector;
+
+        [Header("Sound")]
+        [SerializeField] private EventChannelSO soundChannel;
+        [SerializeField] private SoundClipSo drinkSfx;
 
         private Player _player;
 
@@ -52,6 +58,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                 return;
 
             CurrentItem.UseItem();
+
+            soundChannel.RaiseEvent(SoundEvents.PlaySoundEvent.Init(transform.position, drinkSfx, 0, null));
         }
 
         public void PickupItem()
