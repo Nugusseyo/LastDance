@@ -47,4 +47,6 @@ MonoBehaviour:
   idleHash: {fileID: 11400000, guid: 52427c781a7a85e42ae271f9ce99e467, type: 2}
   moveHash: {fileID: 11400000, guid: e5ed06aa4fc6161459132af56b0b1ddc, type: 2}
   runHash: {fileID: 11400000, guid: 8491754b775b6754db95a4921d4178c5, type: 2}
+  grabHash: {fileID: 0}
+  useHash: {fileID: 11400000, guid: 61aab571c84a7f641b2575b034497a5c, type: 2}
   attackHash: {fileID: 11400000, guid: de06a7c5cd6a2e4418a4024e1a19936c, type: 2}

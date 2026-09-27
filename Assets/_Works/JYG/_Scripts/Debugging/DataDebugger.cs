@@ -12,8 +12,12 @@ namespace _Works.JYG._Scripts.Debugging
         {
             if (Keyboard.current.spaceKey.wasPressedThisFrame)
             {
-                dataContainer.Value++;
-                Debug.Log(dataContainer.Value);
+                dataContainer.Value += 1000;
+            }
+            
+            if (Keyboard.current.enterKey.wasPressedThisFrame)
+            {
+                dataContainer.Value -= 1000;
             }
         }
     }

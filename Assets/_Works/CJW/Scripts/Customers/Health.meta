@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/_Works/CJW/Scripts/Customers/Health.meta
 guid: 419822ba51d07364290b645ed369ae8e
+========
+guid: 72589719770b04ead999af902c0459f8
+>>>>>>>> Base:Assets/AllSkyFree.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
