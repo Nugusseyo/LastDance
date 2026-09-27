@@ -55,6 +55,7 @@ namespace _Works.JYG.Data.Vending_Machine
             if (eventChannelSO != null)
             {
                 eventChannelSO.RaiseEvent(VendingEvents.VendingSelectDropEvent.Init(_vendingItem));
+                Debug.Log(_vendingItem.ItemName);
             }
         }
 
