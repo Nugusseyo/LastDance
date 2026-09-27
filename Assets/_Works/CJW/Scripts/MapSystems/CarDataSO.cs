@@ -40,6 +40,11 @@ namespace _Works.CJW.Scripts.MapSystems
         [Header("판매")]
         [SerializeField] private int price;
 
+        [Header("주유")]
+        [Tooltip("이 차에 주유를 해 줬을 때의 정가. 손님의 지불 배율(CustomerDataSO.fuelPayRate)을 곱해 RefuelingEvent로 보내고, " +
+                 "평판·상점 보너스는 MoneyManager가 곱한다.")]
+        [SerializeField, Min(0)] private int fuelPrice = 50;
+
         public PoolItemSO PoolItem => poolItem;
         public bool RandomVisual => randomVisual;
 
@@ -51,6 +56,7 @@ namespace _Works.CJW.Scripts.MapSystems
         public float SpawnWeight => spawnWeight;
         public CarGrade Grade => grade;
         public int Price => price;
+        public int FuelPrice => fuelPrice;
 
         /// <summary>비어 있으면 null을 돌려준다. 호출한 쪽이 기본 목록으로 넘어가면 된다.</summary>
         public CustomerDataSO[] Customers => customers != null && customers.Length > 0 ? customers : null;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using _Works.CJW.Scripts.Cars;
 using _Works.CJW.Scripts.Customers;
 using _Works.CJW.Scripts.Customers.Health;
 using _Works.CJW.Scripts.Customers.Visit;
@@ -27,7 +28,7 @@ namespace _Works.CJW.Scripts.Test.Editor
         private const float LightDamage = 10f;
         private const float HitForce = 6f;
 
-        private enum Step { FirstHit, HitAnim, Kill, CheckDead, WaitDespawn, WaitVisit, Done }
+        private enum Step { FirstHit, HitAnim, Kill, CheckDead, WaitDespawn, WaitVisit, CheckCarStays, Done }
 
         private sealed class Target
         {
@@ -42,6 +43,17 @@ namespace _Works.CJW.Scripts.Test.Editor
             public bool VisitCompleted;
             public float DiedAt;
             public Vector3 AttackerPos;
+            public Car Car;
+            public Vector3 CarPosAtDeath;
+            public int CompanionsAtDeath;
+
+            /// <summary>일행까지 모두 죽여, 탄 사람이 모두 죽은 차가 제자리에 남는지 본다. 두 번째 대상만 켠다.</summary>
+            public bool KillAll;
+
+            /// <summary>주유를 받기 전에 죽은 주유 손님인지. 남은 일행이 곧장 출발해야 한다.</summary>
+            public bool DiedWaitingFuel;
+            public float DepartAt = -1f;
+            public System.Action<VisitPhase> OnPhase;
             public System.Action<HitInfo> OnDamaged;
             public System.Action<HitInfo> OnDied;
             public System.Action<VisitSession> OnVisitCompleted;
@@ -163,6 +175,14 @@ namespace _Works.CJW.Scripts.Test.Editor
                     continue;
                 }
 
+                // 첫 대상은 일행이 있는 주유 손님을 고른다. 주유 손님이 죽으면 남은 일행이 곧장 떠나는지 보기 위해서다.
+                // 한참 안 나오면 아무나 고른다.
+                if (Targets.Count == 0 && Time.time - _startTime < 240f &&
+                    !(c.Fsm != null && c.Fsm.WantsFuel && c.Session.Customers.Count > 1))
+                {
+                    continue;
+                }
+
                 var t = new Target
                 {
                     Customer = c,
@@ -170,15 +190,35 @@ namespace _Works.CJW.Scripts.Test.Editor
                     Session = c.Session,
                     Name = $"{c.name}#{c.GetInstanceID()}",
                     Step = Step.FirstHit,
+                    KillAll = Targets.Count == 1,
+                    Car = c.Session.Car,
                     NextAt = Time.time + 1f,
                 };
 
                 t.OnDamaged = _ => t.DamagedCount++;
-                t.OnDied = _ => { t.DiedCount++; t.DiedAt = Time.time; };
+                // 혼자 탄 손님은 죽은 다음 틱에 방문이 닫혀 세션이 비워진다. 남은 일행·차 위치는 죽는 그 순간에 적는다.
+                t.OnDied = _ =>
+                {
+                    t.DiedCount++;
+                    t.DiedAt = Time.time;
+                    t.CompanionsAtDeath = t.Session.Customers.Count;
+                    t.CarPosAtDeath = t.Car != null ? t.Car.transform.position : Vector3.zero;
+                    t.DiedWaitingFuel = c.Fsm != null && c.Fsm.WantsFuel && t.CompanionsAtDeath > 0;
+                };
                 t.OnVisitCompleted = _ => t.VisitCompleted = true;
                 t.Health.Damaged += t.OnDamaged;
                 t.Health.Died += t.OnDied;
                 t.Session.Completed += t.OnVisitCompleted;
+
+                // 출발(탑승 시작) 시각. 시체가 사라지기 전에 떠날 수 있어 단계가 바뀌는 순간에 적는다.
+                t.OnPhase = phase =>
+                {
+                    if (t.DiedAt > 0f && t.DepartAt < 0f && phase is VisitPhase.Boarding or VisitPhase.Leaving)
+                    {
+                        t.DepartAt = Time.time;
+                    }
+                };
+                t.Session.OnStateChanged += t.OnPhase;
 
                 Targets.Add(t);
                 Write($"대상 {t.Name}: 체력 {t.Health.CurrentHealth}/{t.Health.MaxHealth}, 방문 단계 {t.Session.Phase}");
@@ -213,6 +253,11 @@ namespace _Works.CJW.Scripts.Test.Editor
             ICustomerHealth h = t.Health;
             GameObject attacker = null;
             Vector3 dir = t.Customer.transform.forward * -1f;
+
+            if (t.KillAll && t.Step is Step.WaitDespawn or Step.WaitVisit)
+            {
+                KillCompanions(t);
+            }
 
             switch (t.Step)
             {
@@ -286,6 +331,8 @@ namespace _Works.CJW.Scripts.Test.Editor
                     AbstractCustomer c = t.Customer;
                     Check(h.CurrentHealth <= 0f && t.DiedCount == 1, $"{t.Name} 죽음: 체력 {h.CurrentHealth}, Died {t.DiedCount}회");
                     Check(c.IsKnockedDown, $"{t.Name} 래그돌로 쓰러짐: IsKnockedDown={c.IsKnockedDown}");
+                    Write($"{t.Name} 죽을 때 남은 일행 {t.CompanionsAtDeath}명");
+
                     Check(c.Session == null && !t.Session.Customers.Contains(c),
                           $"{t.Name} 방문에서 빠짐: Session={(c.Session == null ? "null" : "남음")}, 목록에 {(t.Session.Customers.Contains(c) ? "있음" : "없음")}");
 
@@ -320,11 +367,108 @@ namespace _Works.CJW.Scripts.Test.Editor
                         return;
                     }
 
+                    if (t.DiedWaitingFuel)
+                    {
+                        float departDelay = t.DepartAt >= 0f ? t.DepartAt - t.DiedAt : float.MaxValue;
+                        Check(departDelay < 8f, $"{t.Name} 주유 손님이 죽자 남은 일행이 곧장 출발: 죽고 {departDelay:F1}초 뒤 탑승 시작");
+                    }
+
                     Check(true, $"{t.Name}이(가) 타고 온 차의 방문이 끝까지 감(죽고 {now - t.DiedAt:F0}초 뒤 완료)");
+
+                    // 탄 사람이 모두 죽은 차는 자리에 남고, 일행이 남은 차는 평소대로 떠난다. 몇 초 뒤에 본다.
+                    t.Step = Step.CheckCarStays;
+                    t.NextAt = now + 5f;
+                    return;
+
+                case Step.CheckCarStays:
+                {
+                    bool listed = IsAbandoned(t.Car);
+                    bool present = t.Car != null && t.Car.gameObject.activeInHierarchy;
+                    float moved = present ? Vector3.Distance(t.Car.transform.position, t.CarPosAtDeath) : -1f;
+
+                    if (t.CompanionsAtDeath == 0)
+                    {
+                        Check(listed && present && moved < 0.5f,
+                              $"{t.Name} 혼자 탄 차는 제자리에 남음: 버려진 차 목록 {listed}, 활성 {present}, 움직인 거리 {moved:F2}m");
+
+                        CheckRemoveApi(t);
+                    }
+                    else
+                    {
+                        Check(!listed && (!present || moved > 3f),
+                              $"{t.Name} 일행이 남은 차는 떠남: 버려진 차 목록 {listed}, 활성 {present}, 움직인 거리 {moved:F2}m");
+                    }
+
                     Cleanup(t);
                     t.Step = Step.Done;
                     return;
+                }
             }
+        }
+
+        /// <summary>대상이 죽은 뒤 같은 차의 남은 일행을 맞을 수 있을 때마다 쓰러뜨린다. 모두 죽으면 그때 차 위치를 기준으로 삼는다.</summary>
+        private static void KillCompanions(Target t)
+        {
+            if (t.VisitCompleted || t.CompanionsAtDeath == 0)
+            {
+                return;
+            }
+
+            foreach (AbstractCustomer other in t.Session.Customers.ToList())
+            {
+                if (other.Health != null && other.Health.CanBeHit)
+                {
+                    other.Health.TakeHit(new HitInfo(9999f, other.transform.forward));
+                    Write($"{t.Name}의 일행 {other.name} 쓰러뜨림");
+                }
+            }
+
+            if (t.Session.Customers.Count == 0)
+            {
+                t.CompanionsAtDeath = 0;
+                t.CarPosAtDeath = t.Car != null ? t.Car.transform.position : Vector3.zero;
+                Write($"{t.Name}의 차에 탄 사람이 모두 죽음, 방문 단계 {t.Session.Phase}");
+            }
+        }
+
+        /// <summary>팀원이 쓰는 치우기 API(IRemovableCar)를 확인한다. 콜라이더에서 찾아 치우면 풀로 돌아가고 목록에서 빠져야 한다.
+        /// 방문 중인 차는 치울 수 없어야 한다.</summary>
+        private static void CheckRemoveApi(Target t)
+        {
+            Car busy = Object.FindObjectsByType<Car>(FindObjectsSortMode.None).FirstOrDefault(c => c != t.Car && !IsAbandoned(c));
+            if (busy != null)
+            {
+                Check(!busy.CanRemove && !busy.Remove() && busy.gameObject.activeInHierarchy,
+                      $"방문 중인 차({busy.name})는 치울 수 없음: CanRemove={busy.CanRemove}");
+            }
+
+            Collider body = t.Car != null ? t.Car.GetComponentInChildren<Collider>() : null;
+            _Works.Shared.Cars.IRemovableCar removable = body != null ? body.GetComponentInParent<_Works.Shared.Cars.IRemovableCar>() : null;
+            bool canRemove = removable != null && removable.CanRemove;
+            bool removed = canRemove && removable.Remove();
+
+            Check(canRemove && removed && !t.Car.gameObject.activeInHierarchy && !IsAbandoned(t.Car) && !t.Car.CanRemove,
+                  $"{t.Name}의 버려진 차를 콜라이더({(body != null ? body.name : "없음")})로 찾아 치움: CanRemove {canRemove}, Remove {removed}, " +
+                  $"활성 {t.Car.gameObject.activeInHierarchy}, 목록에 {IsAbandoned(t.Car)}, 치운 뒤 CanRemove {t.Car.CanRemove}");
+        }
+
+        private static bool IsAbandoned(Car car)
+        {
+            var director = Object.FindAnyObjectByType<_Works.CJW.Scripts.Customers.Visit.VisitDirector>();
+            if (director == null || car == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < director.AbandonedCarCount; i++)
+            {
+                if (director.TryGetAbandonedCar(i, out Car abandoned) && abandoned == car)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void Cleanup(Target t)
@@ -338,6 +482,7 @@ namespace _Works.CJW.Scripts.Test.Editor
             if (t.Session != null)
             {
                 t.Session.Completed -= t.OnVisitCompleted;
+                t.Session.OnStateChanged -= t.OnPhase;
             }
         }
 
