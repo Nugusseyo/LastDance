@@ -50,7 +50,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed4364597779cca469fc692033ac2ce3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.ItemType.ColaEffect
-  rating: {fileID: 11400000, guid: 15c969aeb15147e4b82d949cb0989643, type: 2}
+  itemSO: {fileID: 0}
 --- !u!114 &5025176050713597576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -242,7 +242,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 4875907273765177850, guid: 4bf39f506b1d5ee4caf537ccfe018a7c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4bf39f506b1d5ee4caf537ccfe018a7c, type: 3}
