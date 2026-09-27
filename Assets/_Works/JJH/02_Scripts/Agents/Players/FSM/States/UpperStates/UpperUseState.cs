@@ -22,7 +22,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.UpperStates
         {
             _useTimer += Time.deltaTime;
 
-            if (_useTimer >= 1f)
+            if (_useTimer >= 3.6f)
             {
                 StateMachine.ChangeState<UpperIdleState>();
             }

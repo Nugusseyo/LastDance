@@ -1,6 +1,7 @@
 ﻿using _Works.JJH._02_Scripts.Objects;
 using _Works.JYG._Scripts.Events;
 using DevLib.EventChannelSystem;
+using DevLib.SoundSystem;
 using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
@@ -16,12 +17,18 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
         [Header("Duration / UI")]
         [SerializeField] private EventChannelSO durationChannel;
 
+        [Header("Sound")]
+        [SerializeField] private EventChannelSO soundChannel;
+        [SerializeField] private SoundClipSo fuelingSfx;
+        [SerializeField] private int fuelSoundChannelNumber = 20;
+
         public LayerMask FuelDoorLayerMask => fuelDoorLayerMask;
         public bool IsFueling => _currentDoor != null;
 
         private FuelDoor _currentDoor;
         private float _holdTime;
         private bool _progressShown;
+        private bool _isFuelSoundPlaying;
 
         public bool TryStartFueling(FuelDoor door)
         {
@@ -38,6 +45,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             _holdTime = 0f;
 
             _currentDoor.NotifyFuelingStarted();
+            PlayFuelSound(door.transform);
 
             return true;
         }
@@ -56,7 +64,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                 CompleteFueling();
         }
 
-        /// <summary>게이지가 다 찼다. 주유구에 완료를 알리고 주유를 끝낸다.</summary>
         private void CompleteFueling()
         {
             FuelDoor door = _currentDoor;
@@ -65,6 +72,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             _holdTime = 0f;
 
             HideProgress();
+            StopFuelSound();
 
             door.NotifyFuelingCompleted();
         }
@@ -80,6 +88,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             _holdTime = 0f;
 
             HideProgress();
+            StopFuelSound();
 
             door.NotifyFuelingEnded();
         }
@@ -97,6 +106,25 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             _progressShown = false;
             if (durationChannel == null) return;
             durationChannel.RaiseEvent(UIEvents.DurationEvent.Init(1f, 1f));
+        }
+
+        private void PlayFuelSound(Transform doorTransform)
+        {
+            if (_isFuelSoundPlaying || soundChannel == null || fuelingSfx == null)
+                return;
+
+            soundChannel.RaiseEvent(SoundEvents.PlaySoundEvent.Init(doorTransform.position, fuelingSfx,
+                                                                                                            fuelSoundChannelNumber, doorTransform));
+            _isFuelSoundPlaying = true;
+        }
+
+        private void StopFuelSound()
+        {
+            if (!_isFuelSoundPlaying || soundChannel == null)
+                return;
+
+            soundChannel.RaiseEvent(SoundEvents.StopSoundEvent.Init(fuelSoundChannelNumber));
+            _isFuelSoundPlaying = false;
         }
     }
 }
