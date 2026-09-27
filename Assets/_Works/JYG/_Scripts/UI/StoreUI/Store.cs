@@ -160,7 +160,10 @@ namespace _Works.JYG._Scripts.UI.StoreUI
              block.UpgradeRequest(upgradeItem, false);
          }
          private bool CanUpgradeItem(StoreItem item) => moneyManager.Value >= item.price && item.maxlevel > item.curLevel;
-        
+
+         public UpgradeBlock GetStoreItemWithIndex(int index)
+             => upgradeDict.GetValueOrDefault(index);
+
     }
 
     [Serializable]

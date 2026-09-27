@@ -7,5 +7,6 @@ namespace _Works.JJH._02_Scripts.Items
     {
         [field: SerializeField] public int Damage { get; private set; }
         [field: SerializeField] public float AttackCooltime { get; private set; }
+        [field: SerializeField] public float MoveSpeedMultiplier { get; private set; }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using _Works.JYG._Scripts.Data_Container.Money;
 using _Works.JYG._Scripts.Events;
+using _Works.JYG._Scripts.UI.Setting;
 using DevLib.EventChannelSystem;
 using Resources.DataBase.Review_Data;
 using UnityEngine;
@@ -14,13 +15,20 @@ namespace _Works.JYG._Scripts.GameModule
         [SerializeField] private IntegerDataContainer reviewContainer;
         [SerializeField] private float increasePercentage = 0.5f;
         [SerializeField] private EventChannelSO eventChannel;
+        [SerializeField] private SettingSO setting;
 
         private float _accumulatedValue = 0f;
         private Coroutine _reviewCoroutine;
 
-        public UnityEvent<int, int, ReviewType> OnValueChanged; //FirstValue : newValue, lastValue : OldValue
+        public UnityEvent<ReviewType, int> OnValueChanged; //lastValue : index
 
         private bool _isDestroy = false;
+
+        [Header("ReviewValue")]
+        [SerializeField] private int resGood = 5;
+
+        [SerializeField] private int resBad = -3;
+        [SerializeField] private int resLate = -1;
 
         private void Awake()
         {
@@ -80,8 +88,19 @@ namespace _Works.JYG._Scripts.GameModule
         {
             if (reviewContainer == null) return;
             
-            OnValueChanged?.Invoke(reviewContainer.Value + evt.PlusValue, reviewContainer.Value, evt.ReviewType);
-            reviewContainer.Value += evt.PlusValue;
+            bool canAlarm = !(evt.ReviewType == ReviewType.Good && setting.isAlarmBanned);
+            
+            if(canAlarm)
+                OnValueChanged?.Invoke(evt.ReviewType, evt.Index);
+            
+            
+            reviewContainer.Value += evt.ReviewType switch
+            {
+                ReviewType.Good => resGood,
+                ReviewType.Bad => resBad,
+                ReviewType.Late => resLate,
+                _ => 0
+            };
         }
         
         #if UNITY_EDITOR
@@ -91,7 +110,7 @@ namespace _Works.JYG._Scripts.GameModule
         {
             if (eventChannel != null)
             {
-                eventChannel.RaiseEvent(UIEvents.ReviewEvent.IncreaseValue(10, ReviewType.Good));
+                eventChannel.RaiseEvent(UIEvents.ReviewEvent.Review(1, ReviewType.Good));
             }
         }
 
@@ -100,7 +119,7 @@ namespace _Works.JYG._Scripts.GameModule
         {
             if (eventChannel != null)
             {
-                eventChannel.RaiseEvent(UIEvents.ReviewEvent.IncreaseValue(-10, ReviewType.Bad));
+                eventChannel.RaiseEvent(UIEvents.ReviewEvent.Review(1, ReviewType.Bad));
             }
         }
             

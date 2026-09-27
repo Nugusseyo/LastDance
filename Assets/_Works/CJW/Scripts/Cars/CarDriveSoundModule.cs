@@ -62,8 +62,16 @@ namespace _Works.CJW.Scripts.Cars
             velocity.y = 0f;
             float speed = velocity.magnitude;
 
-            if (!_sound.IsLooping)
+            // 반복 소리는 차마다 하나다. 주유 소리처럼 다른 모듈이 튼 소리는 건드리지 않는다.
+            bool playing = _sound.CurrentLoop == driveSound;
+
+            if (!playing)
             {
+                if (_sound.IsLooping)
+                {
+                    return;
+                }
+
                 if (speed >= startSpeed)
                 {
                     _stoppedFor = 0f;

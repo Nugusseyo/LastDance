@@ -13035,6 +13035,7 @@ GameObject:
   m_Component:
   - component: {fileID: 963976083}
   - component: {fileID: 963976082}
+  - component: {fileID: 963976084}
   m_Layer: 0
   m_Name: VisitDirector
   m_TagString: Untagged
@@ -13068,6 +13069,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9d99663fa0655ca439c405ce3b044278, type: 2}
   - {fileID: 11400000, guid: a160ae9a9e93ffe47a029b91058ff188, type: 2}
   - {fileID: 11400000, guid: a096b2e040d99b74d92a59e5ff5d3e36, type: 2}
+  reputation: {fileID: 11400000, guid: 15c969aeb15147e4b82d949cb0989643, type: 2}
+  carGradeTable: {fileID: 11400000, guid: 3ae93d16ce39f9545a8bf1f154be5155, type: 2}
   defaultCustomerDataList:
   - {fileID: 11400000, guid: 609eda10c670162498209c4498d480ab, type: 2}
   - {fileID: 11400000, guid: fcfc26551792c7040927fc47e04d859d, type: 2}
@@ -13076,6 +13079,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b74294e87b10cac45b8fa6d51edcdb29, type: 2}
   - {fileID: 11400000, guid: 2f0e85eec0836564a913045f49628f89, type: 2}
   - {fileID: 11400000, guid: 1f7d6bcd2df198f44a77fca89a962fb4, type: 2}
+  fuelCustomerChance: 0.7
   spawnPoint: {fileID: 652173342}
   shopPoint: {fileID: 1226028539}
   exitPoint: {fileID: 885458535}
@@ -13106,6 +13110,25 @@ Transform:
   - {fileID: 885458535}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &963976084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963976081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 022823f8045391b469e844221837ba91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Visit.VisitReputationReporter
+  visitDirector: {fileID: 963976082}
+  reviewChannel: {fileID: 11400000, guid: 5ca454320a311264a830e271fd884517, type: 2}
+  fueled: 2
+  fuelLate: -1
+  badDefeated: 5
+  badMissed: -3
+  goodHit: -3
 --- !u!1001 &965182337
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15452,6 +15475,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7289878340555720972, guid: bda339a6352bc964793845848649cd45, type: 3}
   m_PrefabInstance: {fileID: 1103710927}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1105613130
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1105613132}
+  - component: {fileID: 1105613131}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1105613131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1105613130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83cad76b2e8942679036abd5e9e36fc7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SoundSystem_Assembly::DevLib.SoundSystem.SoundManager
+  poolManager: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
+  soundItem: {fileID: 11400000, guid: 3234f2be15619cd49941ae425682c64b, type: 2}
+  <SoundChannel>k__BackingField: {fileID: 11400000, guid: fa8239ba7d936984d851fe904b2da6cc, type: 2}
+--- !u!4 &1105613132
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1105613130}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1108650042
 GameObject:
   m_ObjectHideFlags: 0
@@ -34075,3 +34145,4 @@ SceneRoots:
   - {fileID: 2131473176}
   - {fileID: 455735994}
   - {fileID: 314747655}
+  - {fileID: 1105613132}

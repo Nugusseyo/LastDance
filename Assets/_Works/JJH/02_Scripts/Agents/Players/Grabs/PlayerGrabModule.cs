@@ -28,19 +28,36 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
         private Player _player;
 
+        private float _currentWeaponSpeedMultiplier = 1f;
+
         public override void Initialize(ModuleOwner owner)
         {
             base.Initialize(owner);
             _player = (Player)owner;
         }
 
+        // F키를 누르고 있는 동안 부품 분리·주유 게이지를 진행시킨다. 부르는 곳이 없으면 시작만 되고 게이지가 멈춰 있다.
+        private void Update()
+        {
+            if (_player == null)
+                return;
+
+            UpdateDetachHold();
+            UpdateFuelHold();
+        }
+
         public void UseItem()
         {
+            if (CurrentItem == null)
+                return;
+
             CurrentItem.UseItem();
         }
 
         public void PickupItem()
         {
+            bool holdingWrench = CurrentGrabObject != null && CurrentGrabObject.GetComponent<WrenchTool>() != null;
+
             if (CurrentGrabObject != null)
             {
                 if (CurrentItem is FuelNozzle && fuelInjector != null
@@ -53,11 +70,40 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                         return;
                 }
 
+                if (holdingWrench && partDetacher != null
+                  && _player.Sensor.FindItem(_player.Camera.CameraTrans, partDetacher.PartLayerMask,
+                                                                  pickupDistance, out Collider wrenchPartCollider))
+                {
+                    GrabItem wrenchTargetPart = wrenchPartCollider.GetComponent<GrabItem>();
+
+                    if (wrenchTargetPart != null)
+                    {
+                        partDetacher.TryDetachPart(wrenchTargetPart);
+                        return;
+                    }
+                }
+
                 if (AttachCurrentItem())
                     return;
 
                 DropItem();
                 return;
+            }
+
+            // 주유구는 뒷바퀴 바로 위라 바퀴(부품)와 겹친다. 두 레이어를 한 번에 쏴서 실제로 조준한 쪽을 고른다.
+            LayerMask fuelDoorMask = fuelInjector != null ? fuelInjector.FuelDoorLayerMask : (LayerMask)0;
+            if (fuelInjector != null && partDetacher != null
+              && _player.Sensor.FindItem(_player.Camera.CameraTrans, partDetacher.PartLayerMask | fuelDoorMask,
+                                                              pickupDistance, out Collider aimedCollider)
+              && (fuelDoorMask.value & (1 << aimedCollider.gameObject.layer)) != 0)
+            {
+                FuelDoor aimedDoor = aimedCollider.GetComponent<FuelDoor>();
+
+                if (aimedDoor != null)
+                {
+                    fuelInjector.TryStartFueling(aimedDoor);
+                    return;
+                }
             }
 
             if (partDetacher != null
@@ -131,6 +177,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
             CurrentGrabObject.transform.SetParent(weaponHoldPoint, true);
             CurrentGrabObject.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+            ApplyWeaponSpeedModifier(item);
         }
 
         public void SwapItem(GrabItem item)
@@ -166,6 +214,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
             CurrentItem = null;
             CurrentGrabObject = null;
+
+            ResetWeaponSpeedModifier();
         }
 
         public void ClearCurrentItem()
@@ -175,6 +225,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
             CurrentItem = null;
             CurrentGrabObject = null;
+
+            ResetWeaponSpeedModifier();
         }
 
         public bool AttachCurrentItem()
@@ -203,6 +255,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
                 CurrentItem = null;
                 CurrentGrabObject = null;
+                ResetWeaponSpeedModifier();
 
                 return true;
             }
@@ -215,6 +268,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
             CurrentItem = null;
             CurrentGrabObject = null;
+            ResetWeaponSpeedModifier();
 
             return true;
         }
@@ -234,6 +288,16 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             if (partDetacher == null || !partDetacher.IsDetaching)
                 return;
 
+            WrenchTool wrench = CurrentGrabObject != null
+                                                ? CurrentGrabObject.GetComponent<WrenchTool>()
+                                                : null;
+
+            if (CurrentGrabObject != null && wrench == null)
+            {
+                partDetacher.CancelDetach();
+                return;
+            }
+
             bool holding = _player.PlayerInput != null && _player.PlayerInput.IsInteractHeld;
 
             if (!holding)
@@ -241,10 +305,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                 partDetacher.CancelDetach();
                 return;
             }
-
-            WrenchTool wrench = CurrentGrabObject != null
-                                                ? CurrentGrabObject.GetComponent<WrenchTool>()
-                                                : null;
 
             partDetacher.TickDetach(Time.deltaTime, wrench);
         }
@@ -263,6 +323,35 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             }
 
             fuelInjector.TickFueling(Time.deltaTime);
+        }
+
+        private void ApplyWeaponSpeedModifier(GrabItem item)
+        {
+            if (_player.Mover == null)
+                return;
+
+            float multiplier = item.CurrentItemData is WeaponItemSO weaponData && weaponData.MoveSpeedMultiplier > 0f
+                                        ? weaponData.MoveSpeedMultiplier
+                                        : 1f;
+
+            if (Mathf.Approximately(multiplier, _currentWeaponSpeedMultiplier))
+                return;
+
+            _player.Mover.MoveSpeed = _player.Mover.MoveSpeed / _currentWeaponSpeedMultiplier * multiplier;
+            _player.Mover.RunSpeed = _player.Mover.RunSpeed / _currentWeaponSpeedMultiplier * multiplier;
+
+            _currentWeaponSpeedMultiplier = multiplier;
+        }
+
+        private void ResetWeaponSpeedModifier()
+        {
+            if (_player.Mover == null || Mathf.Approximately(_currentWeaponSpeedMultiplier, 1f))
+                return;
+
+            _player.Mover.MoveSpeed /= _currentWeaponSpeedMultiplier;
+            _player.Mover.RunSpeed /= _currentWeaponSpeedMultiplier;
+
+            _currentWeaponSpeedMultiplier = 1f;
         }
     }
 }

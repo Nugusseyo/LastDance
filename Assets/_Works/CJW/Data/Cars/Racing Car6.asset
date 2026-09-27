@@ -17,10 +17,11 @@ MonoBehaviour:
   moveSpeed: 6
   arriveThreshold: 0.5
   customers: []
-  bodyColors: []
   stateOverrides: []
+  grade: 3
   spawnWeight: 1
   maxConcurrent: 0
+  price: 0
   references:
     version: 2
     RefIds: []

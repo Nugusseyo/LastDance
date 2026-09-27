@@ -48,8 +48,25 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                 return;
 
             _holdTime = Mathf.Min(_holdTime + deltaTime, fuelDuration);
+            Debug.Log("<color=green> 주유중 </color>");
 
             ShowProgress(_holdTime, fuelDuration);
+
+            if (_holdTime >= fuelDuration)
+                CompleteFueling();
+        }
+
+        /// <summary>게이지가 다 찼다. 주유구에 완료를 알리고 주유를 끝낸다.</summary>
+        private void CompleteFueling()
+        {
+            FuelDoor door = _currentDoor;
+
+            _currentDoor = null;
+            _holdTime = 0f;
+
+            HideProgress();
+
+            door.NotifyFuelingCompleted();
         }
 
         public void CancelFueling()

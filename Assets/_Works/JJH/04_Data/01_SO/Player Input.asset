@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28e9cede2c728c842a6a23555eb52fd8, type: 3}
   m_Name: Player Input
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.PlayerInputSO
+  uiInputSO: {fileID: 11400000, guid: 86eff0b269ff5be44a6abfb3469c222d, type: 2}
