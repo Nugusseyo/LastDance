@@ -51,6 +51,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 128
+  holdPositionOffset: {x: -0.005, y: 0.066, z: -0.03}
+  holdRotationOffset: {x: 359.96265, y: -0.0043574986, z: 180.04141}
+  holdScale: {x: 1.8, y: 1.8, z: 1.8}
   UseEvent:
     m_PersistentCalls:
       m_Calls: []

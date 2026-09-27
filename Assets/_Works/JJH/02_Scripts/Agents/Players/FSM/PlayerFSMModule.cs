@@ -64,7 +64,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM
 
         private void HandleUseKeyPressed()
         {
-            if (_player.Grab.CurrentItem != null)
+            if (_player.Grab.CurrentItem != null && _player.Grab.CurrentItem.CurrentItemData is UseItemSO)
                 UpperBody.ChangeState<UpperUseState>();
         }
 
