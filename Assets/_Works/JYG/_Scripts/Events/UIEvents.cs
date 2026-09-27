@@ -45,7 +45,6 @@ namespace _Works.JYG._Scripts.Events
     public class ReviewEvent : GameEvent
     {
         public int Index { get; set; }
-        public int PlusValue { get; set; }
         public ReviewType ReviewType { get; set; }
 
         public ReviewEvent Review(int index, ReviewType reviewType)
