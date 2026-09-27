@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 082c556adc8a42d7ac5f98109c82dc03, type: 3}
+  m_Name: Kick
+  m_EditorClassIdentifier: SoundSystem_Assembly::DevLib.SoundSystem.SoundClipSo
+  audioType: 0
+  clip: {fileID: 8300000, guid: 45985a08b49515547b397f18c04083a9, type: 3}
+  loop: 0
+  randomizePitch: 1
+  randomPitchModifier: 0.1
+  volume: 1
+  pitch: 1
+  startTime: 0
+  endTime: 0

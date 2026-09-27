@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 722116522099564382}
   - component: {fileID: 5903309322208164130}
   - component: {fileID: 8176693654625810345}
+  - component: {fileID: 1744576071038305074}
   m_Layer: 0
   m_Name: Refueling Customer
   m_TagString: Untagged
@@ -134,8 +135,8 @@ MonoBehaviour:
     - rid: 4377106771376341106
   - Phase: 3
     States:
-    - rid: 4377106771376341107
     - rid: 4377106771376341108
+    - rid: 4377106771376341107
     - rid: 4377106771376341109
   - Phase: 5
     States:
@@ -165,6 +166,7 @@ MonoBehaviour:
           rid: -2
         timeout: 40
         fuelTimeout: 0
+        lateSeconds: 30
     - rid: 4377106771376341108
       type: {class: SpeechState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
       data:
@@ -174,7 +176,7 @@ MonoBehaviour:
         bubbleItem: {fileID: 11400000, guid: 2a00163c0ed52214a828e00935dbf2e5, type: 2}
         lineIndices: 01000000
         offset: {x: 0, y: 2.2, z: 0}
-        runAlongside: 0
+        runAlongside: 1
         speechSound: {fileID: 0}
     - rid: 4377106771376341109
       type: {class: StayState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
@@ -247,7 +249,7 @@ MonoBehaviour:
   despawnDelay: 3
   poolManager: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
   fightBack: 1
-  damagedSound: {fileID: 0}
+  damagedSound: {fileID: 11400000, guid: a4e1202c4a7640d4baa4db68977c3335, type: 2}
   deathSound: {fileID: 0}
 --- !u!114 &8176693654625810345
 MonoBehaviour:
@@ -262,6 +264,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Sounds.SoundEmitterModule
   soundChannel: {fileID: 11400000, guid: fa8239ba7d936984d851fe904b2da6cc, type: 2}
+--- !u!114 &1744576071038305074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1374554424783394349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 676fae61fafa4054eb45888e38e68835, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Appearance.CustomerAppearanceModule
+  lookSet: {fileID: 11400000, guid: b141f1b7c7aac4c45a959e747d19de1f, type: 2}
 --- !u!1 &4592436310506188908
 GameObject:
   m_ObjectHideFlags: 0

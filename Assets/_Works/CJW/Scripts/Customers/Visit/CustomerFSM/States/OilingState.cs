@@ -19,6 +19,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("주유기에 도착한 뒤 플레이어의 주유가 끝나길 기다리는 최대 시간(초). 0 이하면 끝날 때까지 기다린다.")]
         [SerializeField] private float fuelTimeout;
 
+        [Tooltip("주유기에 도착한 뒤 이 시간(초)이 지나도 주유가 안 끝나면 늦었다고 알린다(평판 감소). 계속 기다리는 건 fuelTimeout이 정한다. 0 이하면 알리지 않는다.")]
+        [SerializeField] private float lateSeconds = 30f;
+
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
         {
             AbstractCustomer customer = Ctx.Customer;
@@ -74,32 +77,50 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             }
         }
 
-        /// <summary>플레이어가 이 차의 주유를 마칠 때까지 기다린다. <see cref="FuelDoor.OnFuelingEnded"/>가 유일한 끝 신호다.
+        /// <summary>플레이어가 이 차의 주유를 마칠 때까지 기다린다. <see cref="FuelDoor.OnFuelingCompleted"/>가 유일한 끝 신호다 — 중간에 손을 떼면 계속 기다린다.
         private async UniTask<VisitOutcome> WaitForFuelingEnded(FuelDoor fuelDoor, CancellationToken ct)
         {
-            var ended = new UniTaskCompletionSource();
-            void OnEnded() => ended.TrySetResult();
+            bool ended = false;
+            void OnEnded() => ended = true;
 
-            fuelDoor.OnFuelingEnded += OnEnded;
+            fuelDoor.OnFuelingCompleted += OnEnded;
 
             try
             {
-                if (fuelTimeout <= 0f)
+                float start = Time.time;
+                bool lateReported = false;
+
+                while (!ended)
                 {
-                    await ended.Task.AttachExternalCancellation(ct);
-                    return VisitOutcome.Done;
+                    float waited = Time.time - start;
+
+                    if (!lateReported && lateSeconds > 0f && waited >= lateSeconds)
+                    {
+                        lateReported = true;
+                        Ctx.Visit?.ReportFuelLate(Ctx.Customer);
+                    }
+
+                    if (fuelTimeout > 0f && waited >= fuelTimeout)
+                    {
+                        // 기다리다 떠나는 것도 늦은 것이다. 이미 알렸으면 두 번 깎지 않는다.
+                        if (!lateReported)
+                        {
+                            Ctx.Visit?.ReportFuelLate(Ctx.Customer);
+                        }
+
+                        return VisitOutcome.Timeout;
+                    }
+
+                    await UniTask.Yield(PlayerLoopTiming.Update, ct);
                 }
 
-                int winner = await UniTask.WhenAny(
-                    ended.Task.AttachExternalCancellation(ct),
-                    UniTask.Delay(TimeSpan.FromSeconds(fuelTimeout), cancellationToken: ct));
-
-                return winner == 0 ? VisitOutcome.Done : VisitOutcome.Timeout;
+                Ctx.Visit?.ReportFueled(Ctx.Customer);
+                return VisitOutcome.Done;
             }
             finally
             {
                 // 풀링으로 차가 재사용되므로 구독을 남기면 다음 방문의 주유 끝 신호가 이미 끝난 손님에게 간다.
-                fuelDoor.OnFuelingEnded -= OnEnded;
+                fuelDoor.OnFuelingCompleted -= OnEnded;
             }
         }
 

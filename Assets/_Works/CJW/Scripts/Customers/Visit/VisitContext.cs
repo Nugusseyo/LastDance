@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using _Works.CJW.Scripts.Cars;
 using _Works.CJW.Scripts.MapSystems;
 using UnityEngine;
@@ -64,6 +65,16 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
         /// <summary>손님이 훔쳐 탄 차. 방문을 닫을 때 손님을 먼저 풀로 돌린 뒤 치운다.</summary>
         public StealableCar StolenCar;
+
+        /// <summary>손님이 주유를 받았다. 손님 상태가 알리고, 평판처럼 방문 밖에서 결과를 셈하는 쪽이 듣는다.</summary>
+        public event Action<AbstractCustomer> Fueled;
+
+        /// <summary>손님이 주유를 너무 오래 기다렸다. 한 번 기다림에 한 번만 온다.</summary>
+        public event Action<AbstractCustomer> FuelLate;
+
+        public void ReportFueled(AbstractCustomer customer) => Fueled?.Invoke(customer);
+
+        public void ReportFuelLate(AbstractCustomer customer) => FuelLate?.Invoke(customer);
 
         /// <summary>단계가 바뀔 때마다 진행 상태만 되돌린다. 방문 전체 값(차·지점)은 건드리지 않는다.</summary>
         public void ResetPhaseProgress()

@@ -203,7 +203,7 @@ PrefabInstance:
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: managedReferences[4377106815191875675].startSound
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 11400000, guid: 84ce6db256f49644ba58b8209655748a, type: 2}
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: managedReferences[4377106815191875676].boardSound
       value: 
