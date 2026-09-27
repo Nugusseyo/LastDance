@@ -48,7 +48,7 @@ namespace _Works.CJW.Scripts.Test.Editor
 
         private static void OnReview(ReviewEvent evt)
         {
-            File.AppendAllText(OutPath, $"{Time.time:F1}s {evt.ReviewType} {evt.PlusValue:+0;-0}\n");
+            File.AppendAllText(OutPath, $"{Time.time:F1}s {evt.ReviewType}\n");
         }
     }
 }

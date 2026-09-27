@@ -1,6 +1,7 @@
 ﻿using _Works.JJH._02_Scripts.Agents.Players.FSM.StateMachines;
 using _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates;
 using _Works.JJH._02_Scripts.Agents.Players.FSM.States.UpperStates;
+using _Works.JJH._02_Scripts.Items;
 using DevLib.AnimatorSystem;
 using DevLib.ModuleSystem;
 using UnityEngine;
@@ -52,6 +53,12 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM
 
         private void HandleAttackKeyPressed()
         {
+            if (_player.Grab.CurrentItem == null)
+                return;
+
+            if (_player.Grab.CurrentItem.CurrentItemData is not WeaponItemSO)
+                return;
+
             UpperBody.ChangeState<UpperAttackState>();
         }
 

@@ -50,9 +50,19 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         }
 
         private void HandleAttackKeyPressed()
-            => AttackSkill.ChangeCurrentAttack<AttackSkill>();
+        {
+            if (Grab.CurrentItem == null)
+                return;
+
+            AttackSkill.ChangeCurrentAttack<AttackSkill>();
+        }
 
         private void HandleThrowAttackKeyPressed()
-            => AttackSkill.ChangeCurrentAttack<ThrowAttackSkill>();
+        {
+            if (Grab.CurrentItem == null)
+                return;
+
+            AttackSkill.ChangeCurrentAttack<ThrowAttackSkill>();
+        }
     }
 }

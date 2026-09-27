@@ -50,7 +50,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 401ac16c3260e584e9a710a4c16adef8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.ItemType.CiderEffect
-  duration: 5
+  itemSO: {fileID: 0}
 --- !u!114 &3021705950023277124
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,13 +174,17 @@ PrefabInstance:
     - target: {fileID: -1625010455173122373, guid: f2f378121613dc144a153addaad78074, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 41b886ab89303a34e900c9dae8076427, type: 2}
+      objectReference: {fileID: 2100000, guid: 691a2a159a5958c45b3e969e4fb55c2c, type: 2}
     - target: {fileID: 919132149155446097, guid: f2f378121613dc144a153addaad78074, type: 3}
       propertyPath: m_Name
       value: SM_Aluminum_Can_01_Closed
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedComponents:
+    - {fileID: 4742473837712756890, guid: f2f378121613dc144a153addaad78074, type: 3}
+    m_RemovedGameObjects:
+    - {fileID: 596971467092199100, guid: f2f378121613dc144a153addaad78074, type: 3}
+    - {fileID: -6178662960935952092, guid: f2f378121613dc144a153addaad78074, type: 3}
+    - {fileID: -7592749736941973317, guid: f2f378121613dc144a153addaad78074, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f2f378121613dc144a153addaad78074, type: 3}
@@ -245,8 +249,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Aluminum_Can_01_Tab
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedComponents:
+    - {fileID: 4742473837712756890, guid: 6ba684b861bf7274ab05e3eb6ddfa15c, type: 3}
+    m_RemovedGameObjects:
+    - {fileID: 4030685944203408725, guid: 6ba684b861bf7274ab05e3eb6ddfa15c, type: 3}
+    - {fileID: -3252384171246079698, guid: 6ba684b861bf7274ab05e3eb6ddfa15c, type: 3}
+    - {fileID: 4210006274768025032, guid: 6ba684b861bf7274ab05e3eb6ddfa15c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6ba684b861bf7274ab05e3eb6ddfa15c, type: 3}
@@ -312,7 +320,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 4875907273765177850, guid: 4bf39f506b1d5ee4caf537ccfe018a7c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4bf39f506b1d5ee4caf537ccfe018a7c, type: 3}

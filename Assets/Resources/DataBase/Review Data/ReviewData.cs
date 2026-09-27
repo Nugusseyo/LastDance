@@ -8,7 +8,9 @@ namespace Resources.DataBase.Review_Data
     {
         public int index;
         public ReviewType type;
-        public string content;
+        public string contentUp;
+        public string contentDown;
+        public string contentLate;
     }
 
     public enum ReviewType

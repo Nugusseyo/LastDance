@@ -13,6 +13,12 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.UpperStates
 
         public override void Enter()
         {
+            if (Player.Grab == null || Player.Grab.CurrentItem == null)
+            {
+                StateMachine.ChangeState<UpperGrabState>();
+                return;
+            }
+
             _attackTimer = 0f;
 
             Player.AttackSkill.Attack();

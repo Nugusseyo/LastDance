@@ -48,6 +48,9 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
         public void UseItem()
         {
+            if (CurrentItem == null)
+                return;
+
             CurrentItem.UseItem();
         }
 
