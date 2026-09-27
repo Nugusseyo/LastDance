@@ -1,5 +1,6 @@
 using System;
 using _Works.JYG._Scripts.Data_Container.Money;
+using _Works.JYG._Scripts.Events;
 using _Works.JYG._Scripts.Util;
 using _Works.JYG._Scripts.Vending_Machine;
 using _Works.KDH._01.Scripts.Vending;
@@ -16,7 +17,8 @@ namespace _Works.JYG.Data.Vending_Machine
         [SerializeField] private Image itemImage;
         [SerializeField] private Image priceBackground;
         [SerializeField] private Button buyButton;
-        [SerializeField] private EventChannelSO eventChannelSO;
+        [SerializeField] private EventChannelSO systemEventChannel;
+        [SerializeField] private EventChannelSO uiEventChannel;
 
         [Header("아이템 활성화, 비활성화 색상")] 
         [SerializeField] private Color greenColor;
@@ -47,14 +49,16 @@ namespace _Works.JYG.Data.Vending_Machine
             if (price > _moneyManager.Value)
             {
                 //ErrorMessage
+                if (uiEventChannel != null)
+                    uiEventChannel.RaiseEvent(UIEvents.MessageEvent.Init("물건을 살 돈이 부족합니다!"));
                 return;
             }
 
             _moneyManager.Value -= price;
             
-            if (eventChannelSO != null)
+            if (systemEventChannel != null)
             {
-                eventChannelSO.RaiseEvent(VendingEvents.VendingSelectDropEvent.Init(_vendingItem));
+                systemEventChannel.RaiseEvent(VendingEvents.VendingSelectDropEvent.Init(_vendingItem));
                 Debug.Log(_vendingItem.ItemName);
             }
         }
