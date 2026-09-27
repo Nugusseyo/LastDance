@@ -36,6 +36,16 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             _player = (Player)owner;
         }
 
+        // F키를 누르고 있는 동안 부품 분리·주유 게이지를 진행시킨다. 부르는 곳이 없으면 시작만 되고 게이지가 멈춰 있다.
+        private void Update()
+        {
+            if (_player == null)
+                return;
+
+            UpdateDetachHold();
+            UpdateFuelHold();
+        }
+
         public void UseItem()
         {
             CurrentItem.UseItem();
@@ -75,6 +85,22 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
                 DropItem();
                 return;
+            }
+
+            // 주유구는 뒷바퀴 바로 위라 바퀴(부품)와 겹친다. 두 레이어를 한 번에 쏴서 실제로 조준한 쪽을 고른다.
+            LayerMask fuelDoorMask = fuelInjector != null ? fuelInjector.FuelDoorLayerMask : (LayerMask)0;
+            if (fuelInjector != null && partDetacher != null
+              && _player.Sensor.FindItem(_player.Camera.CameraTrans, partDetacher.PartLayerMask | fuelDoorMask,
+                                                              pickupDistance, out Collider aimedCollider)
+              && (fuelDoorMask.value & (1 << aimedCollider.gameObject.layer)) != 0)
+            {
+                FuelDoor aimedDoor = aimedCollider.GetComponent<FuelDoor>();
+
+                if (aimedDoor != null)
+                {
+                    fuelInjector.TryStartFueling(aimedDoor);
+                    return;
+                }
             }
 
             if (partDetacher != null

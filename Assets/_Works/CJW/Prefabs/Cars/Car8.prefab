@@ -156,6 +156,11 @@ GameObject:
   - component: {fileID: 2976470074682179230}
   - component: {fileID: 8226764873331829991}
   - component: {fileID: 8707563664363265166}
+  - component: {fileID: 1464825232350863185}
+  - component: {fileID: 5211818916731416533}
+  - component: {fileID: 7129004938782702161}
+  - component: {fileID: 38443170344500499}
+  - component: {fileID: 7431592486038837119}
   m_Layer: 0
   m_Name: Car8
   m_TagString: Untagged
@@ -346,7 +351,87 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Cars.CarHitDetectorModule
   minHitSpeed: 1
   repeatCooldown: 2
-  hitSound: {fileID: 0}
+  hitSound: {fileID: 11400000, guid: 352e00d4333b46d48a366ce6b15e79cb, type: 2}
+--- !u!114 &1464825232350863185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092125046746352269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15a66550fd3f2144ba07301922417cb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Car.CarSeller
+  carBasePrice: 20000
+  wheelDefaultPrice: 100
+  RefuelingPrice: 5000
+  wheelLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  walletEffect: {fileID: 0}
+--- !u!114 &5211818916731416533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092125046746352269}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2664f1de01756f4db7fd39b247e77ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarStraightMover
+  speed: 5
+  wheels:
+  - {fileID: 3002235778345637628}
+  - {fileID: 3002235778345637616}
+  - {fileID: 3002235778345637630}
+  - {fileID: 3002235778345637618}
+  wheelRadius: 0.35
+--- !u!114 &7129004938782702161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092125046746352269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a850895d40797b4b83a33af28355d99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Cars.CarFuelSoundModule
+  fuelSound: {fileID: 11400000, guid: fff274ca5f927524aba4ebc54cb90e13, type: 2}
+--- !u!114 &38443170344500499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092125046746352269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8a86851a5a82ad44966279deeb57e8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Sounds.SoundEmitterModule
+  soundChannel: {fileID: 11400000, guid: fa8239ba7d936984d851fe904b2da6cc, type: 2}
+--- !u!114 &7431592486038837119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092125046746352269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 869177491b8cbb04b80432f3bae840b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Cars.CarDriveSoundModule
+  driveSound: {fileID: 11400000, guid: d784f642299e68e46b7abbe792a0db18, type: 2}
+  startSpeed: 0.5
+  stopSpeed: 0.2
+  stopDelay: 1
 --- !u!1 &7301508252532507970
 GameObject:
   m_ObjectHideFlags: 0
@@ -399,7 +484,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.3, y: 0.35, z: 0.35}
+  m_Size: {x: 0.81, y: 0.98, z: 0.95}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6794475526191854523
 MonoBehaviour:
@@ -424,6 +509,22 @@ PrefabInstance:
     - target: {fileID: 100000, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
       propertyPath: m_Name
       value: Car8
+      objectReference: {fileID: 0}
+    - target: {fileID: 100004, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 100006, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 100008, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 100010, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
       propertyPath: m_LocalScale.x
@@ -480,7 +581,43 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 100006, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5321320594375203166}
+    - targetCorrespondingSourceObject: {fileID: 100006, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8918634698965914347}
+    - targetCorrespondingSourceObject: {fileID: 100006, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8757525567869756380}
+    - targetCorrespondingSourceObject: {fileID: 100010, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1840692995083729942}
+    - targetCorrespondingSourceObject: {fileID: 100010, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7993217773725883125}
+    - targetCorrespondingSourceObject: {fileID: 100010, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6712741549157144096}
+    - targetCorrespondingSourceObject: {fileID: 100004, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1153595926806742821}
+    - targetCorrespondingSourceObject: {fileID: 100004, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4109384596125258706}
+    - targetCorrespondingSourceObject: {fileID: 100004, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 767968145362894570}
+    - targetCorrespondingSourceObject: {fileID: 100008, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1554376135236111679}
+    - targetCorrespondingSourceObject: {fileID: 100008, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4936057058560986922}
+    - targetCorrespondingSourceObject: {fileID: 100008, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 650060431729701038}
   m_SourcePrefab: {fileID: 100100000, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
 --- !u!4 &3002235778345637616 stripped
 Transform:
@@ -507,6 +644,366 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400004, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
   m_PrefabInstance: {fileID: 3002235778345766010}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3002235778345798352 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100010, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+  m_PrefabInstance: {fileID: 3002235778345766010}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &1840692995083729942
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3002235778345798352}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!146 &7993217773725883125
+WheelCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3002235778345798352}
+  serializedVersion: 2
+  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.5913541
+  m_SuspensionSpring:
+    spring: 35000
+    damper: 4500
+    targetPosition: 0.5
+  m_SuspensionDistance: 0.3
+  m_ForceAppPointDistance: 0
+  m_Mass: 20
+  m_WheelDampingRate: 0.25
+  m_ForwardFriction:
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.8
+    m_AsymptoteValue: 0.5
+    m_Stiffness: 1
+  m_SidewaysFriction:
+    m_ExtremumSlip: 0.2
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.5
+    m_AsymptoteValue: 0.75
+    m_Stiffness: 1
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_Enabled: 1
+  m_ProvidesContacts: 0
+--- !u!114 &6712741549157144096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3002235778345798352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
+  <CurrentItemData>k__BackingField: {fileID: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  UseEvent:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!1 &3002235778345798354 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100008, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+  m_PrefabInstance: {fileID: 3002235778345766010}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &1554376135236111679
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3002235778345798354}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!146 &4936057058560986922
+WheelCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3002235778345798354}
+  serializedVersion: 2
+  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.60954547
+  m_SuspensionSpring:
+    spring: 35000
+    damper: 4500
+    targetPosition: 0.5
+  m_SuspensionDistance: 0.3
+  m_ForceAppPointDistance: 0
+  m_Mass: 20
+  m_WheelDampingRate: 0.25
+  m_ForwardFriction:
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.8
+    m_AsymptoteValue: 0.5
+    m_Stiffness: 1
+  m_SidewaysFriction:
+    m_ExtremumSlip: 0.2
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.5
+    m_AsymptoteValue: 0.75
+    m_Stiffness: 1
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_Enabled: 1
+  m_ProvidesContacts: 0
+--- !u!114 &650060431729701038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3002235778345798354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
+  <CurrentItemData>k__BackingField: {fileID: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  UseEvent:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!1 &3002235778345798364 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100006, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+  m_PrefabInstance: {fileID: 3002235778345766010}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &5321320594375203166
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3002235778345798364}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!146 &8918634698965914347
+WheelCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3002235778345798364}
+  serializedVersion: 2
+  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.5913541
+  m_SuspensionSpring:
+    spring: 35000
+    damper: 4500
+    targetPosition: 0.5
+  m_SuspensionDistance: 0.3
+  m_ForceAppPointDistance: 0
+  m_Mass: 20
+  m_WheelDampingRate: 0.25
+  m_ForwardFriction:
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.8
+    m_AsymptoteValue: 0.5
+    m_Stiffness: 1
+  m_SidewaysFriction:
+    m_ExtremumSlip: 0.2
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.5
+    m_AsymptoteValue: 0.75
+    m_Stiffness: 1
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_Enabled: 1
+  m_ProvidesContacts: 0
+--- !u!114 &8757525567869756380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3002235778345798364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
+  <CurrentItemData>k__BackingField: {fileID: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  UseEvent:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!1 &3002235778345798366 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100004, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
+  m_PrefabInstance: {fileID: 3002235778345766010}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &1153595926806742821
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3002235778345798366}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!146 &4109384596125258706
+WheelCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3002235778345798366}
+  serializedVersion: 2
+  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.60954547
+  m_SuspensionSpring:
+    spring: 35000
+    damper: 4500
+    targetPosition: 0.5
+  m_SuspensionDistance: 0.3
+  m_ForceAppPointDistance: 0
+  m_Mass: 20
+  m_WheelDampingRate: 0.25
+  m_ForwardFriction:
+    m_ExtremumSlip: 0.4
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.8
+    m_AsymptoteValue: 0.5
+    m_Stiffness: 1
+  m_SidewaysFriction:
+    m_ExtremumSlip: 0.2
+    m_ExtremumValue: 1
+    m_AsymptoteSlip: 0.5
+    m_AsymptoteValue: 0.75
+    m_Stiffness: 1
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_Enabled: 1
+  m_ProvidesContacts: 0
+--- !u!114 &767968145362894570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3002235778345798366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
+  <CurrentItemData>k__BackingField: {fileID: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  UseEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!23 &3002235778348061722 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 2300000, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}

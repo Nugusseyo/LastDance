@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using _Works.CJW.Scripts.Sounds;
 using Cysharp.Threading.Tasks;
 using DevLib.AnimatorSystem;
 using DevLib.SoundSystem;
@@ -52,6 +53,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
         [Tooltip("방어 차례가 올 때마다 낼 소리(막는 소리). 공격 소리와 같은 순간에 나므로 비워 두어도 된다.")]
         [SerializeField] private SoundClipSo blockSound;
+
+        [Tooltip("싸우는 동안 깔리는 반복 소리(몸싸움·고함). loop를 켜야 한다. 둘이 겹치지 않게 먼저 공격하는 쪽만 튼다.")]
+        [SerializeField] private SoundClipSo fightLoopSound;
 
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
         {
@@ -177,6 +181,11 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             bool attacksFirst = Ctx.Customer.GetInstanceID() < partner.Customer.GetInstanceID();
             int lastTurn = -1;
 
+            if (attacksFirst)
+            {
+                Ctx.Customer.Sound?.PlayLoop(fightLoopSound);
+            }
+
             try
             {
                 while (Time.time < until)
@@ -217,6 +226,12 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             {
                 // 취소로 끊겨도 여기는 반드시 지난다. 빼먹으면 손님이 걷는 내내 주먹을 휘두른다.
                 Ctx.Customer.ActionAnimator?.End();
+
+                ISoundEmitter sound = Ctx.Customer.Sound;
+                if (sound != null && fightLoopSound != null && sound.CurrentLoop == fightLoopSound)
+                {
+                    sound.StopLoop();
+                }
             }
         }
 

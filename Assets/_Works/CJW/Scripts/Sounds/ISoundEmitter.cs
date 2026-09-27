@@ -10,6 +10,9 @@ namespace _Works.CJW.Scripts.Sounds
         /// <summary>반복 소리를 틀고 있는지.</summary>
         bool IsLooping { get; }
 
+        /// <summary>지금 틀고 있는 반복 소리. 없으면 null. 반복 소리는 주인마다 하나라, 끄기 전에 내가 튼 것인지 확인할 때 쓴다.</summary>
+        SoundClipSo CurrentLoop { get; }
+
         /// <summary>주인 위치에서 한 번 튼다.</summary>
         void Play(SoundClipSo clip);
 

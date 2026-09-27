@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 8729102429169878593}
   - component: {fileID: 6297310825078683012}
   - component: {fileID: 1124743697083204356}
+  - component: {fileID: 8353002571845267994}
   m_Layer: 0
   m_Name: Brawler Customer
   m_TagString: Untagged
@@ -41,7 +42,6 @@ Transform:
   m_Children:
   - {fileID: 4170889198326711947}
   - {fileID: 1232048733889065188}
-  - {fileID: 617699870591141525}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &1874628895881318613
@@ -179,8 +179,9 @@ MonoBehaviour:
         blockClip: {fileID: 11400000, guid: 5dbc4ccdd47e4c14981d001d9237d7a5, type: 2}
         swingInterval: 1.8
         turnSpeed: 540
-        attackSound: {fileID: 0}
-        blockSound: {fileID: 0}
+        attackSound: {fileID: 11400000, guid: 7f6240342e8afa9418c6043f4acaabf3, type: 2}
+        blockSound: {fileID: 11400000, guid: a4e1202c4a7640d4baa4db68977c3335, type: 2}
+        fightLoopSound: {fileID: 11400000, guid: b82e9087a5218ab4ca3680e64e04f317, type: 2}
     - rid: 4377106771376341121
       type: {class: StayState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
       data:
@@ -290,7 +291,7 @@ MonoBehaviour:
   despawnDelay: 3
   poolManager: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
   fightBack: 1
-  damagedSound: {fileID: 0}
+  damagedSound: {fileID: 11400000, guid: a4e1202c4a7640d4baa4db68977c3335, type: 2}
   deathSound: {fileID: 0}
 --- !u!114 &1124743697083204356
 MonoBehaviour:
@@ -305,53 +306,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Sounds.SoundEmitterModule
   soundChannel: {fileID: 11400000, guid: fa8239ba7d936984d851fe904b2da6cc, type: 2}
---- !u!1 &3883249974309651837
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 617699870591141525}
-  - component: {fileID: 8187892814317759280}
-  m_Layer: 0
-  m_Name: Reputation Module
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &617699870591141525
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3883249974309651837}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7441515418579160928}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8187892814317759280
+--- !u!114 &8353002571845267994
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3883249974309651837}
+  m_GameObject: {fileID: 3502977764553103516}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0eb704e5e7ef4d3db8a17f751479bef9, type: 3}
+  m_Script: {fileID: 11500000, guid: 676fae61fafa4054eb45888e38e68835, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Interaction.ReputationModule
-  reduceInterval: 1
-  reduceAmount: 5
-  maxReputation: 100
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Appearance.CustomerAppearanceModule
+  lookSet: {fileID: 11400000, guid: b141f1b7c7aac4c45a959e747d19de1f, type: 2}
 --- !u!1 &5302839806324611258
 GameObject:
   m_ObjectHideFlags: 0

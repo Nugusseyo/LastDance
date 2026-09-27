@@ -3,6 +3,7 @@ using System;
 using _Works.CJW.Scripts.Customers.Visit;
 using _Works.CJW.Scripts.Customers.Visit.CustomerFSM;
 using _Works.CJW.Scripts.Customers.Animation;
+using _Works.CJW.Scripts.Customers.Appearance;
 using _Works.CJW.Scripts.Customers.Data;
 using _Works.CJW.Scripts.Customers.Health;
 using _Works.CJW.Scripts.Customers.Interaction;
@@ -47,6 +48,9 @@ namespace _Works.CJW.Scripts.Customers
         /// <summary>소리를 내는 창구. 프리팹에 사운드 모듈이 없으면 null이고, 그 손님은 소리 없이 움직인다.</summary>
         public ISoundEmitter Sound { get; private set; }
 
+        /// <summary>겉모습. 스폰될 때마다 무작위로 갈아입는다. 프리팹에 겉모습 모듈이 없으면 null이고, 그 손님은 프리팹 모습 그대로 나온다.</summary>
+        public ICustomerAppearance Appearance { get; private set; }
+
         /// <summary>쓰러져 있는지. 이 동안 손님은 아무 행동도 시작하지 않는다.</summary>
         public bool IsKnockedDown => Ragdoll != null && Ragdoll.IsActive;
         public GameObject GameObject => this != null ? gameObject : null;
@@ -73,6 +77,8 @@ namespace _Works.CJW.Scripts.Customers
         public virtual void Setup(CustomerDataSO data)
         {
             Data = data;
+            Appearance?.Randomize();
+
             if (data == null || Agent == null)
             {
                 return;
@@ -153,6 +159,7 @@ namespace _Works.CJW.Scripts.Customers
             Ragdoll = GetModule<IRagdoll>();
             Health = GetModule<ICustomerHealth>();
             Sound = GetModule<ISoundEmitter>();
+            Appearance = GetModule<ICustomerAppearance>();
         }
 }
 }
