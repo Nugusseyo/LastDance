@@ -13,9 +13,17 @@ namespace _Works.CJW.Scripts.Customers.Animation
         /// <summary>연출이 화면을 잡고 있는 동안 true.</summary>
         bool IsPlaying { get; }
 
+        /// <summary>지금 연출이 루트 모션으로 몸을 움직이는지. 이동 모듈은 이 값이 false인 연출 동안 루트 모션을 버려
+        /// 춤처럼 제자리에서 보여야 하는 클립이 손님을 밀지 않게 한다.</summary>
+        bool UsesRootMotion { get; }
+
         /// <summary>클립을 틀고 <see cref="End"/>를 부를 때까지 유지한다. 같은 클립을 다시 넣으면 처음부터 다시 튼다 —
         /// 주먹질처럼 한 동작을 여러 번 반복할 때 이걸 쓴다.</summary>
         void Begin(HashDataSO clip);
+
+        /// <summary><see cref="Begin(HashDataSO)"/>과 같되, <paramref name="rootMotion"/>이 true면 클립의 루트 모션으로 몸을 움직인다.
+        /// 주먹질처럼 몸이 앞뒤로 실려야 자연스러운 동작에 쓴다.</summary>
+        void Begin(HashDataSO clip, bool rootMotion);
 
         /// <summary>연출을 접고 화면을 이동 모듈에 돌려준다. 시작한 쪽이 반드시 짝을 맞춰 불러야 한다.</summary>
         void End();

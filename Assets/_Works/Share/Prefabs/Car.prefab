@@ -356,6 +356,7 @@ GameObject:
   - component: {fileID: 471449907095769015}
   - component: {fileID: 7882284964110447475}
   - component: {fileID: 3955018737310698002}
+  - component: {fileID: 2304331596410055011}
   m_Layer: 0
   m_Name: Car
   m_TagString: Untagged
@@ -380,6 +381,7 @@ Transform:
   - {fileID: 5228474668963739244}
   - {fileID: 398202869173189023}
   - {fileID: 9219656239496921828}
+  - {fileID: 7777318687887619385}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &4426528510196855596
@@ -522,6 +524,21 @@ MonoBehaviour:
     radius: 0
   steerVisualScale: 1
   steerFollowSpeed: 360
+--- !u!114 &2304331596410055011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3194534393179563438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7fa35208d2216c47ad1f3540010f7e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Cars.CarHitDetectorModule
+  minHitSpeed: 1
+  repeatCooldown: 2
+  hitSound: {fileID: 0}
 --- !u!1 &3443648458402252513
 GameObject:
   m_ObjectHideFlags: 0
@@ -584,6 +601,72 @@ Transform:
   m_Children: []
   m_Father: {fileID: 414716400684570717}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5461022153113429501
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7777318687887619385}
+  - component: {fileID: 58805575544443958}
+  - component: {fileID: 2225760633815955160}
+  m_Layer: 18
+  m_Name: FuelDoor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7777318687887619385
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5461022153113429501}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.7669235, y: 0.49000004, z: -1.1668043}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8627936216674584263}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &58805575544443958
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5461022153113429501}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.3, y: 0.35, z: 0.35}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2225760633815955160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5461022153113429501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc32976058e7ad47a582e2060fd4454, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Objects.FuelDoor
 --- !u!1 &5872462341552229828
 GameObject:
   m_ObjectHideFlags: 0

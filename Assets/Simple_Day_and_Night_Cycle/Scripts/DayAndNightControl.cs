@@ -35,7 +35,7 @@ public class DayAndNightControl : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
-		foreach (Camera c in GameObject.FindObjectsOfType<Camera>())
+		foreach (Camera c in GameObject.FindObjectsByType<Camera>(FindObjectsSortMode.None))
 		{
 			if (c.isActiveAndEnabled) {
 				targetCam = c;

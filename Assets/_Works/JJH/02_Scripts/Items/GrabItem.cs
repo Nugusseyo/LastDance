@@ -17,10 +17,7 @@ namespace _Works.JJH._02_Scripts.Items
         {
             _rigidbody = GetComponent<Rigidbody>();
             _collider = GetComponent<Collider>();
-        }
 
-        private void Start()
-        {
             SetKinematicState();
         }
 
