@@ -13,6 +13,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs.Attacks
                 return;
 
             GrabItem weapon = player.Grab.CurrentItem;
+
+            if (weapon.CurrentItemData is not WeaponItemSO weaponData)
+                return;
+
             GameObject weaponObject = player.Grab.CurrentGrabObject;
 
             if (weaponObject == null)
@@ -22,6 +26,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs.Attacks
 
             weaponObject.transform.SetParent(null);
             weapon.SetPhysicsState();
+            weapon.StartThrow(weaponData.Damage);
             weapon.AddForce(throwDirection * throwForce, ForceMode.Impulse);
 
             player.Grab.ClearCurrentItem();
