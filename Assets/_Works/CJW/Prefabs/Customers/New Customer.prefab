@@ -74,7 +74,7 @@ GameObject:
   - component: {fileID: 5340750438206744906}
   - component: {fileID: 4916817713162045650}
   - component: {fileID: 8300954765236288117}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: New Customer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -303,6 +303,8 @@ MonoBehaviour:
   deathLaunchUp: 1.5
   despawnDelay: 3
   poolManager: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
+  hitClip: {fileID: 11400000, guid: c819ca92aeda640408631732998c6201, type: 2}
+  hitDuration: 0.6
   fightBack: 1
   damagedSound: {fileID: 11400000, guid: a4e1202c4a7640d4baa4db68977c3335, type: 2}
   deathSound: {fileID: 0}

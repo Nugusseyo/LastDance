@@ -12,6 +12,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("머무는 시간. 0이면 Phase가 바뀔 때까지 무한 대기한다.")]
         [SerializeField, Min(0f)] private float duration;
 
+        /// <summary>Phase가 바뀔 때까지 스스로 끝나지 않는지. 이 상태에 들어간 손님은 할 일을 마치고 출발만 기다린다.</summary>
+        public bool IsIndefinite => duration <= 0f;
+
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
         {
             if (duration <= 0f)

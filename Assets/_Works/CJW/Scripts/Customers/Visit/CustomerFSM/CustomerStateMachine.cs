@@ -36,6 +36,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
 
         public bool IsRunning => _lifetime != null;
 
+        /// <summary>지금 <see cref="Interrupt"/>가 먹히는지. 돌고 있는 상태가 없으면(행동 사이, 시퀀스가 끝난 뒤) 인터럽트는 무시된다.</summary>
+        public bool CanInterrupt => _running != null && !_running.IsCancellationRequested;
+
         /// <summary>이 Phase 시퀀스에서 처음 걸어갈 지점의 종류. 걸어갈 상태가 없으면 None.
         /// 조건이 붙은 상태도 그대로 센다 — 내리는 순간에는 조건이 어떻게 풀릴지 알 수 없다.</summary>
         public MapPointType FirstDestination(VisitPhase phase)

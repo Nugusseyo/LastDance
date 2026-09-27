@@ -1,4 +1,5 @@
 ﻿using _Works.JJH._02_Scripts.Agents.Modules;
+using _Works.Shared.Combat;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -88,6 +89,17 @@ namespace _Works.JJH._02_Scripts.Items
 
             if ((groundLayer.value & (1 << collision.gameObject.layer)) != 0)
             {
+                IsThrown = false;
+                return;
+            }
+
+            // 손님처럼 맞은 방향으로 밀려나는 대상. 날아온 방향과 빠르기를 같이 넘긴다.
+            IHittable hittable = collision.collider.GetComponentInParent<IHittable>();
+
+            if (hittable != null)
+            {
+                Vector3 direction = collision.collider.bounds.center - transform.position;
+                hittable.TakeHit(new HitInfo(_throwDamage, direction, collision.relativeVelocity.magnitude * 0.5f));
                 IsThrown = false;
                 return;
             }

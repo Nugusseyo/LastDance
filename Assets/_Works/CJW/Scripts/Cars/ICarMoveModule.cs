@@ -23,6 +23,17 @@ namespace _Works.CJW.Scripts.Cars
         void MoveTo(Vector3 destination, Vector3 approachFrom);
         void Stop();
 
+        /// <summary>지금 목적지로 가기 전에 먼저 곧게 <paramref name="distance"/>m 물러선다. MoveTo 뒤에 부른다.
+        /// 앞뒤 간격이 좁은 줄에서 먼저 떠나는 차가 앞차 옆으로 돌아 나갈 각을 벌 때 쓴다. 후진을 흉내 내지 않는 이동 수단은 무시해도 된다.</summary>
+        void BackOff(float distance) { }
+
+        /// <summary>제자리에서 앞뒤로 조금씩 오가며 <paramref name="direction"/> 쪽으로 차 방향을 튼다(N자 회전). 다 틀면 지금 목적지로 간다.
+        /// MoveTo 뒤에 부른다. 앞뒤가 다른 차로 꽉 막혀 물러설 수도 없는 차가 옆으로 빠져나올 때 쓴다.</summary>
+        void TurnInPlace(Vector3 direction) { }
+
+        /// <summary>제자리 회전처럼 목적지를 향해 달리는 게 아닌 기동 중인지.</summary>
+        bool IsManeuvering => false;
+
         /// <summary>CarDataSO의 값을 이동 수단에 반영한다. moveSpeed가 0 이하면 프리팹 값을 그대로 쓴다.</summary>
         void ApplyStats(float moveSpeed, float arriveThreshold);
     }

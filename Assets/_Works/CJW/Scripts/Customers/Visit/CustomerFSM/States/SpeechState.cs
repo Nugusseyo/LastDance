@@ -62,10 +62,18 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             Transform anchor = Ctx.Customer.transform;
             Follow(bubble, anchor);
 
+            // 앞 대사가 아직 떠 있으면 접는다. 한 손님 머리 위에 말풍선이 겹쳐 뜨지 않게 한다.
+            Ctx.EndSpeech();
+
+            // 컨텍스트에 맡겨 두면 주유를 받거나 죽었을 때 대사가 끝나길 기다리지 않고 바로 접힌다.
+            Action end = bubble.EndSpeech;
+            Ctx.SetSpeech(end);
+
             // 구독은 InitializeBubble보다 먼저 건다. 대사가 없으면 그 안에서 바로 OnSpeechEnd가 불린다.
-            UniTask following = FollowUntilEnd(bubble, anchor, runAlongside ? CancellationToken.None : ct);
+            UniTask following = FollowUntilEnd(bubble, anchor, end, runAlongside ? CancellationToken.None : ct);
 
             int lineIndex = lineIndices[Ctx.PickVariant(lineIndices.Length)];
+            Ctx.LineIndex = lineIndex;
             bubble.InitializeBubble(Ctx.Customer.HumanType, lineIndex);
             Ctx.Customer.Sound?.Play(speechSound);
             Debug.Log($"[SpeechState] {Ctx.Customer.name} 말풍선 시작 (대사 {lineIndex})", Ctx.Customer);
@@ -84,11 +92,18 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         }
 
         /// <summary>말풍선이 끝날 때까지 손님 머리 위를 따라다니게 한다.</summary>
-        private async UniTask FollowUntilEnd(SpeechBubble bubble, Transform anchor, CancellationToken ct)
+        private async UniTask FollowUntilEnd(SpeechBubble bubble, Transform anchor, Action end, CancellationToken ct)
         {
+            CustomerContext ctx = Ctx;
+
             // 이벤트는 await할 수 없으므로 플래그로 바꿔 문다.
+            // 맡긴 말풍선은 끝나는 그 순간 거둔다. 풀로 돌아간 말풍선이 다른 손님에게 다시 나간 뒤 이 손님 쪽에서 접히면 안 된다.
             bool ended = false;
-            void OnSpeechEnd() => ended = true;
+            void OnSpeechEnd()
+            {
+                ended = true;
+                ctx.ClearSpeech(end);
+            }
 
             bubble.OnSpeechEnd += OnSpeechEnd;
 
@@ -113,6 +128,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 {
                     bubble.OnSpeechEnd -= OnSpeechEnd;
                 }
+
+                ctx.ClearSpeech(end);
             }
         }
 

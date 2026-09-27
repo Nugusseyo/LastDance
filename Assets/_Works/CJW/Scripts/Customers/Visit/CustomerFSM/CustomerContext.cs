@@ -1,4 +1,5 @@
 ﻿using _Works.CJW.Scripts.Customers.Data;using _Works.CJW.Scripts.MapSystems;
+using System;
 using JetBrains.Annotations;
 using Resources.DataBase.Human_Data;
 using UnityEngine;
@@ -55,7 +56,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
 
             if (Variant < 0)
             {
-                Variant = Partner != null && Partner.Variant >= 0 ? Partner.Variant + 1 : Random.Range(0, 1 << 16);
+                Variant = Partner != null && Partner.Variant >= 0 ? Partner.Variant + 1 : UnityEngine.Random.Range(0, 1 << 16);
             }
 
             return Variant % count;
@@ -69,6 +70,32 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             Customer = customer;
             Machine = machine;
             MapData = mapData;
+        }
+
+        /// <summary>이번 방문에서 말한 대사 index(HumanDB). 평판 리뷰도 같은 index의 글을 쓴다. 아직 말하지 않았으면 0.</summary>
+        public int LineIndex { get; set; }
+
+        /// <summary>지금 머리 위에 떠 있는 말풍선을 접는 방법. 떠 있는 말풍선이 없으면 null.</summary>
+        private Action _endSpeech;
+
+        /// <summary>띄운 말풍선을 맡긴다. 요구가 풀리거나 손님이 사라질 때 <see cref="EndSpeech"/>로 접힌다.</summary>
+        public void SetSpeech(Action end) => _endSpeech = end;
+
+        /// <summary>말풍선이 스스로 끝났을 때 부른다. 맡긴 것과 같을 때만 비운다 — 그새 새 말풍선이 떴을 수 있다.</summary>
+        public void ClearSpeech(Action end)
+        {
+            if (_endSpeech == end)
+            {
+                _endSpeech = null;
+            }
+        }
+
+        /// <summary>떠 있는 말풍선을 바로 접는다. 주유를 받아 요구가 풀렸거나, 죽었거나, 풀로 돌아갈 때 부른다.</summary>
+        public void EndSpeech()
+        {
+            Action end = _endSpeech;
+            _endSpeech = null;
+            end?.Invoke();
         }
 
         /// <summary>이번 방문에서 이미 차 반대편으로 옮겨 봤는지. 옮겨도 막히면 계속 오가지 않도록 한 번만 허용한다.</summary>
@@ -104,6 +131,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
 
                 Partner = null;
             }
+
+            // 대사 중에 반납되면 말풍선이 빈자리 위에 남아 끝까지 떠 있다.
+            EndSpeech();
+            LineIndex = 0;
 
             Visit = null;
             Target = null;

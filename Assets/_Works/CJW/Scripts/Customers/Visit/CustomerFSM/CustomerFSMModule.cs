@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using _Works.CJW.Scripts.Customers.Animation;
 using _Works.CJW.Scripts.MapSystems;
+using DevLib.AnimatorSystem;
 using DevLib.ModuleSystem;
 using UnityEngine;
 
@@ -171,6 +173,67 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
         }
 
         private KnockedDownState _knockedDown;
+
+        private HitReactState _hitReact;
+
+        /// <summary>맞았다. 하던 걸 끊고 <paramref name="hitFrom"/>(때린 쪽 위치)으로 돌아서며 <paramref name="clip"/>으로 <paramref name="duration"/>초 움찔한 뒤,
+        /// <paramref name="fightBack"/>이면 때린 쪽에게 덤비고(전투 상태가 없으면 도망) 아니면 하던 행동을 처음부터 다시 한다.
+        /// 움찔하는 도중에 또 맞으면 처음부터 다시 움찔한다.</summary>
+        public void TakeHit(HashDataSO clip, float duration, Vector3 hitFrom, Transform attacker, bool fightBack)
+        {
+            if (Machine == null)
+            {
+                return;
+            }
+
+            if (_hitReact == null)
+            {
+                _hitReact = new HitReactState();
+                Machine.Bind(_hitReact);
+            }
+
+            CustomerState then = null;
+            if (fightBack)
+            {
+                if (attacker != null && combat != null)
+                {
+                    Machine.Context.Target = attacker;
+                    then = combat;
+                }
+                else
+                {
+                    then = flee;
+                }
+            }
+
+            _hitReact.Prepare(clip, duration, hitFrom, then);
+
+            // 이미 움찔하는 중이면 Prepare가 다시 시작시킨다. 인터럽트를 또 걸면 움찔하던 걸 끊고 원래 행동으로 돌아가 버린다.
+            if (ReferenceEquals(Machine.Current, _hitReact))
+            {
+                return;
+            }
+
+            if (Machine.CanInterrupt)
+            {
+                Machine.Interrupt(_hitReact);
+                return;
+            }
+
+            // 돌고 있는 행동이 없다(행동 사이·시퀀스가 끝난 뒤). 끊을 게 없으니 때린 쪽으로 바로 돌아서고 클립만 잠깐 튼다.
+            if (_customer != null)
+            {
+                HitReactState.TurnTowards(_customer.transform, hitFrom, 360f);
+            }
+
+            IActionAnimator action = _customer != null ? _customer.ActionAnimator : null;
+            if (action != null && clip != null)
+            {
+                // 클립을 먼저 튼다(PlayFor는 첫 대기 전에 클립을 건다). 그래야 이동 모듈이 서기 클립으로 덮지 않는다.
+                action.PlayFor(clip, duration, destroyCancellationToken).Forget();
+                _customer.Mover?.Stop();
+            }
+        }
 
         /// <summary>도망. 어느 상태에서든 호출할 수 있다.</summary>
         public void RunAway()
