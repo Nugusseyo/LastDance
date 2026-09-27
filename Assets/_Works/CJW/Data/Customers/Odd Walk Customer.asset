@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Odd Walk Customer
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.CustomerDataSO
   poolItem: {fileID: 11400000, guid: fe687d565ece75549b3a13976c3efeb8, type: 2}
-  <CustomerType>k__BackingField: 2
+  <CustomerType>k__BackingField: 12
   moveSpeed: 3.5
   angularSpeed: 120
   stoppingDistance: 0.2

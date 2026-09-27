@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bde5fd399f54a7db30709fbc6e3e094, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.TestCustomer
-  <HumanType>k__BackingField: 1
+  <HumanType>k__BackingField: 2
   <Agent>k__BackingField: {fileID: 3456830236770064048}
   <PoolItem>k__BackingField: {fileID: 11400000, guid: 4842f099d15f7dd458eb24f0e9907feb, type: 2}
 --- !u!114 &684480218473189439
@@ -137,6 +137,7 @@ MonoBehaviour:
     - rid: 4377106771376341130
   - Phase: 3
     States:
+    - rid: 4377106929555079257
     - rid: 4377106771376341119
     - rid: 4377106771376341121
   - Phase: 5
@@ -160,13 +161,6 @@ MonoBehaviour:
         stagger: 0
         jitter: 0.2
         unboardSound: {fileID: 0}
-    - rid: 4377106771376341130
-      type: {class: JoinRendezvousState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
-      data:
-        condition:
-          rid: -2
-        rendezvous: {fileID: 11400000, guid: 96819d8b25e4230499c447e4381b735c, type: 2}
-        meetKey: fight
     - rid: 4377106771376341119
       type: {class: MeetUpState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
       data:
@@ -202,12 +196,29 @@ MonoBehaviour:
         jitter: 0.2
         timeout: 40
         boardSound: {fileID: 0}
+    - rid: 4377106771376341130
+      type: {class: JoinRendezvousState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
+      data:
+        condition:
+          rid: -2
+        rendezvous: {fileID: 11400000, guid: 96819d8b25e4230499c447e4381b735c, type: 2}
+        meetKey: fight
     - rid: 4377106798104543313
       type: {class: MapPointCountCondition, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.Conditions, asm: Assembly-CSharp}
       data:
         pointType: 2
         minCount: 2
         availableOnly: 0
+    - rid: 4377106929555079257
+      type: {class: SpeechState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
+      data:
+        condition:
+          rid: -2
+        poolManager: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
+        bubbleItem: {fileID: 11400000, guid: 2a00163c0ed52214a828e00935dbf2e5, type: 2}
+        offset: {x: 0, y: 2.2, z: 0}
+        runAlongside: 1
+        speechSound: {fileID: 0}
 --- !u!114 &1937135294297791184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -476,6 +487,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1224f78c79e462d41bc4749a4b4024d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Modules.AgentRenderer
+  AnimationEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &4170889198326711947 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3118912421045735128, guid: be6cb4f0791ad3a4a80b41c3177f0aba, type: 3}
