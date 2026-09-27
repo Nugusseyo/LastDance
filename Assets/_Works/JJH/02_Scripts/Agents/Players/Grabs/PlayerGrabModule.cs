@@ -43,6 +43,16 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
         {
             if (CurrentGrabObject != null)
             {
+                if (CurrentItem is FuelNozzle && fuelInjector != null
+                  && _player.Sensor.FindItem(_player.Camera.CameraTrans, fuelInjector.FuelDoorLayerMask,
+                                                                  pickupDistance, out Collider fuelDoorCollider))
+                {
+                    FuelDoor fuelDoor = fuelDoorCollider.GetComponent<FuelDoor>();
+
+                    if (fuelDoor != null && fuelInjector.TryStartFueling(fuelDoor))
+                        return;
+                }
+
                 if (AttachCurrentItem())
                     return;
 
@@ -87,9 +97,9 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
             if (fuelInjector != null
               && _player.Sensor.FindItem(_player.Camera.CameraTrans, fuelInjector.FuelDoorLayerMask,
-                                                              pickupDistance, out Collider fuelDoorCollider))
+                                                              pickupDistance, out Collider fuelDoorCollider2))
             {
-                FuelDoor fuelDoor = fuelDoorCollider.GetComponent<FuelDoor>();
+                FuelDoor fuelDoor = fuelDoorCollider2.GetComponent<FuelDoor>();
 
                 if (fuelDoor == null)
                     return;
