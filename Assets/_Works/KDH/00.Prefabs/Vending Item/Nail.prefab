@@ -130,7 +130,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.ItemType.NailTirePopper
   wheelLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
   popForce: 5
 --- !u!54 &2136057023257040255
 Rigidbody:
