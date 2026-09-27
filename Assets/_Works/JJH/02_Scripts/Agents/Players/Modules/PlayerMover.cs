@@ -92,7 +92,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
 
             if (stamina <= 0f)
             {
-                stamina = 0f;
+                Stamina = 0f;
                 _sprintReleased = false;
                 return;
             }
@@ -101,9 +101,9 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
         }
 
         public void RecoverStamina()
-            => stamina = Mathf.Clamp01(stamina + staminaRecoveryRate * Time.deltaTime);
+            => Stamina = Mathf.Clamp01(stamina + staminaRecoveryRate * Time.deltaTime);
 
         private void ConsumeStamina()
-            => stamina = Mathf.Clamp01(stamina - staminaDrainRate * Time.deltaTime);
+            => Stamina = Mathf.Clamp01(stamina - staminaDrainRate * Time.deltaTime);
     }
 }
