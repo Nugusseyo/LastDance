@@ -34,6 +34,58 @@ Transform:
   - {fileID: 4387856365547739587}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6425177454153663090
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2016884453542562852}
+  - component: {fileID: 8163389173347491194}
+  m_Layer: 5
+  m_Name: MoneyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2016884453542562852
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6425177454153663090}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6546888155170082663}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &8163389173347491194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6425177454153663090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 081ed3c6366ec604581c020cce9b71a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.Data_Container.Money.MoneyManager
+  moneyContainer: {fileID: 11400000, guid: e2d9677edeb7e28419dd3296b34645f6, type: 2}
+  reviewContainer: {fileID: 11400000, guid: 15c969aeb15147e4b82d949cb0989643, type: 2}
+  eventChannel: {fileID: 11400000, guid: 01ba2cac045ca0441ac68c1592a25d57, type: 2}
+  store: {fileID: 5249685548933689378}
 --- !u!1001 &1346037082799847927
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -408,12 +460,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 4974850981784482218, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2016884453542562852}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
 --- !u!224 &960488814719129320 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1334569586291746853, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
+  m_PrefabInstance: {fileID: 2292614283162582733}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5249685548933689378 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6272284727962881775, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
+  m_PrefabInstance: {fileID: 2292614283162582733}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1981b61277618104682b8bcb482b3045, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.StoreUI.Store
+--- !u!224 &6546888155170082663 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4974850981784482218, guid: de58422f5fd1f374faa4a92521c688ce, type: 3}
   m_PrefabInstance: {fileID: 2292614283162582733}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &8140295034190709966 stripped

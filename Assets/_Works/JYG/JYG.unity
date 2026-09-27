@@ -6647,58 +6647,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8818384289722582929, guid: 3c3985f813d2fa24b8afb59a1e517925, type: 3}
   m_PrefabInstance: {fileID: 1153382050}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1171791660
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1171791661}
-  - component: {fileID: 1171791662}
-  m_Layer: 5
-  m_Name: MoneyManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1171791661
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1171791660}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1359774432}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1171791662
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1171791660}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 081ed3c6366ec604581c020cce9b71a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.Data_Container.Money.MoneyManager
-  moneyContainer: {fileID: 11400000, guid: e2d9677edeb7e28419dd3296b34645f6, type: 2}
-  reviewContainer: {fileID: 11400000, guid: 15c969aeb15147e4b82d949cb0989643, type: 2}
-  eventChannel: {fileID: 11400000, guid: 01ba2cac045ca0441ac68c1592a25d57, type: 2}
-  store: {fileID: 2680572877814268382}
 --- !u!1001 &1172570458
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7922,11 +7870,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 2619952571787679945, guid: 976194b71e419d84eb8b6fd6b91e45f9, type: 3}
   m_PrefabInstance: {fileID: 1354028809}
-  m_PrefabAsset: {fileID: 0}
---- !u!224 &1359774432 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 6546888155170082663, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
-  m_PrefabInstance: {fileID: 7424721939505797613}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1388865130
 PrefabInstance:
@@ -12017,17 +11960,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 430c4d1ba180cdb47af7348064cec04c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.PanelUI
---- !u!114 &2680572877814268382 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5249685548933689378, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
-  m_PrefabInstance: {fileID: 7424721939505797613}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1981b61277618104682b8bcb482b3045, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.StoreUI.Store
 --- !u!1001 &7424721939505797613
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12132,41 +12064,9 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3300467367486629090, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3300467367486629090, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3300467367486629090, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3300467367486629090, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4649069318483591759, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
       propertyPath: m_Name
       value: JYGPack
-      objectReference: {fileID: 0}
-    - target: {fileID: 6648196080092112232, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6648196080092112232, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6648196080092112232, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6648196080092112232, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8649817081433913747, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -12210,10 +12110,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 6546888155170082663, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1171791661}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9435065319308de4eadec0e34dc343d0, type: 3}
 --- !u!1001 &8040041214485126811
