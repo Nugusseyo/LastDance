@@ -30,12 +30,65 @@ namespace _Works.JYG._Scripts.GameModule
         [SerializeField] private int resBad = -3;
         [SerializeField] private int resLate = -1;
 
+        
+        #region Review Block & Buff logic
+
+        private Coroutine _reviewBlockCoroutine;
+        private float _duration;
+        private bool _isBlocked = false;
+
+        private Coroutine _reviewBuffCoroutine;
+        private bool _isBuff = false;
+        
+        #endregion
         private void Awake()
         {
             if (reviewContainer == null)
                 Debug.LogWarning("ReviewManager에 ReviewContainer가 존재하지 않습니다!");
             if (eventChannel != null)
+            {
                 eventChannel.AddListener<ReviewEvent>(PlusValue);
+                eventChannel.AddListener<ReviewBlockEvent>(HandleReviewBlock);
+                eventChannel.AddListener<ReviewBuffEvent>(HandleReviewBuff);
+            }
+        }
+
+        private void HandleReviewBuff(ReviewBuffEvent evt)
+        {
+            if(_reviewBuffCoroutine != null)
+                StopCoroutine(_reviewBuffCoroutine);
+            
+            _reviewBuffCoroutine = StartCoroutine(ReviewBuff(evt.Duration));
+        }
+
+        private IEnumerator ReviewBuff(float duration)
+        {
+            _isBuff = true;
+            eventChannel.RaiseEvent(UIEvents.BuffEvent.Init(BuffType.Coke, duration));  //평점 2배는 콜라임.
+            yield return new WaitForSeconds(duration);
+            _isBuff = false;
+            _reviewBuffCoroutine = null;
+        }
+
+        private void HandleReviewBlock(ReviewBlockEvent evt)
+        {
+            if (_reviewBlockCoroutine != null)
+            {
+                StopCoroutine(_reviewBlockCoroutine);
+            }
+
+            _reviewBlockCoroutine = StartCoroutine(ReviewBlockWithDuration(evt.BlockDuration));
+        }
+
+        private IEnumerator ReviewBlockWithDuration(float blockDuration)
+        {
+            _isBlocked = true;
+            eventChannel.RaiseEvent(UIEvents.BuffEvent.Init(BuffType.Cider, blockDuration)); //평점 보호는 사이다임.
+            
+            yield return new WaitForSeconds(blockDuration);
+            
+            _isBlocked = false;
+            _reviewBlockCoroutine = null;
         }
 
         private void OnEnable()
@@ -62,6 +115,8 @@ namespace _Works.JYG._Scripts.GameModule
             if (eventChannel != null)
             {
                 eventChannel.RemoveListener<ReviewEvent>(PlusValue);
+                eventChannel.RemoveListener<ReviewBlockEvent>(HandleReviewBlock);
+                eventChannel.RemoveListener<ReviewBuffEvent>(HandleReviewBuff);
             }
         }
 
@@ -92,7 +147,11 @@ namespace _Works.JYG._Scripts.GameModule
             
             if(canAlarm)
                 OnValueChanged?.Invoke(evt.ReviewType, evt.Index);
+
+            if (_isBlocked && evt.ReviewType != ReviewType.Good)
+                return;
             
+            int multiplier = _isBuff ? 2 : 1;
             
             reviewContainer.Value += evt.ReviewType switch
             {
@@ -100,7 +159,7 @@ namespace _Works.JYG._Scripts.GameModule
                 ReviewType.Bad => resBad,
                 ReviewType.Late => resLate,
                 _ => 0
-            };
+            } * multiplier;
         }
         
         #if UNITY_EDITOR
