@@ -50,8 +50,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15a66550fd3f2144ba07301922417cb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Car.CarSeller
-  carBasePrice: 40000
-  wheelDefaultPrice: 500
+  carBasePrice: 15000
+  wheelDefaultPrice: 7000
   RefuelingPrice: 6000
   wheelLayerMask:
     serializedVersion: 2
@@ -291,6 +291,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
   <CurrentItemData>k__BackingField: {fileID: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  UseEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &1379312130642307686
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -420,6 +426,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
   <CurrentItemData>k__BackingField: {fileID: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  UseEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &2407409805805717863
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -549,6 +561,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
   <CurrentItemData>k__BackingField: {fileID: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  UseEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &7210190285598707122
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -673,6 +691,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
   <CurrentItemData>k__BackingField: {fileID: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  UseEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &9184792064591817706 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1979704105652135512, guid: 6097a8e438dc95c41b23e3c4b867d0fa, type: 3}
