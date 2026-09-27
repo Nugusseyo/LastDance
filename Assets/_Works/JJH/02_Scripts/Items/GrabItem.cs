@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
-namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
+namespace _Works.JJH._02_Scripts.Items
 {
     [RequireComponent(typeof(Rigidbody), typeof(Collider))]
     public class GrabItem : MonoBehaviour
     {
         [field: SerializeField] public ItemDataSO CurrentItemData { get; private set; }
+
+        public UnityEvent UseEvent;
 
         private Rigidbody _rigidbody;
         private Collider _collider;
@@ -19,6 +22,11 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
         private void Start()
         {
             SetKinematicState();
+        }
+
+        public void UseItem()
+        {
+            UseEvent?.Invoke();
         }
 
         public void SetGrabState()

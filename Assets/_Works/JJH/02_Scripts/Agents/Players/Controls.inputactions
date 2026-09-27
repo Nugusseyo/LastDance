@@ -61,10 +61,10 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ChangeWeapon",
-                    "type": "Value",
+                    "name": "Use",
+                    "type": "Button",
                     "id": "1193ef93-901d-439a-9b0a-b3eeacf53170",
-                    "expectedControlType": "Vector2",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -220,7 +220,7 @@
                     "path": "<Keyboard>/f",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Keyboard&Mouse",
                     "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -228,11 +228,11 @@
                 {
                     "name": "",
                     "id": "1b08d635-9c3d-4bcb-b76d-ce25938c4bce",
-                    "path": "<Mouse>/scroll",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "Scale",
-                    "groups": "",
-                    "action": "ChangeWeapon",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Use",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

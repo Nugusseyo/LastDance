@@ -1,8 +1,12 @@
+using _Works.JJH._02_Scripts.Items;
+using _Works.JYG._Scripts.Events;
+using _Works.KDH._01.Scripts.Wrench;
+using DevLib.EventChannelSystem;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
+namespace _Works.KDH._01.Scripts.Car
 {
     public class PartDetacher : MonoBehaviour
     {
@@ -10,7 +14,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
         [SerializeField] private LayerMask partLayerMask;
         [SerializeField] private LayerMask wheelLayerMask;
         [SerializeField] private LayerMask groundLayerMask;
-        
 
         [Header("Detach")]
         [SerializeField] private float popForce = 5f;
@@ -18,11 +21,19 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
         [SerializeField] private float collapseTiltAngle = 5f;
         [SerializeField] private float collapseDuration = 0.15f;
         [SerializeField] private float pickupDistance = 4f;
-        [SerializeField] private float detachTime = 3f;
+
+        [Header("Detach Time / UI")]
+        [SerializeField] private EventChannelSO durationChannel;
+        [SerializeField] private float handDetachTime = 8f;
 
         public LayerMask PartLayerMask => partLayerMask;
+        public bool IsDetaching => _pendingPart != null;
 
         private Coroutine _collapseCoroutine;
+
+        private GrabItem _pendingPart;
+        private float _holdTime;
+        private bool _progressShown;
 
         private struct WheelSocket
         {
@@ -39,42 +50,16 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
             if (part == null)
                 return false;
 
-            GameObject partObject = part.gameObject;
-            Transform car = partObject.transform.parent;
+            if (part.transform.parent == null)
+                return true;
 
-            if (car == null)
-                return false;
-
-            bool isWheel = IsWheel(partObject);
-            Vector3 wheelDropPoint = partObject.transform.position;
-
-            if (isWheel && !_wheelSockets.ContainsKey(partObject))
+            if (_pendingPart != part)
             {
-                _wheelSockets[partObject] = new WheelSocket
-                {
-                    parent = car,
-                    localPosition = partObject.transform.localPosition,
-                    localRotation = partObject.transform.localRotation,
-                    carHeight = car.position.y
-                };
+                _pendingPart = part;
+                _holdTime = 0f;
             }
 
-            partObject.transform.SetParent(null);
-
-            part.SetPhysicsState();
-
-            Vector3 outward = partObject.transform.position - car.position;
-            outward.y = 0f;
-
-            if (outward.sqrMagnitude > 0.001f)
-                outward.Normalize();
-
-            part.AddForce(outward * popForce + Vector3.up * upForce, ForceMode.VelocityChange);
-
-            if (isWheel)
-                CollapseCar(car, wheelDropPoint);
-
-            return true;
+            return false;
         }
 
         public bool TryAttachWheel(GrabItem part, Transform cameraTrm)
@@ -204,6 +189,88 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
             }
 
             _collapseCoroutine = null;
+        }
+
+        public void CancelDetach()
+        {
+            if (_pendingPart == null)
+                return;
+
+            _pendingPart = null;
+            _holdTime = 0f;
+            HideProgress();
+        }
+
+        public bool TickDetach(float deltaTime, WrenchTool wrench)
+        {
+            if (_pendingPart == null)
+                return false;
+
+            _holdTime += deltaTime;
+            float requiredTime = wrench != null ? wrench.GetDetachTime() : handDetachTime;
+
+            ShowProgress(_holdTime, requiredTime);
+
+            if (_holdTime < requiredTime)
+                return false;
+
+            GrabItem part = _pendingPart;
+            _pendingPart = null;
+            _holdTime = 0f;
+            HideProgress();
+
+            DetachNow(part);
+            return true;
+        }
+
+        private void DetachNow(GrabItem part)
+        {
+            GameObject partObject = part.gameObject;
+            Transform car = partObject.transform.parent;
+
+            bool isWheel = IsWheel(partObject);
+            Vector3 wheelDropPoint = partObject.transform.position;
+
+            if (isWheel && !_wheelSockets.ContainsKey(partObject))
+            {
+                _wheelSockets[partObject] = new WheelSocket
+                {
+                    parent = car,
+                    localPosition = partObject.transform.localPosition,
+                    localRotation = partObject.transform.localRotation,
+                    carHeight = car.position.y
+                };
+            }
+
+            partObject.transform.SetParent(null);
+
+            part.SetPhysicsState();
+
+            Vector3 outward = partObject.transform.position - car.position;
+            outward.y = 0f;
+
+            if (outward.sqrMagnitude > 0.001f)
+                outward.Normalize();
+
+            part.AddForce(outward * popForce + Vector3.up * upForce, ForceMode.VelocityChange);
+
+            if (isWheel)
+                CollapseCar(car, wheelDropPoint);
+        }
+
+        private void ShowProgress(float current, float max)
+        {
+            _progressShown = true;
+            if (durationChannel == null) return;
+            durationChannel.RaiseEvent(UIEvents.DurationEvent.Init(current, max));
+        }
+
+        private void HideProgress()
+        {
+            if (!_progressShown) return;
+            _progressShown = false;
+            if (durationChannel == null) return;
+            durationChannel.RaiseEvent(UIEvents.DurationEvent.Init(1f, 1f));
         }
     }
 }

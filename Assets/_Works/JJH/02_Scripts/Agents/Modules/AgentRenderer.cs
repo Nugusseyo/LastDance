@@ -1,5 +1,6 @@
 ﻿using DevLib.ModuleSystem;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace _Works.JJH._02_Scripts.Agents.Modules
 {
@@ -7,12 +8,19 @@ namespace _Works.JJH._02_Scripts.Agents.Modules
     {
         public Animator Animator { get; private set; }
 
+        public UnityEvent AnimationEvent;
+
         public override void Initialize(ModuleOwner owner)
         {
             base.Initialize(owner);
 
             // 손님처럼 Animator가 visual 자식에 있는 프리팹도 있다. 같은 오브젝트면 이쪽이 먼저 잡힌다.
             Animator = GetComponentInChildren<Animator>(true);
+        }
+
+        public void AnimationEventInvoke()
+        {
+            AnimationEvent?.Invoke();
         }
 
         public void SetVisualPos(Vector3 fixedPos)

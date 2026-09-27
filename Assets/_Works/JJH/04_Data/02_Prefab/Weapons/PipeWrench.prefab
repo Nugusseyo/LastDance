@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4312758828612840927}
   - component: {fileID: 2436492952916657325}
+  - component: {fileID: 2155579105525674521}
   - component: {fileID: 2251847248446553244}
   - component: {fileID: 6316519221571150485}
   m_Layer: 15
@@ -47,7 +48,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
-  <CurrentWeaponData>k__BackingField: {fileID: 11400000, guid: 6b4a1b5a1395bee4e93144745220c8e3, type: 2}
+  <CurrentItemData>k__BackingField: {fileID: 0}
+  UseEvent:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &2155579105525674521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8876438061692220578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c631a3deaf4ac4488a6e3bc6ed1a485, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Wrench.WrenchTool
+  level: 1
 --- !u!54 &2251847248446553244
 Rigidbody:
   m_ObjectHideFlags: 0

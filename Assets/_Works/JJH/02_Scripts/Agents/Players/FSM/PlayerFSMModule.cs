@@ -14,6 +14,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM
         [SerializeField] private HashDataSO moveHash;
         [SerializeField] private HashDataSO runHash;
         [SerializeField] private HashDataSO grabHash;
+        [SerializeField] private HashDataSO useHash;
         [SerializeField] private HashDataSO attackHash;
 
         public LowerBodyStateMachine LowerBody { get; private set; }
@@ -36,6 +37,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM
 
             _player.PlayerInput.OnAttackKeyPressed += HandleAttackKeyPressed;
             _player.PlayerInput.OnThrowAttackKeyPressed += HandleAttackKeyPressed;
+            _player.PlayerInput.OnUseKeyPressed += HandleUseKeyPressed;
         }
 
         private void OnDestroy()
@@ -44,12 +46,19 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM
             {
                 _player.PlayerInput.OnAttackKeyPressed -= HandleAttackKeyPressed;
                 _player.PlayerInput.OnThrowAttackKeyPressed -= HandleAttackKeyPressed;
+                _player.PlayerInput.OnUseKeyPressed -= HandleUseKeyPressed;
             }
         }
 
         private void HandleAttackKeyPressed()
         {
             UpperBody.ChangeState<UpperAttackState>();
+        }
+
+        private void HandleUseKeyPressed()
+        {
+            if (_player.Grab.CurrentItem != null)
+                UpperBody.ChangeState<UpperUseState>();
         }
 
         private void Update()
@@ -68,6 +77,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM
                 nextAnimation = attackHash;
             else if (UpperBody.IsState<UpperGrabState>())
                 nextAnimation = grabHash;
+            else if (UpperBody.IsState<UpperUseState>())
+                nextAnimation = useHash;
             else if (LowerBody.IsState<LowerRunState>())
                 nextAnimation = runHash;
             else if (LowerBody.IsState<LowerMoveState>())

@@ -1,4 +1,4 @@
-using _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons;
+using _Works.JJH._02_Scripts.Agents.Players.Grabs;
 using _Works.JYG._Scripts.Events;
 using DevLib.EventChannelSystem;
 using UnityEngine;

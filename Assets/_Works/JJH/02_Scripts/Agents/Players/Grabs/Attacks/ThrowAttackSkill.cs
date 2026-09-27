@@ -1,7 +1,7 @@
-﻿using _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons;
+﻿using _Works.JJH._02_Scripts.Items;
 using UnityEngine;
 
-namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
+namespace _Works.JJH._02_Scripts.Agents.Players.Grabs.Attacks
 {
     public class ThrowAttackSkill : AbstractPlayerAttack
     {
@@ -9,10 +9,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks
 
         public override void Attack()
         {
-            if (player.Grab == null || player.Grab.CurrentWeapon == null)
+            if (player.Grab == null || player.Grab.CurrentItem == null)
                 return;
 
-            GrabItem weapon = player.Grab.CurrentWeapon;
+            GrabItem weapon = player.Grab.CurrentItem;
             GameObject weaponObject = player.Grab.CurrentGrabObject;
 
             if (weaponObject == null)

@@ -1,15 +1,18 @@
-﻿using DevLib.ModuleSystem;
+﻿using _Works.JJH._02_Scripts.Items;
+using _Works.KDH._01.Scripts.Car;
+using _Works.KDH._01.Scripts.Wrench;
+using DevLib.ModuleSystem;
 using UnityEngine;
 
-namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
+namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 {
     public class PlayerGrabModule : AbstractModule, IPlayerGrab
     {
-        public GrabItem CurrentWeapon { get; private set; }
+        public GrabItem CurrentItem { get; private set; }
         public GameObject CurrentGrabObject { get; private set; }
 
         [Header("Layer")]
-        [SerializeField] private LayerMask weaponLayer;
+        [SerializeField] private LayerMask itemLayer;
 
         [Header("Grab")]
         [SerializeField] private Transform weaponHoldPoint;
@@ -26,6 +29,11 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
             _player = (Player)owner;
         }
 
+        public void UseItem()
+        {
+            CurrentItem.UseItem();
+        }
+
         public void PickupItem()
         {
             if (CurrentGrabObject != null)
@@ -38,23 +46,22 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
             }
 
             if (partDetacher != null
-                && _player.Sensor.FindItem(_player.Camera.CameraTrans, partDetacher.PartLayerMask,
-                                                                pickupDistance, out Collider partCollider))
+              && _player.Sensor.FindItem(_player.Camera.CameraTrans, partDetacher.PartLayerMask,
+                                                              pickupDistance, out Collider partCollider))
             {
                 GrabItem part = partCollider.GetComponent<GrabItem>();
 
                 if (part == null)
                     return;
 
-                if (part.transform.parent != null
-                    && !partDetacher.TryDetachPart(part))
+                if (!partDetacher.TryDetachPart(part))
                     return;
 
                 EquipItem(part);
                 return;
             }
 
-            if (!_player.Sensor.FindItem(_player.Camera.CameraTrans, weaponLayer, pickupDistance, out Collider collider))
+            if (!_player.Sensor.FindItem(_player.Camera.CameraTrans, itemLayer, pickupDistance, out Collider collider))
                 return;
 
             GrabItem item = collider.GetComponent<GrabItem>();
@@ -70,7 +77,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
             if (item == null)
                 return;
 
-            CurrentWeapon = item;
+            CurrentItem = item;
             CurrentGrabObject = item.gameObject;
 
             item.SetGrabState();
@@ -81,7 +88,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
 
         public void SwapItem(GrabItem item)
         {
-            if (item == null || item == CurrentWeapon)
+            if (item == null || item == CurrentItem)
                 return;
 
             if (CurrentGrabObject == null)
@@ -97,44 +104,74 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons
             currentItemTransform.SetParent(null);
             currentItemTransform.SetPositionAndRotation(itemPosition, itemRotation);
 
-            CurrentWeapon.SetPhysicsState();
+            CurrentItem.SetPhysicsState();
 
             EquipItem(item);
         }
 
         public void DropItem()
         {
-            if (CurrentWeapon == null)
+            if (CurrentItem == null)
                 return;
 
-            CurrentWeapon.transform.SetParent(null);
-            CurrentWeapon.SetPhysicsState();
+            CurrentItem.transform.SetParent(null);
+            CurrentItem.SetPhysicsState();
 
-            CurrentWeapon = null;
+            CurrentItem = null;
             CurrentGrabObject = null;
         }
 
         public void ClearCurrentItem()
         {
-            if (CurrentWeapon != null)
-                CurrentWeapon.SetPhysicsState();
+            if (CurrentItem != null)
+                CurrentItem.SetPhysicsState();
 
-            CurrentWeapon = null;
+            CurrentItem = null;
             CurrentGrabObject = null;
         }
 
         public bool AttachCurrentItem()
         {
-            if (CurrentWeapon == null || partDetacher == null)
+            if (CurrentItem == null || partDetacher == null)
                 return false;
 
-            if (!partDetacher.TryAttachWheel(CurrentWeapon, _player.Camera.CameraTrans))
+            if (!partDetacher.TryAttachWheel(CurrentItem, _player.Camera.CameraTrans))
                 return false;
 
-            CurrentWeapon = null;
+            CurrentItem = null;
             CurrentGrabObject = null;
 
             return true;
+        }
+
+        public void DestroyCurrentItem()
+        {
+            if (CurrentGrabObject == null)
+                return;
+
+            Destroy(CurrentGrabObject);
+
+            ClearCurrentItem();
+        }
+
+        public void UpdateDetachHold()
+        {
+            if (partDetacher == null || !partDetacher.IsDetaching)
+                return;
+
+            bool holding = _player.PlayerInput != null && _player.PlayerInput.IsInteractHeld;
+
+            if (!holding)
+            {
+                partDetacher.CancelDetach();
+                return;
+            }
+
+            WrenchTool wrench = CurrentGrabObject != null
+                                                ? CurrentGrabObject.GetComponent<WrenchTool>()
+                                                : null;
+
+            partDetacher.TickDetach(Time.deltaTime, wrench);
         }
     }
 }

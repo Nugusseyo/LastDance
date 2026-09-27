@@ -1,6 +1,8 @@
 ﻿using _Works.JJH._02_Scripts.Agents.Modules;
 using _Works.JYG._Scripts.Events;
+using _Works.KDH._01.Scripts.ItemType;
 using DevLib.EventChannelSystem;
+using System;
 using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.Modules
@@ -14,6 +16,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
 
         [Header("Data")]
         [SerializeField] private EventChannelSO uiChannel;
+        [SerializeField] private EventChannelSO itemEffectChannel;
 
         public float Stamina
         {
@@ -27,6 +30,52 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
         public bool CanRun => stamina > 0f && _sprintReleased;
 
         private bool _sprintReleased = true;
+
+        private float _speedMultiplier = 1f;
+        private float _speedBoostTimer;
+
+        private void Awake()
+        {
+            itemEffectChannel.AddListener<SpeedBoostEvent>(SpeedBoostEventHandle);
+        }
+
+        private void OnDestroy()
+        {
+            itemEffectChannel.RemoveListener<SpeedBoostEvent>(SpeedBoostEventHandle);
+        }
+
+        private void Update()
+        {
+            if (_speedBoostTimer <= 0f)
+                return;
+
+            _speedBoostTimer -= Time.deltaTime;
+
+            if (_speedBoostTimer <= 0f)
+            {
+                _speedBoostTimer = 0f;
+
+                MoveSpeed /= _speedMultiplier;
+                RunSpeed /= _speedMultiplier;
+
+                _speedMultiplier = 1f;
+            }
+        }
+
+        private void SpeedBoostEventHandle(SpeedBoostEvent evt)
+        {
+            if (_speedBoostTimer > 0f)
+            {
+                MoveSpeed /= _speedMultiplier;
+                RunSpeed /= _speedMultiplier;
+            }
+
+            _speedMultiplier = evt.Multiplier;
+            _speedBoostTimer = evt.Duration;
+
+            MoveSpeed *= _speedMultiplier;
+            RunSpeed *= _speedMultiplier;
+        }
 
         public void UpdateSprintState(bool isSprinting)
         {

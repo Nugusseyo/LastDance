@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8255701257384843791}
-  - component: {fileID: 7991099934579792339}
+  - component: {fileID: 8319282374609873503}
   m_Layer: 0
   m_Name: PlayerAttackSkillModule
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7991099934579792339
+--- !u!114 &8319282374609873503
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,6 +41,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 6450463814592710810}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 814bad91c804f234db9b9e79e8db6c31, type: 3}
+  m_Script: {fileID: 11500000, guid: 36a96533506b3e74189ecb0b6e4a3e8f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.PlayerAttackSkillModule
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Grabs.Attacks.PlayerAttackSkillModule
