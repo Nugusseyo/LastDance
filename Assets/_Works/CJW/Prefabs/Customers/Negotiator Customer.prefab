@@ -48,6 +48,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4465516880626282336, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 3601089496038113904}
     - target: {fileID: 4559870543567499094, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: <PoolItem>k__BackingField
       value: 
@@ -60,157 +64,30 @@ PrefabInstance:
       propertyPath: agent
       value: 
       objectReference: {fileID: 8035260773353730888}
-    - target: {fileID: 5790812639602798014, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: animator
-      value: 
-      objectReference: {fileID: 7367463639401576798}
     - target: {fileID: 7189175007966602525, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: m_Name
       value: Negotiator Customer
       objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: 'managedReferences[4377106815191875685]'
-      value: Assembly-CSharp _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States.UnboardState
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: 'managedReferences[4377106815191875686]'
-      value: Assembly-CSharp _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States.MoveToNearestPointState
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: 'managedReferences[4377106815191875687]'
-      value: Assembly-CSharp _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States.RequestServiceState
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: 'managedReferences[4377106815191875688]'
-      value: Assembly-CSharp _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States.StayState
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: 'managedReferences[4377106815191875689]'
-      value: Assembly-CSharp _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States.BoardState
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: 'sequences.Array.data[0].States.Array.data[0]'
-      value: 4377106815191875685
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: 'sequences.Array.data[1].States.Array.data[0]'
-      value: 4377106815191875686
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: 'sequences.Array.data[1].States.Array.data[1]'
-      value: 4377106815191875687
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: 'sequences.Array.data[1].States.Array.data[2]'
-      value: 4377106815191875688
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: 'sequences.Array.data[2].States.Array.data[0]'
-      value: 4377106815191875689
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875685].jitter
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875687].amount
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875689].jitter
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875685].stagger
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875686].timeout
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875687].faceCar
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875689].stagger
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875689].timeout
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875688].duration
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875685].condition
-      value: -2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875686].condition
-      value: -2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875687].condition
-      value: -2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875687].requestAt
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875687].turnSpeed
-      value: 360
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875688].condition
-      value: -2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875689].condition
-      value: -2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875686].targetPoint
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875687].moveTimeout
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875687].requestType
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: managedReferences[4377106815191875687].waitTimeout
-      value: 30
-      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5790812639602798014, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
     - {fileID: 1849533345801159971, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2438315802242550798, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 3755322571624575713, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2388137659387331354}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7189175007966602525, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4924220749974728583}
+    - targetCorrespondingSourceObject: {fileID: 7189175007966602525, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2913686580832994417}
   m_SourcePrefab: {fileID: 100100000, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
 --- !u!4 &2827777916453235352 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3755322571624575713, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-  m_PrefabInstance: {fileID: 1379188847666255993}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &5751207205444449937 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6697899966989151976, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-  m_PrefabInstance: {fileID: 1379188847666255993}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &7367463639401576798 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 8439079218824929575, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
   m_PrefabInstance: {fileID: 1379188847666255993}
   m_PrefabAsset: {fileID: 0}
 --- !u!195 &8035260773353730888 stripped
@@ -235,3 +112,108 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6a3da4dde843de489d7340cab7bda3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Interaction.CustomerRequestModule
+--- !u!114 &2913686580832994417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8135410123454872932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f0442a68545331448e4cf10fe62183f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Animation.ActionAnimatorModule
+  crossFade: 0.1
+  exitClip: {fileID: 11400000, guid: 4aa00dabdbbb49f284c98aa9587ac5ff, type: 2}
+--- !u!1001 &8032101060064506547
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2827777916453235352}
+    m_Modifications:
+    - target: {fileID: 4978816779655408403, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+      propertyPath: m_Name
+      value: visual
+      objectReference: {fileID: 0}
+    - target: {fileID: 5644030507746144681, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0206
+      objectReference: {fileID: 0}
+    - target: {fileID: 5644030507746144681, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5644030507746144681, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5644030507746144681, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5644030507746144681, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5644030507746144681, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5644030507746144681, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5644030507746144681, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5644030507746144681, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5644030507746144681, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6813491633293684931, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: f922ab9b1f466d543a131aeb73839a32, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4978816779655408403, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2678330930884984249}
+  m_SourcePrefab: {fileID: 100100000, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+--- !u!4 &2388137659387331354 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5644030507746144681, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+  m_PrefabInstance: {fileID: 8032101060064506547}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3057818943389669792 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4978816779655408403, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+  m_PrefabInstance: {fileID: 8032101060064506547}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2678330930884984249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3057818943389669792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1224f78c79e462d41bc4749a4b4024d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Modules.AgentRenderer
+--- !u!95 &3601089496038113904 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 6813491633293684931, guid: ce2548dbc81851b488075bf19a61322a, type: 3}
+  m_PrefabInstance: {fileID: 8032101060064506547}
+  m_PrefabAsset: {fileID: 0}

@@ -8,13 +8,15 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 {
     /// <summary>정해진 종류의 지점 중 걸어서 닿는 가장 가까운 곳으로 가서 도착할 때까지 기다린다. 씬의 Transform을 직접 참조하지 않아 풀링해도 참조가 끊기지 않는다.</summary>
     [Serializable]
-    public sealed class MoveToNearestPointState : CustomerState
+    public sealed class MoveToNearestPointState : CustomerState, IDestinationState
     {
+        public MapPointType Destination => targetPoint;
+
         [Tooltip("이 종류의 지점 중 가장 가까운 곳으로 간다.")]
         [SerializeField] private MapPointType targetPoint = MapPointType.OilDispenser;
 
         [Tooltip("이 시간 안에 도착하지 못하면 Timeout으로 끝낸다. 0이면 무제한.")]
-        [SerializeField, Min(0f)] private float timeout = 15f;
+        [SerializeField, Min(0f)] private float timeout = 40f;
 
         [Tooltip("걸어서 닿는 지점이 없을 때 다시 찾아볼 시간(초). 줄지어 선 차가 길을 막았다가 떠나면 열린다.")]
         [SerializeField, Min(0f)] private float reachWait = 5f;

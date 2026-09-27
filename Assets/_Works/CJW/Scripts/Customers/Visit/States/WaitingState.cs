@@ -18,7 +18,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
 
         public override VisitPhase Tick(VisitContext context, float dt)
         {
-            if (phaseTimeout <= 0f)
+            // 손님이 차를 훔쳐 떠나는 중이면 스스로 출발하지 않는다. 방문은 그 손님이 떠나면 닫힌다.
+            if (phaseTimeout <= 0f || context.Abandoning)
             {
                 return VisitPhase.Waiting;
             }

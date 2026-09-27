@@ -1,5 +1,6 @@
 using System;
 using _Works.CJW.Scripts.Cars;
+using DevLib.SoundSystem;
 using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit.States
@@ -23,6 +24,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
 
         [Tooltip("이 단계에 머물 수 있는 한계 시간(초). 없으면 막힌 세션이 주차 자리를 영영 반납하지 않아 스폰까지 멈춘다.")]
         [SerializeField, Min(0f)] private float phaseTimeout = 45f;
+
+        [Header("사운드")]
+        [Tooltip("자리에 들어와 멈출 때 낼 소리(브레이크·시동 끄는 소리).")]
+        [SerializeField] private SoundClipSo parkSound;
 
         public override VisitPhase Phase => VisitPhase.Arriving;
 
@@ -125,6 +130,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
 
                 // NavMesh가 회전을 되돌리지 않도록 먼저 멈춘 뒤에 방향을 맞춘다.
                 context.Car.Stop();
+                context.Car.Sound?.Play(parkSound);
 
                 // 안전망. 어떤 이유로든 반대로 도착했다면 여기서 뒤집힌 쪽을 고른다.
                 // 덕분에 남는 각도가 항상 90도 이하라 제자리에서 크게 돌 일이 없다.

@@ -18,3 +18,5 @@ MonoBehaviour:
   angularSpeed: 120
   stoppingDistance: 0.2
   spawnWeight: 1
+  ridesAlone: 0
+  comesInPairs: 1

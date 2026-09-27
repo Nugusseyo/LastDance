@@ -1,5 +1,6 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using _Works.CJW.Scripts.Cars;
+using _Works.CJW.Scripts.MapSystems;
 using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit
@@ -16,6 +17,8 @@ namespace _Works.CJW.Scripts.Customers.Visit
         public Quaternion ArrivalRotation = Quaternion.identity;
         public Vector3 ShopPoint;
         public Vector3 ExitPoint;
+        /// <summary>주차 자리·주유기 같은 맵 지점. 차가 빠져나갈 길을 고를 때 본다. 없을 수 있다.</summary>
+        public MapDataSo MapData;
         public float Interval;
         /// <summary>현재 Phase의 손님별 시퀀스가 전원 끝났는지. 동기 Tick인 세션 상태와 비동기 손님 머신을 잇는 다리다.</summary>
         public bool CustomerPhaseDone = true;
@@ -43,6 +46,25 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>Leaving 전용. 곧게 빠져나올 지점.</summary>
         public Vector3 DepartPoint;
 
+        /// <summary>Leaving 전용. 차가 마지막으로 앞으로 나아간 자리와, 그 뒤로 막히지 않은 채 제자리였던 시간(초).</summary>
+        public Vector3 LeaveProgressPoint;
+        public float LeaveStallElapsed;
+
+        /// <summary>Leaving 전용. 제자리에 멈춘 차를 다시 출발시킨 횟수.</summary>
+        public int LeaveRestarts;
+
+        /// <summary>Leaving 전용. 앞차에 막힌 채 마지막 경적 뒤로 기다린 시간(초).</summary>
+        public float LeaveHonkElapsed;
+
+        /// <summary>손님이 다른 차를 훔치러 나섰는지. 이때부터 방문은 출발·퇴치 요청을 받지 않고 손님이 떠나기를 기다린다.</summary>
+        public bool Abandoning;
+
+        /// <summary>훔친 차가 맵을 빠져나갔는지. 세션이 다음 틱에 방문을 닫는다.</summary>
+        public bool AbandonDone;
+
+        /// <summary>손님이 훔쳐 탄 차. 방문을 닫을 때 손님을 먼저 풀로 돌린 뒤 치운다.</summary>
+        public StealableCar StolenCar;
+
         /// <summary>단계가 바뀔 때마다 진행 상태만 되돌린다. 방문 전체 값(차·지점)은 건드리지 않는다.</summary>
         public void ResetPhaseProgress()
         {
@@ -53,12 +75,19 @@ namespace _Works.CJW.Scripts.Customers.Visit
             PatrolPointElapsed = 0f;
             Departing = false;
             DepartPoint = Vector3.zero;
+            LeaveProgressPoint = Vector3.zero;
+            LeaveStallElapsed = 0f;
+            LeaveRestarts = 0;
+            LeaveHonkElapsed = 0f;
         }
 
         public void Clear()
         {
             Customers.Clear();
             Car = null;
+            Abandoning = false;
+            AbandonDone = false;
+            StolenCar = null;
             ResetPhaseProgress();
         }
     }

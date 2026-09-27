@@ -14,12 +14,27 @@ namespace DevLib.SoundSystem
         [SerializeField] private AudioMixerGroup musicGroup;
         
         private AudioSource _audioSource;
+        private Transform _follow;
         
         public event Action<SoundPlayer> OnSoundFinished;
 
         private void Awake()
         {
             _audioSource = GetComponent<AudioSource>();
+        }
+
+        /// <summary>소리가 따라다닐 대상을 정한다. null이면 제자리에 머문다.</summary>
+        public void SetFollow(Transform follow)
+        {
+            _follow = follow;
+        }
+
+        private void LateUpdate()
+        {
+            if (_follow != null)
+            {
+                transform.position = _follow.position;
+            }
         }
 
         public void PlaySound(SoundClipSo clipData)
@@ -58,12 +73,14 @@ namespace DevLib.SoundSystem
         {
             await Awaitable.WaitForSecondsAsync(time);
             _audioSource.Stop();
+            _follow = null;
             OnSoundFinished?.Invoke(this);
         }
 
         public void ForceStopSound()
         {
             _audioSource.Stop();
+            _follow = null;
         }
 
     }

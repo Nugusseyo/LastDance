@@ -76,6 +76,7 @@ GameObject:
   - component: {fileID: 1201033255657940018}
   - component: {fileID: 3258948878037891588}
   - component: {fileID: 3085645793791751695}
+  - component: {fileID: 648354110226391807}
   m_Layer: 0
   m_Name: TestSUV
   m_TagString: Untagged
@@ -251,6 +252,20 @@ MonoBehaviour:
     radius: 0
   steerVisualScale: 1
   steerFollowSpeed: 360
+--- !u!114 &648354110226391807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8015753301047892956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7fa35208d2216c47ad1f3540010f7e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Cars.CarHitDetectorModule
+  minHitSpeed: 1
+  repeatCooldown: 2
 --- !u!1 &8049125052074737424
 GameObject:
   m_ObjectHideFlags: 0

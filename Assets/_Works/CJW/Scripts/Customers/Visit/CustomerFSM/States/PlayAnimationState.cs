@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DevLib.AnimatorSystem;
+using DevLib.SoundSystem;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -27,6 +28,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("몸을 돌리는 각속도(도/초).")]
         [SerializeField, Min(1f)] private float turnSpeed = 360f;
 
+        [Header("사운드")]
+        [Tooltip("연출을 시작할 때 낼 소리. 화내는 몸짓이면 고함, 춤이면 흥얼거림처럼 클립에 맞춰 넣는다.")]
+        [SerializeField] private SoundClipSo startSound;
+
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
         {
             if (clips == null || clips.Length == 0)
@@ -51,6 +56,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 time += Random.Range(0f, jitter);
             }
 
+            Ctx.Customer.Sound?.Play(startSound);
             await PlayAction(clip, time, ct);
 
             return VisitOutcome.Done;

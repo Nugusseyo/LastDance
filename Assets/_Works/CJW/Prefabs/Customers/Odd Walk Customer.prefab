@@ -1,5 +1,96 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &5390720346988057389
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7208215807304512615}
+    m_Modifications:
+    - target: {fileID: 1366320327512348768, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: f922ab9b1f466d543a131aeb73839a32, type: 2}
+    - target: {fileID: 5014500871186048516, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+      propertyPath: m_Name
+      value: visual
+      objectReference: {fileID: 0}
+    - target: {fileID: 5682633802629659838, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0206
+      objectReference: {fileID: 0}
+    - target: {fileID: 5682633802629659838, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5682633802629659838, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5682633802629659838, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5682633802629659838, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5682633802629659838, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5682633802629659838, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5682633802629659838, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5682633802629659838, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5682633802629659838, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5014500871186048516, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9082168488345946836}
+  m_SourcePrefab: {fileID: 100100000, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+--- !u!4 &293695832898645907 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5682633802629659838, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+  m_PrefabInstance: {fileID: 5390720346988057389}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1105838635726402857 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5014500871186048516, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+  m_PrefabInstance: {fileID: 5390720346988057389}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9082168488345946836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1105838635726402857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1224f78c79e462d41bc4749a4b4024d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Modules.AgentRenderer
+--- !u!95 &6357264637535537997 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 1366320327512348768, guid: cca7ca7fef4016648a7396ddd83e4967, type: 3}
+  m_PrefabInstance: {fileID: 5390720346988057389}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5770571194513081990
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -48,6 +139,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4465516880626282336, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 6357264637535537997}
     - target: {fileID: 4559870543567499094, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: <PoolItem>k__BackingField
       value: 
@@ -56,10 +151,6 @@ PrefabInstance:
       propertyPath: agent
       value: 
       objectReference: {fileID: 3221208462557916599}
-    - target: {fileID: 5790812639602798014, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: animator
-      value: 
-      objectReference: {fileID: 2668539163900192673}
     - target: {fileID: 7189175007966602525, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: m_Name
       value: Odd Walk Customer
@@ -114,7 +205,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: managedReferences[4377106815191875666].timeout
-      value: 15
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: managedReferences[4377106815191875668].stagger
@@ -122,7 +213,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: managedReferences[4377106815191875668].timeout
-      value: 20
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: managedReferences[4377106815191875667].duration
@@ -144,26 +235,28 @@ PrefabInstance:
       propertyPath: managedReferences[4377106815191875668].condition
       value: -2
       objectReference: {fileID: 0}
+    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: managedReferences[4377106815191875668].boardSound
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: managedReferences[4377106815191875665].unboardSound
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5790812639602798014, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
     - {fileID: 1849533345801159971, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2438315802242550798, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 3755322571624575713, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 293695832898645907}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7189175007966602525, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5369252933812456644}
   m_SourcePrefab: {fileID: 100100000, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
---- !u!1 &929596833304471662 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6697899966989151976, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-  m_PrefabInstance: {fileID: 5770571194513081990}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &2668539163900192673 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 8439079218824929575, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-  m_PrefabInstance: {fileID: 5770571194513081990}
-  m_PrefabAsset: {fileID: 0}
 --- !u!195 &3221208462557916599 stripped
 NavMeshAgent:
   m_CorrespondingSourceObject: {fileID: 8980503021522971441, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
@@ -186,8 +279,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb2cd0e993424c947869699cf375c65a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Movement.OddGaitModule
-  walkClip: {fileID: 0}
+  walkClip: {fileID: 11400000, guid: a5916928c80afbd44aee71aeae5f599f, type: 2}
   swayDegrees: 25
   swaySpeed: 0.6
   irregularity: 0.35
   activeOnStart: 1
+--- !u!4 &7208215807304512615 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3755322571624575713, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+  m_PrefabInstance: {fileID: 5770571194513081990}
+  m_PrefabAsset: {fileID: 0}

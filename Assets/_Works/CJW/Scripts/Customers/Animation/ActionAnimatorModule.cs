@@ -25,6 +25,8 @@ namespace _Works.CJW.Scripts.Customers.Animation
 
         public bool IsPlaying { get; private set; }
 
+        public bool UsesRootMotion { get; private set; }
+
         public override void Initialize(ModuleOwner owner)
         {
             base.Initialize(owner);
@@ -44,7 +46,9 @@ namespace _Works.CJW.Scripts.Customers.Animation
             }
         }
 
-        public void Begin(HashDataSO clip)
+        public void Begin(HashDataSO clip) => Begin(clip, false);
+
+        public void Begin(HashDataSO clip, bool rootMotion)
         {
             if (clip == null || clip.HashValue == 0)
             {
@@ -53,6 +57,7 @@ namespace _Works.CJW.Scripts.Customers.Animation
             }
 
             IsPlaying = true;
+            UsesRootMotion = rootMotion;
             Play(clip);
         }
 
@@ -64,6 +69,7 @@ namespace _Works.CJW.Scripts.Customers.Animation
             }
 
             IsPlaying = false;
+            UsesRootMotion = false;
 
             // 이동 모듈이 다음 프레임에 걷기·서기를 다시 틀어 준다. exitClip은 이동 모듈이 없는 프리팹을 위한 보험이다.
             if (exitClip != null)

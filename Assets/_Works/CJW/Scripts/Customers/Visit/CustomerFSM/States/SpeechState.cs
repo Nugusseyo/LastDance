@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using _Works.JYG._Scripts.UI.SpeechBubble;
 using Cysharp.Threading.Tasks;
+using DevLib.SoundSystem;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
 
@@ -21,6 +22,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Header("표시")]
         [Tooltip("손님 기준으로 말풍선을 띄울 위치(m). 머리 위로 올리려면 y를 키운다.")]
         [SerializeField] private Vector3 offset = new(0f, 2.2f, 0f);
+
+        [Header("사운드")]
+        [Tooltip("말풍선이 뜰 때 낼 소리(웅얼거리는 말소리).")]
+        [SerializeField] private SoundClipSo speechSound;
 
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
         {
@@ -52,6 +57,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             bubble.transform.position = anchor.position + offset;
 
             bubble.InitializeBubble(Ctx.Customer.HumanType);
+            Ctx.Customer.Sound?.Play(speechSound);
             Debug.Log("[SpeechState] 말풍선 시작", Ctx.Customer);
 
             while (!ended)

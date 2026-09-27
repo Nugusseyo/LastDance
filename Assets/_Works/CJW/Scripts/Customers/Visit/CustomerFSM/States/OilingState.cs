@@ -7,8 +7,12 @@ using UnityEngine;
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 {
     [Serializable]
-    public sealed class OilingState : CustomerState
+    public sealed class OilingState : CustomerState, IDestinationState
     {
+        public MapPointType Destination => MapPointType.OilDispenser;
+
+        public override bool WantsFuel => true;
+
         [SerializeField] private float timeout;
 
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)

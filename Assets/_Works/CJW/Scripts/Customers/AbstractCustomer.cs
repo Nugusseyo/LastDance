@@ -1,11 +1,14 @@
+﻿using _Works.CJW.Scripts.Customers.Ragdoll;
 using System;
 using _Works.CJW.Scripts.Customers.Visit;
 using _Works.CJW.Scripts.Customers.Visit.CustomerFSM;
 using _Works.CJW.Scripts.Customers.Animation;
 using _Works.CJW.Scripts.Customers.Data;
+using _Works.CJW.Scripts.Customers.Health;
 using _Works.CJW.Scripts.Customers.Interaction;
 using _Works.CJW.Scripts.Customers.Movement;
 using _Works.CJW.Scripts.ManagingAgents;
+using _Works.CJW.Scripts.Sounds;
 using _Works.Shared.Boarding;
 using DevLib.ObjectPool.Runtime;
 using Resources.DataBase.Human_Data;
@@ -34,6 +37,18 @@ namespace _Works.CJW.Scripts.Customers
 
         /// <summary>플레이어에게 무언가를 요구하는 창구. 요구하지 않는 손님에게는 없으므로 null이다.</summary>
         public ICustomerRequest Request { get; private set; }
+
+        /// <summary>물리로 쓰러지는 몸. 프리팹에 래그돌 모듈이 없으면 null이다.</summary>
+        public IRagdoll Ragdoll { get; private set; }
+
+        /// <summary>체력과 맞는 창구. 프리팹에 체력 모듈이 없으면 null이고, 그 손님은 맞지 않는다.</summary>
+        public ICustomerHealth Health { get; private set; }
+
+        /// <summary>소리를 내는 창구. 프리팹에 사운드 모듈이 없으면 null이고, 그 손님은 소리 없이 움직인다.</summary>
+        public ISoundEmitter Sound { get; private set; }
+
+        /// <summary>쓰러져 있는지. 이 동안 손님은 아무 행동도 시작하지 않는다.</summary>
+        public bool IsKnockedDown => Ragdoll != null && Ragdoll.IsActive;
         public GameObject GameObject => this != null ? gameObject : null;
         /// <summary>이 손님이 참여 중인 방문. 방문 밖에서는 null이다.</summary>
         public VisitSession Session { get; private set; }
@@ -101,6 +116,12 @@ namespace _Works.CJW.Scripts.Customers
                 }
             }
 
+            // 쓰러진 채 반납됐을 수 있다. 일으키지 않으면 다음 손님이 누운 채로, 길찾기도 꺼진 채로 나온다.
+            if (IsKnockedDown)
+            {
+                Ragdoll.Recover();
+            }
+
             // 걷던 중에 반납됐을 수 있다. 여기서 접지 않으면 다음 손님이 선 자리에서 걷는 애니메이션으로 시작한다.
             Mover?.Stop();
 
@@ -112,6 +133,9 @@ namespace _Works.CJW.Scripts.Customers
             {
                 Request.Withdraw();
             }
+
+            // 맞던 손님이 반납됐을 수 있다. 채우지 않으면 다음 손님이 깎인 체력으로 나온다.
+            Health?.ResetHealth();
         }
     
 
@@ -126,6 +150,9 @@ namespace _Works.CJW.Scripts.Customers
             ActionAnimator = GetModule<IActionAnimator>();
             Gait = GetModule<IGait>();
             Request = GetModule<ICustomerRequest>();
+            Ragdoll = GetModule<IRagdoll>();
+            Health = GetModule<ICustomerHealth>();
+            Sound = GetModule<ISoundEmitter>();
         }
 }
 }
