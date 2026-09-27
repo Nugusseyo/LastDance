@@ -65,6 +65,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
   <CurrentItemData>k__BackingField: {fileID: 11400000, guid: 42b4ca239dfb5c04a9b7cb8c376002a7, type: 2}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
   UseEvent:
     m_PersistentCalls:
       m_Calls:
