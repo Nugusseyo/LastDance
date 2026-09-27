@@ -27,7 +27,7 @@ namespace _Works.CJW.Scripts.Test.Editor
         private const float LightDamage = 10f;
         private const float HitForce = 6f;
 
-        private enum Step { FirstHit, Kill, CheckDead, WaitDespawn, WaitVisit, Done }
+        private enum Step { FirstHit, HitAnim, Kill, CheckDead, WaitDespawn, WaitVisit, Done }
 
         private sealed class Target
         {
@@ -41,6 +41,7 @@ namespace _Works.CJW.Scripts.Test.Editor
             public int DiedCount;
             public bool VisitCompleted;
             public float DiedAt;
+            public Vector3 AttackerPos;
             public System.Action<HitInfo> OnDamaged;
             public System.Action<HitInfo> OnDied;
             public System.Action<VisitSession> OnVisitCompleted;
@@ -53,6 +54,7 @@ namespace _Works.CJW.Scripts.Test.Editor
         private static int _fail;
         private static float _startTime;
         private static bool _boardedChecked;
+        private static GameObject _attacker;
 
         static CustomerHitProbe()
         {
@@ -222,7 +224,11 @@ namespace _Works.CJW.Scripts.Test.Editor
                         return;
                     }
 
-                    h.TakeHit(new HitInfo(LightDamage, dir, HitForce, attacker));
+                    // 옆(오른쪽 2m)에 선 가짜 플레이어가 때린다. 맞은 손님은 이쪽으로 돌아서야 한다.
+                    if (_attacker == null) _attacker = new GameObject("[HitProbe] Attacker");
+                    _attacker.transform.position = t.Customer.transform.position + t.Customer.transform.right * 2f;
+                    t.AttackerPos = _attacker.transform.position;
+                    h.TakeHit(new HitInfo(LightDamage, t.AttackerPos - t.Customer.transform.position, HitForce, _attacker));
                     Check(Mathf.Approximately(h.CurrentHealth, h.MaxHealth - LightDamage) && t.DamagedCount == 1 && !h.IsDead,
                           $"{t.Name} 한 대: 체력 {h.CurrentHealth}/{h.MaxHealth}, Damaged {t.DamagedCount}회, 죽음 {h.IsDead}");
 
@@ -231,6 +237,27 @@ namespace _Works.CJW.Scripts.Test.Editor
                     h.TakeHit(new HitInfo(LightDamage, dir, HitForce, attacker));
                     Check(Mathf.Approximately(before, h.CurrentHealth) && t.DamagedCount == 1,
                           $"{t.Name} 무적 시간 중 재타격 무시: 체력 {before}→{h.CurrentHealth}, Damaged {t.DamagedCount}회");
+
+                    // 플레이어 공격(AttackSkill)은 Customer 레이어 콜라이더에서 부모의 IHittable을 찾는다.
+                    Collider body = t.Customer.GetComponent<Collider>();
+                    Check(t.Customer.gameObject.layer == LayerMask.NameToLayer("Customer") && body != null && body.GetComponentInParent<IHittable>() != null,
+                          $"{t.Name} 플레이어 공격 판정에 걸림: 레이어 {LayerMask.LayerToName(t.Customer.gameObject.layer)}, 몸통 콜라이더 {(body != null ? "있음" : "없음")}");
+
+                    t.Step = Step.HitAnim;
+                    t.NextAt = now + 0.15f;
+                    return;
+
+                case Step.HitAnim:
+                    Animator animator = t.Customer.GetComponentInChildren<Animator>();
+                    bool playingHit = animator != null && (animator.GetCurrentAnimatorStateInfo(0).IsName("HIT") || animator.GetNextAnimatorStateInfo(0).IsName("HIT"));
+                    string current = t.Customer.Fsm?.Machine?.Current?.GetType().Name ?? "-";
+                    Check(playingHit && t.Customer.ActionAnimator != null && t.Customer.ActionAnimator.IsPlaying,
+                          $"{t.Name} 맞고 피격 애니메이션: HIT 재생 {playingHit}, 상태 {current}");
+
+                    Vector3 toAttacker = t.AttackerPos - t.Customer.transform.position;
+                    toAttacker.y = 0f;
+                    float angle = Vector3.Angle(t.Customer.transform.forward, toAttacker);
+                    Check(angle < 15f, $"{t.Name} 맞고 때린 쪽을 바라봄: 어긋난 각도 {angle:F0}°");
 
                     t.Step = Step.Kill;
                     t.NextAt = now + 0.5f;

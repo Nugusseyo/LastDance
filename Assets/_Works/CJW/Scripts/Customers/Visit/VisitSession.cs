@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using _Works.CJW.Scripts.Cars;
 using _Works.CJW.Scripts.Customers.Visit.CustomerFSM;
+using _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States;
 using _Works.CJW.Scripts.Customers.Visit.States;
 using _Works.CJW.Scripts.MapSystems;
 using _Works.CJW.Scripts.ManagingAgents;
+using _Works.JJH._02_Scripts.Objects;
 using _Works.Shared.Boarding;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
@@ -29,6 +31,20 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>손님 Phase 실행의 일련번호. 달려온 이전 Phase의 완료를 걸러낸다.</summary>
         private int _customerPhaseSerial;
 
+        /// <summary>주유를 받고 나서 출발하기까지 최소로 두는 시간(초). 주유가 끝난 걸 눈으로 본 뒤에 떠나게 한다.</summary>
+        private const float DepartAfterFuelDelay = 1.5f;
+
+        /// <summary>주유 뒤 손님이 할 일(대사 등)을 마치길 기다리는 최대 시간(초). 넘기면 하던 일을 끊고 출발한다.</summary>
+        private const float DepartAfterFuelMaxWait = 15f;
+
+        /// <summary>이번 방문에서 주유를 받은 손님.</summary>
+        private readonly HashSet<AbstractCustomer> _fueled = new();
+
+        /// <summary>주유가 다 끝나고 흐른 시간(초). 음수면 기다리는 중이 아니다.</summary>
+        private float _departAfterFuelTimer = -1f;
+
+        /// <summary>이번 방문 차의 주유구. 손님이 주유기에 닿기 전에 주유가 끝나도 기록해 두려고 방문 내내 듣는다.</summary>
+        private FuelDoor _fuelDoor;
 
         public VisitPhase Phase { get; private set; } = VisitPhase.None;
         public Car Car => _context.Car;
@@ -66,6 +82,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
             AddDefault(new WaitingState());
             AddDefault(new BoardingState());
             AddDefault(new LeavingState());
+
+            // 컨텍스트는 세션과 수명이 같아 한 번만 구독한다.
+            _context.Fueled += HandleFueled;
         }
 
         /// <param name="arrivalPoint">차량이 정차할 위치.</param>
@@ -79,6 +98,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
                           Vector3 shopPoint, Vector3 exitPoint, MapDataSo mapData = null)
         {
             _context.Clear();
+            ResetFuelDeparture();
             _context.Car = car;
             _context.ArrivalPoint = arrivalPoint;
             _context.ArrivalRotation = arrivalRotation;
@@ -86,6 +106,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             _context.ExitPoint = exitPoint;
             _context.MapData = mapData;
             _context.Interval = car.BoardingInterval;
+            ListenFuelDoor(car);
 
             ApplyStateOverrides(car);
 
@@ -255,6 +276,12 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return;
             }
 
+            TickFuelDeparture(dt);
+            if (_current == null)
+            {
+                return;
+            }
+
             VisitPhase next = _current.Tick(_context, dt);
             if (next != _current.Phase)
             {
@@ -285,6 +312,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
 
             _context.Clear();
+            ResetFuelDeparture();
             _current = null;
             Phase = VisitPhase.None;
         }
@@ -359,6 +387,99 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
         }
 
+
+        /// <summary>주유를 원하던 손님이 모두 주유를 받으면 잠시 뒤 출발한다. 안 그러면 주유가 끝나도 손님이 그 자리에 선 채
+        /// 자동 출발 타이머나 Waiting 한계 시간이 다 될 때까지 아무 반응 없이 기다린다.</summary>
+        private void HandleFueled(AbstractCustomer customer)
+        {
+            if (customer == null || !_fueled.Add(customer))
+            {
+                return;
+            }
+
+            List<AbstractCustomer> customers = _context.Customers;
+            for (int i = 0; i < customers.Count; i++)
+            {
+                CustomerFSMModule fsm = customers[i].Fsm;
+                if (fsm != null && fsm.WantsFuel && !_fueled.Contains(customers[i]))
+                {
+                    return;
+                }
+            }
+
+            _departAfterFuelTimer = 0f;
+        }
+
+        private void TickFuelDeparture(float dt)
+        {
+            if (_departAfterFuelTimer < 0f)
+            {
+                return;
+            }
+
+            _departAfterFuelTimer += dt;
+            if (_departAfterFuelTimer < DepartAfterFuelDelay)
+            {
+                return;
+            }
+
+            // 주유 뒤에 대사 같은 할 일이 남은 손님이 있으면 마칠 때까지 기다린다. 출발하면 하던 일이 끊긴다.
+            if (_departAfterFuelTimer < DepartAfterFuelMaxWait && !AllFueledCustomersIdle())
+            {
+                return;
+            }
+
+            _departAfterFuelTimer = -1f;
+
+            // 그새 퇴치나 차 도난으로 흐름이 바뀌었으면 끼어들지 않는다.
+            if (Phase == VisitPhase.Waiting && !_context.Abandoning)
+            {
+                RequestDeparture();
+            }
+        }
+
+        /// <summary>주유 받은 손님이 모두 이번 단계에서 할 일을 마치고 출발만 기다리는지.</summary>
+        private bool AllFueledCustomersIdle()
+        {
+            foreach (AbstractCustomer customer in _fueled)
+            {
+                CustomerState current = customer != null ? customer.Fsm?.Machine?.Current : null;
+                if (current != null && !(current is StayState stay && stay.IsIndefinite))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void ResetFuelDeparture()
+        {
+            _fueled.Clear();
+            _departAfterFuelTimer = -1f;
+            ListenFuelDoor(null);
+        }
+
+        /// <summary>차의 주유구를 갈아 끼운다. 차는 풀에서 재사용되므로 이전 방문의 구독을 반드시 푼다.</summary>
+        private void ListenFuelDoor(Car car)
+        {
+            if (_fuelDoor != null)
+            {
+                _fuelDoor.OnFuelingCompleted -= HandleCarFueled;
+            }
+
+            _fuelDoor = car != null ? car.GetComponentInChildren<FuelDoor>(true) : null;
+
+            if (_fuelDoor != null)
+            {
+                _fuelDoor.OnFuelingCompleted += HandleCarFueled;
+            }
+        }
+
+        private void HandleCarFueled()
+        {
+            _context.CarFueled = true;
+        }
 
         private void AddDefault(VisitState state)
         {

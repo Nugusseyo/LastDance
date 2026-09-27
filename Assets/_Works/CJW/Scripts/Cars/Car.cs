@@ -152,6 +152,21 @@ namespace _Works.CJW.Scripts.Cars
             _moveModule?.Stop();
         }
 
+        /// <summary>지금 목적지로 가기 전에 먼저 곧게 물러선다. MoveTo 뒤에 부른다.</summary>
+        public void BackOff(float distance)
+        {
+            _moveModule?.BackOff(distance);
+        }
+
+        /// <summary>지금 목적지로 가기 전에 제자리에서 앞뒤로 오가며 이 방향으로 튼다. MoveTo 뒤에 부른다.</summary>
+        public void TurnInPlace(Vector3 direction)
+        {
+            _moveModule?.TurnInPlace(direction);
+        }
+
+        /// <summary>제자리 회전 같은 기동 중인지. 이 동안은 앞으로 나아가지 않아도 막힌 게 아니다.</summary>
+        public bool IsManeuvering => _moveModule != null && _moveModule.IsManeuvering;
+
         /// <summary>정차 자리 방향으로 조금씩 돌린다. 회전이 다 맞으면 true. Stop() 뒤에 불러야 한다.</summary>
         public bool AlignTo(Quaternion target, float dt)
         {

@@ -19,7 +19,8 @@ GameObject:
   - component: {fileID: 8044413519669516130}
   - component: {fileID: 5726732016977419859}
   - component: {fileID: 7731419603731710057}
-  m_Layer: 0
+  - component: {fileID: 5374007774449037017}
+  m_Layer: 19
   m_Name: Stay In Car Customer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,6 +134,7 @@ MonoBehaviour:
   - Phase: 3
     States:
     - rid: 4377106771376341112
+    - rid: 4377106771376341199
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
   combat:
     rid: -2
@@ -152,8 +154,15 @@ MonoBehaviour:
         bubbleItem: {fileID: 11400000, guid: 2a00163c0ed52214a828e00935dbf2e5, type: 2}
         lineIndices: 01000000
         offset: {x: 0, y: 2.2, z: 0}
-        runAlongside: 0
+        runAlongside: 1
         speechSound: {fileID: 0}
+    - rid: 4377106771376341199
+      type: {class: InCarFuelState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
+      data:
+        condition:
+          rid: -2
+        fuelTimeout: 0
+        lateSeconds: 30
 --- !u!114 &7400742253367986626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -209,6 +218,8 @@ MonoBehaviour:
   deathLaunchUp: 1.5
   despawnDelay: 3
   poolManager: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
+  hitClip: {fileID: 11400000, guid: c819ca92aeda640408631732998c6201, type: 2}
+  hitDuration: 0.6
   fightBack: 1
   damagedSound: {fileID: 11400000, guid: a4e1202c4a7640d4baa4db68977c3335, type: 2}
   deathSound: {fileID: 0}
@@ -238,6 +249,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Appearance.CustomerAppearanceModule
   lookSet: {fileID: 11400000, guid: b141f1b7c7aac4c45a959e747d19de1f, type: 2}
+--- !u!114 &5374007774449037017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2165922732805641989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f0442a68545331448e4cf10fe62183f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Animation.ActionAnimatorModule
+  crossFade: 0.1
+  exitClip: {fileID: 11400000, guid: 4aa00dabdbbb49f284c98aa9587ac5ff, type: 2}
 --- !u!1 &6056690002955640199
 GameObject:
   m_ObjectHideFlags: 0
