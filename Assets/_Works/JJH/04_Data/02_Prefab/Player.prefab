@@ -44,6 +44,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73d6d80073f7a624a8702eca3fe1b157, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Grabs.Attacks.AttackSkill
+  boxHalfExtents: {x: 0.5, y: 0.5, z: 0.75}
+  boxDistance: 1
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 524288
 --- !u!1 &8283555692955630140
 GameObject:
   m_ObjectHideFlags: 0

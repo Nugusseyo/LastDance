@@ -216,6 +216,7 @@ MonoBehaviour:
           rid: -2
         poolManager: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
         bubbleItem: {fileID: 11400000, guid: 2a00163c0ed52214a828e00935dbf2e5, type: 2}
+        lineIndices: 090000000a000000
         offset: {x: 0, y: 2.2, z: 0}
         runAlongside: 1
         speechSound: {fileID: 0}

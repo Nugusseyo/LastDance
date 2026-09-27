@@ -33,6 +33,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
         [SerializeField] private CarDataSO[] carDataList;
         [Tooltip("차가 손님 목록을 지정하지 않았을 때 쓰는 기본 손님 종류.")]
         [SerializeField] private CustomerDataSO[] defaultCustomerDataList;
+        [Tooltip("좌석 하나를 뽑을 때 주유를 원하는 손님 쪽에서 뽑을 확률. 나머지는 그 외 손님 쪽에서 뽑는다.\n" +
+                 "각 쪽 안에서는 CustomerDataSO의 spawnWeight로 나눈다. 한쪽에 후보가 없으면(이미 주유 손님이 탄 차 등) 다른 쪽에서 뽑는다.")]
+        [SerializeField, Range(0f, 1f)] private float fuelCustomerChance = 0.7f;
 
         [Header("경로")]
         [Tooltip("차량이 처음 나타나는 위치.")]
@@ -85,6 +88,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
         /// <summary>조건으로 후보를 좁힐 때 쓰는 임시 목록. 스폰마다 새로 할당하지 않으려고 들고 있는다.</summary>
         private readonly List<CustomerDataSO> _pickBuffer = new();
+        private readonly List<CustomerDataSO> _otherPickBuffer = new();
 
         /// <summary>이번 방문에서 이미 태운 특수 역할(<see cref="CustomerRoles.RoleOf"/>로 묶은 값). None(일반 손님)은 역할이 아니므로 여기 들어가지 않고, 여럿 태울 수 있다.</summary>
         private readonly HashSet<CustomerType> _takenRoles = new();
@@ -711,7 +715,47 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 _pickBuffer.Add(data);
             }
 
-            return WeightedPicker.Pick(_pickBuffer, data => data.SpawnWeight);
+            return WeightedPicker.Pick(PickGroup(), data => data.SpawnWeight);
+        }
+
+        /// <summary>후보를 주유 손님과 그 외로 나눠 <see cref="fuelCustomerChance"/>로 한쪽을 고른다.
+        /// 한쪽이 비었으면 다른 쪽을 돌려준다. <see cref="_pickBuffer"/>에는 주유 손님만 남는다.</summary>
+        private List<CustomerDataSO> PickGroup()
+        {
+            _otherPickBuffer.Clear();
+
+            for (int i = _pickBuffer.Count - 1; i >= 0; i--)
+            {
+                if (!CustomerRoles.WantsFuel(_pickBuffer[i]))
+                {
+                    _otherPickBuffer.Add(_pickBuffer[i]);
+                    _pickBuffer.RemoveAt(i);
+                }
+            }
+
+            // 가중치 합이 0인 쪽(모두 spawnWeight 0)을 고르면 WeightedPicker가 균등 추첨으로 물러나 뽑히면 안 될 손님이 나온다. 빈 쪽으로 본다.
+            if (TotalWeight(_pickBuffer) <= 0f)
+            {
+                return _otherPickBuffer;
+            }
+
+            if (TotalWeight(_otherPickBuffer) <= 0f)
+            {
+                return _pickBuffer;
+            }
+
+            return Random.value < fuelCustomerChance ? _pickBuffer : _otherPickBuffer;
+        }
+
+        private static float TotalWeight(List<CustomerDataSO> list)
+        {
+            float sum = 0f;
+            for (int i = 0; i < list.Count; i++)
+            {
+                sum += Mathf.Max(0f, list[i].SpawnWeight);
+            }
+
+            return sum;
         }
 
         /// <summary>지금 뽑는 차 뒤로 짝을 태운 차 한 대를 더 보낼 수 있는지. 지금 차는 자리를 이미 빌렸고 방문 목록에는 아직 없다.</summary>

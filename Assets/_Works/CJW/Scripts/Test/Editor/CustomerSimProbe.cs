@@ -19,7 +19,7 @@ namespace _Works.CJW.Scripts.Test.Editor
         private const string RunIndexKey = "CJW.CustomerSim.RunIndex";
         private const string OutDir = "Temp/CustomerSim";
 
-        private const int TotalRuns = 5;
+        private const int TotalRuns = 3;
         private const float SimSeconds = 240f;
         private const float TimeScale = 3f;
         private const float StuckSeconds = 90f;

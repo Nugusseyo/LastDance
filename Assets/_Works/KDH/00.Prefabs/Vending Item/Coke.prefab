@@ -9,9 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1234999638946976387}
-  - component: {fileID: 1220555076473012896}
   - component: {fileID: 4376762030019143622}
-  m_Layer: 0
+  - component: {fileID: 5025176050713597576}
+  - component: {fileID: 1220555076473012896}
+  - component: {fileID: 6305896968425842733}
+  m_Layer: 15
   m_Name: Coke
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -36,6 +38,38 @@ Transform:
   - {fileID: 8772120803966421067}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4376762030019143622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1930490722395287774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed4364597779cca469fc692033ac2ce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.ItemType.ColaEffect
+  rating: {fileID: 11400000, guid: 15c969aeb15147e4b82d949cb0989643, type: 2}
+--- !u!114 &5025176050713597576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1930490722395287774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
+  <CurrentItemData>k__BackingField: {fileID: 11400000, guid: 9b7be8d02703ad8429c32f6929d6a5bf, type: 2}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  UseEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!54 &1220555076473012896
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -63,19 +97,28 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &4376762030019143622
-MonoBehaviour:
+--- !u!64 &6305896968425842733
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1930490722395287774}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed4364597779cca469fc692033ac2ce3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.ItemType.ColaEffect
-  rating: {fileID: 11400000, guid: 15c969aeb15147e4b82d949cb0989643, type: 2}
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5447040849830592693, guid: f2f378121613dc144a153addaad78074, type: 3}
 --- !u!1001 &2246765292269100169
 PrefabInstance:
   m_ObjectHideFlags: 0

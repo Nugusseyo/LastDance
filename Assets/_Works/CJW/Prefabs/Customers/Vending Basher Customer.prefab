@@ -341,6 +341,14 @@ PrefabInstance:
       propertyPath: 'managedReferences[4377106815191875678].hitClips.Array.data[1]'
       value: 
       objectReference: {fileID: 11400000, guid: 75732187796747149aaf63a96b08ead7, type: 2}
+    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: managedReferences[4377106929555079263].lineIndices.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: 'managedReferences[4377106929555079263].lineIndices.Array.data[0]'
+      value: 7
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5790812639602798014, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
     m_RemovedGameObjects:

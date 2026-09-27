@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using _Works.JJH._02_Scripts.Agents.Modules;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace _Works.JJH._02_Scripts.Items
@@ -8,7 +9,13 @@ namespace _Works.JJH._02_Scripts.Items
     {
         [field: SerializeField] public ItemDataSO CurrentItemData { get; private set; }
 
+        [Header("Throw")]
+        [SerializeField] private LayerMask groundLayer;
+
         public UnityEvent UseEvent;
+
+        public bool IsThrown { get; private set; }
+        private int _throwDamage;
 
         private Rigidbody _rigidbody;
         private Collider _collider;
@@ -34,6 +41,8 @@ namespace _Works.JJH._02_Scripts.Items
             _rigidbody.isKinematic = true;
             _rigidbody.useGravity = false;
             _collider.isTrigger = true;
+
+            IsThrown = false;
         }
 
         public void SetPhysicsState()
@@ -51,6 +60,8 @@ namespace _Works.JJH._02_Scripts.Items
             _rigidbody.isKinematic = true;
             _rigidbody.useGravity = false;
             _collider.isTrigger = false;
+
+            IsThrown = false;
         }
 
         public void StopPhysics()
@@ -62,6 +73,32 @@ namespace _Works.JJH._02_Scripts.Items
         public void AddForce(Vector3 force, ForceMode forceMode)
         {
             _rigidbody.AddForce(force, forceMode);
+        }
+
+        public void StartThrow(int damage)
+        {
+            IsThrown = true;
+            _throwDamage = damage;
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (!IsThrown)
+                return;
+
+            if ((groundLayer.value & (1 << collision.gameObject.layer)) != 0)
+            {
+                IsThrown = false;
+                return;
+            }
+
+            IHealth health = collision.collider.GetComponentInParent<IHealth>();
+
+            if (health == null)
+                return;
+
+            health.Damage(_throwDamage);
+            IsThrown = false;
         }
     }
 }

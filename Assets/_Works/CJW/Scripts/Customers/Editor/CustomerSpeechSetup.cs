@@ -52,6 +52,78 @@ namespace _Works.CJW.Scripts.Customers.Editor
             }
         }
 
+        /// <summary>기획서의 손님별 대사 index. 없는 손님은 말하지 않는다. index가 둘이면 방문마다 갈래로 하나를 고른다.</summary>
+        private static readonly (string prefab, int[] lines, bool matchDance)[] Lines =
+        {
+            ("New Customer", new[] { 1 }, false),
+            ("Refueling Customer", new[] { 1 }, false),
+            ("Odd Walk Customer", new[] { 1 }, false),
+            ("Stay In Car Customer", new[] { 1 }, false),
+            ("Car Talker Customer", new[] { 3 }, false),
+            ("Vending Visitor Customer", new[] { 8 }, false),
+            ("Car Basher Customer", new[] { 2, 4 }, false),
+            ("Negotiator Customer", new[] { 5 }, false),
+            ("Vending Basher Customer", new[] { 7 }, false),
+            ("Brawler Customer", new[] { 9, 10 }, false),
+            // 춤 클립 순서(PlayAnimationState.clips)와 같은 순서로 대사가 짝지어진다.
+            ("Dancer Customer", new[] { 6, 11 }, true),
+            ("Circler Customer", new int[0], false),
+            ("Entrance Blocker Customer", new int[0], false),
+        };
+
+        [MenuItem("Tools/JW/Customers/Apply Speech Lines")]
+        private static void ApplyLines()
+        {
+            // 변형 프리팹이 원본의 변경을 먼저 받도록 원본부터 처리한다.
+            foreach (var (name, lines, matchDance) in Lines.OrderBy(l => l.prefab != "New Customer"))
+            {
+                string path = $"{PrefabFolder}/{name}.prefab";
+                GameObject root = PrefabUtility.LoadPrefabContents(path);
+                try
+                {
+                    var fsm = root.GetComponentInChildren<CustomerFSMModule>(true);
+                    var so = new SerializedObject(fsm);
+                    SerializedProperty sequences = so.FindProperty("sequences");
+                    int speechCount = 0, danceCount = 0;
+
+                    for (int i = 0; i < sequences.arraySize; i++)
+                    {
+                        SerializedProperty states = sequences.GetArrayElementAtIndex(i).FindPropertyRelative("States");
+                        for (int j = 0; j < states.arraySize; j++)
+                        {
+                            SerializedProperty state = states.GetArrayElementAtIndex(j);
+                            switch (state.managedReferenceValue)
+                            {
+                                case SpeechState:
+                                    SerializedProperty indices = state.FindPropertyRelative("lineIndices");
+                                    indices.arraySize = lines.Length;
+                                    for (int k = 0; k < lines.Length; k++)
+                                    {
+                                        indices.GetArrayElementAtIndex(k).intValue = lines[k];
+                                    }
+
+                                    speechCount++;
+                                    break;
+
+                                case PlayAnimationState when matchDance:
+                                    state.FindPropertyRelative("matchVariant").boolValue = true;
+                                    danceCount++;
+                                    break;
+                            }
+                        }
+                    }
+
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                    PrefabUtility.SaveAsPrefabAsset(root, path);
+                    Debug.Log($"[CustomerSpeechSetup] {name}: 대사 [{string.Join(", ", lines)}] → SpeechState {speechCount}개, 춤 짝 맞춤 {danceCount}개");
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(root);
+                }
+            }
+        }
+
         private static bool TryAdd(GameObject root, PoolManagerSO poolManager, PoolItemSO bubbleItem, out string result)
         {
             var fsm = root.GetComponentInChildren<CustomerFSMModule>(true);
