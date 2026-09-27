@@ -91,7 +91,7 @@ namespace _Works.JYG._Scripts.GameModule
         {
             if (eventChannel != null)
             {
-                eventChannel.RaiseEvent(UIEvents.ReviewEvent.IncreaseValue(10, ReviewType.Good));
+                eventChannel.RaiseEvent(UIEvents.ReviewEvent.Review(1, ReviewType.Good));
             }
         }
 
@@ -100,7 +100,7 @@ namespace _Works.JYG._Scripts.GameModule
         {
             if (eventChannel != null)
             {
-                eventChannel.RaiseEvent(UIEvents.ReviewEvent.IncreaseValue(-10, ReviewType.Bad));
+                eventChannel.RaiseEvent(UIEvents.ReviewEvent.Review(1, ReviewType.Bad));
             }
         }
             

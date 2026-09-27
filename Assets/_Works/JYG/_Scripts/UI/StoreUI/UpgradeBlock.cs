@@ -42,6 +42,8 @@ namespace _Works.JYG._Scripts.UI.StoreUI
         public IDataContainer<float> RealStoreValue => _realStoreValue;
         public StoreItem CurItem => _item;
 
+        public event Action<StoreItem> OnValueChanged;
+
         public void UpgradeInit(StoreItem item, List<UpgradeDataWrapper> upgradeData, Action buyLogic, IntegerDataContainer moneyManager) //Class 받아야 함. // 받았음.
         {
             barInitializer.InitializeBar(item.maxlevel);
@@ -97,6 +99,8 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             
             if (_moneyManager != null)
                 HandlePriceChanged(_moneyManager.Value, _moneyManager.Value);
+            
+            OnValueChanged?.Invoke(_item);
         }
         
         private void UpdateUI(StoreItem item)

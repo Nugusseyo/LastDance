@@ -28,6 +28,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
         private Player _player;
 
+        private float _currentWeaponSpeedMultiplier = 1f;
+
         public override void Initialize(ModuleOwner owner)
         {
             base.Initialize(owner);
@@ -51,6 +53,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
         public void PickupItem()
         {
+            bool holdingWrench = CurrentGrabObject != null && CurrentGrabObject.GetComponent<WrenchTool>() != null;
+
             if (CurrentGrabObject != null)
             {
                 if (CurrentItem is FuelNozzle && fuelInjector != null
@@ -61,6 +65,19 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
                     if (fuelDoor != null && fuelInjector.TryStartFueling(fuelDoor))
                         return;
+                }
+
+                if (holdingWrench && partDetacher != null
+                  && _player.Sensor.FindItem(_player.Camera.CameraTrans, partDetacher.PartLayerMask,
+                                                                  pickupDistance, out Collider wrenchPartCollider))
+                {
+                    GrabItem wrenchTargetPart = wrenchPartCollider.GetComponent<GrabItem>();
+
+                    if (wrenchTargetPart != null)
+                    {
+                        partDetacher.TryDetachPart(wrenchTargetPart);
+                        return;
+                    }
                 }
 
                 if (AttachCurrentItem())
@@ -157,6 +174,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
             CurrentGrabObject.transform.SetParent(weaponHoldPoint, true);
             CurrentGrabObject.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+            ApplyWeaponSpeedModifier(item);
         }
 
         public void SwapItem(GrabItem item)
@@ -192,6 +211,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
             CurrentItem = null;
             CurrentGrabObject = null;
+
+            ResetWeaponSpeedModifier();
         }
 
         public void ClearCurrentItem()
@@ -201,6 +222,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
             CurrentItem = null;
             CurrentGrabObject = null;
+
+            ResetWeaponSpeedModifier();
         }
 
         public bool AttachCurrentItem()
@@ -229,6 +252,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
                 CurrentItem = null;
                 CurrentGrabObject = null;
+                ResetWeaponSpeedModifier();
 
                 return true;
             }
@@ -241,6 +265,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
             CurrentItem = null;
             CurrentGrabObject = null;
+            ResetWeaponSpeedModifier();
 
             return true;
         }
@@ -260,6 +285,16 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             if (partDetacher == null || !partDetacher.IsDetaching)
                 return;
 
+            WrenchTool wrench = CurrentGrabObject != null
+                                                ? CurrentGrabObject.GetComponent<WrenchTool>()
+                                                : null;
+
+            if (CurrentGrabObject != null && wrench == null)
+            {
+                partDetacher.CancelDetach();
+                return;
+            }
+
             bool holding = _player.PlayerInput != null && _player.PlayerInput.IsInteractHeld;
 
             if (!holding)
@@ -267,10 +302,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                 partDetacher.CancelDetach();
                 return;
             }
-
-            WrenchTool wrench = CurrentGrabObject != null
-                                                ? CurrentGrabObject.GetComponent<WrenchTool>()
-                                                : null;
 
             partDetacher.TickDetach(Time.deltaTime, wrench);
         }
@@ -289,6 +320,35 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             }
 
             fuelInjector.TickFueling(Time.deltaTime);
+        }
+
+        private void ApplyWeaponSpeedModifier(GrabItem item)
+        {
+            if (_player.Mover == null)
+                return;
+
+            float multiplier = item.CurrentItemData is WeaponItemSO weaponData && weaponData.MoveSpeedMultiplier > 0f
+                                        ? weaponData.MoveSpeedMultiplier
+                                        : 1f;
+
+            if (Mathf.Approximately(multiplier, _currentWeaponSpeedMultiplier))
+                return;
+
+            _player.Mover.MoveSpeed = _player.Mover.MoveSpeed / _currentWeaponSpeedMultiplier * multiplier;
+            _player.Mover.RunSpeed = _player.Mover.RunSpeed / _currentWeaponSpeedMultiplier * multiplier;
+
+            _currentWeaponSpeedMultiplier = multiplier;
+        }
+
+        private void ResetWeaponSpeedModifier()
+        {
+            if (_player.Mover == null || Mathf.Approximately(_currentWeaponSpeedMultiplier, 1f))
+                return;
+
+            _player.Mover.MoveSpeed /= _currentWeaponSpeedMultiplier;
+            _player.Mover.RunSpeed /= _currentWeaponSpeedMultiplier;
+
+            _currentWeaponSpeedMultiplier = 1f;
         }
     }
 }
