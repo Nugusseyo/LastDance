@@ -12,5 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d01a48ec5ff0e67419d0be251414750c, type: 3}
   m_Name: Customer Rendezvous
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Visit.CustomerFSM.CustomerRendezvousSO
+  randomWalkable: 1
+  randomRadius: 20
+  maxWalkLength: 30
+  randomTries: 60
+  carZoneClearance: 4
+  carClearance: 4
+  edgeClearance: 1.5
   meetAt: 7
   meetSampleRadius: 3
+  standSpacing: 0.65

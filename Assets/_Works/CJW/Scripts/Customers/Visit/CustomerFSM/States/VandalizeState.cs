@@ -4,9 +4,12 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using _Works.CJW.Scripts.Cars;
 using _Works.CJW.Scripts.Customers.Interaction;
+using _Works.CJW.Scripts.Customers.Movement;
 using _Works.CJW.Scripts.MapSystems;
 using DevLib.AnimatorSystem;
+using DevLib.SoundSystem;
 using UnityEngine;
+using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
@@ -15,8 +18,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
     /// 나머지는 같아서 한 상태로 묶었다 — 종류가 늘 때 프리팹에서 대상만 바꾸면 된다.
     /// 맞는 쪽은 <see cref="IVandalTarget"/>으로만 안다. 대상이 그걸 구현하지 않았으면 때리는 시늉만 하고 끝난다.</summary>
     [Serializable]
-    public sealed class VandalizeState : CustomerState
+    public sealed class VandalizeState : CustomerState, IDestinationState
     {
+        public MapPointType Destination => source == TargetSource.MapPoint ? targetPoint : MapPointType.None;
+
         /// <summary>때릴 물건을 고르는 방법.</summary>
         private enum TargetSource
         {
@@ -40,7 +45,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("OtherCar일 때 둘러볼 반경(m).")]
         [SerializeField, Min(0f)] private float searchRadius = 25f;
 
-        [Tooltip("대상이 없을 때 다시 찾아볼 시간(초). 주차장에 남의 차가 한 대도 없을 때 곧 들어올 차를 기다린다. 0이면 바로 넘어간다.")]
+        [Tooltip("대상이 없을 때 다시 찾아볼 시간(초). 때릴 차나 닿는 자판기가 아직 없으면 생길 때까지 기다린다. 0이면 바로 넘어간다.")]
         [SerializeField, Min(0f)] private float targetWaitTimeout = 10f;
 
         [Header("접근")]
@@ -48,7 +53,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [SerializeField, Min(0f)] private float standoff = 1.2f;
 
         [Tooltip("대상까지 걸어갈 때의 한계 시간(초).")]
-        [SerializeField, Min(0f)] private float moveTimeout = 15f;
+        [SerializeField, Min(0f)] private float moveTimeout = 40f;
 
         [Tooltip("몸을 돌리는 각속도(도/초).")]
         [SerializeField, Min(1f)] private float turnSpeed = 540f;
@@ -57,8 +62,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("때릴 때 재생할 클립 후보. 여럿이면 타격마다 하나를 무작위로 고른다.")]
         [SerializeField] private HashDataSO[] hitClips;
 
-        [Tooltip("몇 번 때리는지.")]
-        [SerializeField, Min(1)] private int hitCount = 4;
+        [Tooltip("몇 번 때리는지. 0이면 스스로 멈추지 않고 Phase가 바뀌거나 인터럽트가 들어올 때까지 계속 때린다.")]
+        [SerializeField, Min(0)] private int hitCount = 4;
 
         [Tooltip("한 번 때리는 데 걸리는 시간(초). 클립 길이에 맞춰야 동작이 끊기지 않는다.")]
         [SerializeField, Min(0.05f)] private float hitInterval = 0.8f;
@@ -66,63 +71,68 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("한 대의 세기. 맞는 쪽이 이 값을 어떻게 쓸지는 그쪽이 정한다.")]
         [SerializeField, Min(0f)] private float power = 1f;
 
+        [Tooltip("켜면 대상 앞까지 가서 동작만 하고 때리지는 않는다(타격·타격 소리 없음). 남의 차 앞에서 말을 걸거나 자판기 앞에서 서성이는 정상 손님에 쓴다.\n" +
+                 "기본값을 false로 둔 건 이 필드가 없던 프리팹이 기존처럼 때리게 하기 위해서다.")]
+        [SerializeField] private bool noContact;
+
+        [Header("사운드")]
+        [Tooltip("주먹이 대상에 닿을 때마다 낼 소리. 맞은 자리에서 난다.")]
+        [SerializeField] private SoundClipSo hitSound;
+
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
         {
             AbstractCustomer customer = Ctx.Customer;
+            _unreachableCar = null;
 
-            Transform target = await WaitForTarget(ct);
-            if (target == null)
-            {
-                // 때릴 게 없다고 방문을 세우지는 않는다. 다음 행동으로 넘긴다.
-                Debug.LogWarning($"[{nameof(VandalizeState)}] {customer.name}이(가) 때릴 대상을 찾지 못했습니다.", customer);
-                return VisitOutcome.Blocked;
-            }
-
-            Vector3 approach = GetApproachPoint(target, customer.transform.position);
-
-            VisitOutcome moved = await MoveAndWait(approach, moveTimeout, ct);
-            if (moved == VisitOutcome.Blocked)
-            {
-                return moved;
-            }
-
-            // 대상이 그 사이 사라졌을 수 있다. 반납된 차를 때리려 들면 여기서 걸러진다.
-            if (target == null)
-            {
-                return VisitOutcome.Blocked;
-            }
-
-            // 걷기를 접지 않으면 이동 모듈이 타격 중에도 방향을 붙들고 있다.
-            customer.Mover?.Stop();
-            await FaceTowards(target.position, turnSpeed, ct);
-
-            IVandalTarget victim = target.GetComponentInParent<IVandalTarget>();
+            int hits = 0;
 
             try
             {
-                for (int i = 0; i < hitCount; i++)
+                // 남의 차를 때리는 손님은 차가 떠나도 멈추지 않는다. 다음 차를 찾고, 없으면 돌아다니며 새 차를 기다린다.
+                // hitCount가 0이면 취소(Phase 전환·퇴치)로만 벗어난다.
+                while (hitCount == 0 || hits < hitCount)
                 {
+                    // 걸을 때는 연출을 접어야 한다. 안 접으면 이동 모듈이 걷기 클립을 틀지 못해 주먹을 뻗은 채 미끄러진다.
+                    customer.ActionAnimator?.End();
+
+                    Transform target = source == TargetSource.OtherCar ? await WanderUntilCar(ct) : await WaitForTarget(ct);
                     if (target == null)
                     {
+                        if (hits > 0)
+                        {
+                            break;
+                        }
+
+                        // 때릴 게 없다고 방문을 세우지는 않는다. 다음 행동으로 넘긴다.
+                        Debug.LogWarning($"[{nameof(VandalizeState)}] {customer.name}이(가) 때릴 대상을 찾지 못했습니다.", customer);
+                        return VisitOutcome.Blocked;
+                    }
+
+                    if (!await Approach(target, ct))
+                    {
+                        if (source == TargetSource.OtherCar)
+                        {
+                            // 닿지 않는 차에 매달리면 그 앞에서 멍하니 선다. 잠시 그 차를 빼고 다른 차를 찾는다.
+                            MarkUnreachable(target);
+                            continue;
+                        }
+
+                        if (IsGone(target))
+                        {
+                            // 걸어가는 사이 대상이 사라졌다. 빈 자리에 주먹질하지 않는다.
+                            break;
+                        }
+
+                        return VisitOutcome.Blocked;
+                    }
+
+                    StrikeResult result = await Strike(target, hitCount == 0 ? int.MaxValue : hitCount - hits, ct);
+                    hits += result.Hits;
+
+                    // 차를 때리는 손님만 대상이 떠나도 이어 간다. 자판기처럼 한 대상만 때리는 손님은 대상이 사라지면 끝낸다.
+                    if (result.Gone && source != TargetSource.OtherCar)
+                    {
                         break;
-                    }
-
-                    HashDataSO clip = PickClip();
-                    if (clip != null)
-                    {
-                        customer.ActionAnimator?.Begin(clip);
-                    }
-
-                    await UniTask.Delay(TimeSpan.FromSeconds(hitInterval), cancellationToken: ct);
-
-                    // 때리는 동작이 끝난 뒤에 알린다. 먼저 알리면 소리와 이펙트가 주먹보다 앞선다.
-                    if (victim != null && victim.CanTakeHit)
-                    {
-                        Vector3 point = target.position;
-                        Vector3 direction = point - customer.transform.position;
-                        direction.y = 0f;
-
-                        victim.TakeVandalHit(new VandalHit(customer.gameObject, power, point, direction.normalized));
                     }
                 }
             }
@@ -134,6 +144,269 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             }
 
             return VisitOutcome.Done;
+        }
+
+        private readonly struct StrikeResult
+        {
+            public readonly int Hits;
+
+            /// <summary>대상이 사라져서 멈췄는지. false면 다 때렸거나 몸이 밀려나 다시 다가가야 한다.</summary>
+            public readonly bool Gone;
+
+            public StrikeResult(int hits, bool gone)
+            {
+                Hits = hits;
+                Gone = gone;
+            }
+        }
+
+        /// <summary>대상 앞까지 걸어가 주먹이 닿는 자리에 선다. 가는 사이 대상이 사라졌거나 끝내 닿지 못하면 false.</summary>
+        private async UniTask<bool> Approach(Transform target, CancellationToken ct)
+        {
+            AbstractCustomer customer = Ctx.Customer;
+
+            Vector3 approach = GetApproachPoint(target, customer.transform.position);
+            if (await MoveAndWait(approach, moveTimeout, ct) == VisitOutcome.Blocked)
+            {
+                return false;
+            }
+
+            // 차는 몸체 표면에 붙어 서야 주먹이 닿는다. 가는 동안 차가 조금 움직였거나 누구에게 막혀 멀찍이 섰으면
+            // 지금 자리에서 설 자리를 다시 잡아 한두 번 더 다가간다.
+            for (int retry = 0; retry < CarApproachRetries && !IsGone(target) && IsTooFarFromCar(target, customer.transform.position); retry++)
+            {
+                approach = GetApproachPoint(target, customer.transform.position);
+                if (await MoveAndWait(approach, moveTimeout, ct) == VisitOutcome.Blocked)
+                {
+                    break;
+                }
+            }
+
+            return !IsGone(target) && !IsTooFarFromCar(target, customer.transform.position);
+        }
+
+        /// <summary>대상을 최대 <paramref name="maxHits"/>번 때린다. 대상이 사라지거나 루트 모션에 밀려 주먹이 닿지 않게 되면 멈춘다.</summary>
+        private async UniTask<StrikeResult> Strike(Transform target, int maxHits, CancellationToken ct)
+        {
+            AbstractCustomer customer = Ctx.Customer;
+            IVandalTarget victim = target.GetComponentInParent<IVandalTarget>();
+
+            // 걷기를 접지 않으면 이동 모듈이 타격 중에도 방향을 붙들고 있다.
+            customer.Mover?.Stop();
+
+            // 도착하자마자 휘두른다. 다 돌아선 뒤에 틀면 그 사이 멍하니 서 있는 것처럼 보인다 — 돌아서는 건 첫 동작과 겹쳐도 어색하지 않다.
+            BeginSwing();
+            float nextHit = Time.time + hitInterval;
+            await FaceTowards(AimPoint(target, customer.transform.position), turnSpeed, ct);
+
+            int hits = 0;
+            while (hits < maxHits)
+            {
+                // 차가 떠나는 순간 멈춘다. 타격 시각까지 통째로 기다리면 떠난 자리에 주먹질을 한다.
+                await UniTask.WaitUntil(() => Time.time >= nextHit || IsGone(target), cancellationToken: ct);
+                if (IsGone(target))
+                {
+                    return new StrikeResult(hits, true);
+                }
+
+                // 때리는 동작이 끝난 뒤에 알린다. 먼저 알리면 소리와 이펙트가 주먹보다 앞선다.
+                Vector3 point = AimPoint(target, customer.transform.position);
+                if (!noContact)
+                {
+                    customer.Sound?.Play(hitSound, point);
+                }
+
+                if (!noContact && victim != null && victim.CanTakeHit)
+                {
+                    Vector3 direction = point - customer.transform.position;
+                    direction.y = 0f;
+
+                    victim.TakeVandalHit(new VandalHit(customer.gameObject, power, point, direction.normalized));
+                }
+
+                hits++;
+                if (hits >= maxHits)
+                {
+                    break;
+                }
+
+                // 주먹질의 루트 모션이 몸을 조금씩 밀어낸다. 닿지 않을 만큼 멀어졌으면 다시 다가간다.
+                if (IsTooFarFromCar(target, customer.transform.position))
+                {
+                    break;
+                }
+
+                // 다음 동작을 곧바로 잇는다. 클립이 끝나기 전에 다음 클립을 틀어야 주먹질이 끊기지 않는다.
+                BeginSwing();
+                nextHit += hitInterval;
+            }
+
+            return new StrikeResult(hits, false);
+        }
+
+        private void BeginSwing()
+        {
+            HashDataSO clip = PickClip();
+            if (clip != null)
+            {
+                Ctx.Customer.ActionAnimator?.Begin(clip, true);
+            }
+        }
+
+        /// <summary>때릴 차가 나타날 때까지 주변을 돌아다닌다. 제자리에 서서 기다리면 손님이 굳은 것처럼 보인다.
+        /// 걷는 도중에도 계속 둘러보다가 차가 서면 곧장 그 차를 돌려준다. 취소(Phase 전환)로만 빈손으로 끝난다.</summary>
+        private async UniTask<Transform> WanderUntilCar(CancellationToken ct)
+        {
+            AbstractCustomer customer = Ctx.Customer;
+            IMover mover = customer.Mover;
+
+            while (true)
+            {
+                Transform car = FindOtherCar();
+                if (car != null)
+                {
+                    return car;
+                }
+
+                if (mover != null && mover.IsReady && TryPickWanderPoint(out Vector3 destination))
+                {
+                    mover.MoveTo(destination);
+
+                    // SetDestination 직후 한 프레임은 경로가 없어 도착으로 보인다.
+                    await UniTask.NextFrame(ct);
+
+                    float walkUntil = Time.time + WanderWalkLimit;
+                    while (!mover.IsArrived && Time.time < walkUntil)
+                    {
+                        car = FindOtherCar();
+                        if (car != null)
+                        {
+                            return car;
+                        }
+
+                        await UniTask.Delay(TimeSpan.FromSeconds(CarPollInterval), cancellationToken: ct);
+                    }
+
+                    mover.Stop();
+                }
+
+                // 도착하면 잠깐 서서 둘러본다. 이 사이에도 차가 서면 바로 간다.
+                float pauseUntil = Time.time + Random.Range(WanderPauseMin, WanderPauseMax);
+                while (Time.time < pauseUntil)
+                {
+                    car = FindOtherCar();
+                    if (car != null)
+                    {
+                        return car;
+                    }
+
+                    await UniTask.Delay(TimeSpan.FromSeconds(CarPollInterval), cancellationToken: ct);
+                }
+            }
+        }
+
+        /// <summary>돌아다닐 다음 자리. 자기 차 둘레에서 고른다 — 지금 자리를 중심으로 고르면 걸음마다 조금씩 멀어져 결국 가게를 벗어난다.</summary>
+        private bool TryPickWanderPoint(out Vector3 destination)
+        {
+            destination = default;
+            AbstractCustomer customer = Ctx.Customer;
+            NavMeshAgent agent = customer.Agent;
+            if (Ctx.MapData == null || agent == null)
+            {
+                return false;
+            }
+
+            Car ownCar = Ctx.Visit?.Car;
+            Vector3 center = ownCar != null ? ownCar.transform.position : customer.transform.position;
+            var filter = new NavMeshQueryFilter { agentTypeID = agent.agentTypeID, areaMask = agent.areaMask };
+
+            return Ctx.MapData.TryGetRandomPosition(center, WanderRadius, filter, WanderTries, IsGoodWanderSpot, out destination);
+        }
+
+        private bool IsGoodWanderSpot(Vector3 position)
+        {
+            // 자기 차 옆에 서면 동행이 타고 내리는 길을 막는다.
+            Car ownCar = Ctx.Visit?.Car;
+            if (ownCar != null)
+            {
+                Vector3 delta = position - ownCar.transform.position;
+                delta.y = 0f;
+                if (delta.sqrMagnitude < WanderMinFromCar * WanderMinFromCar)
+                {
+                    return false;
+                }
+            }
+
+            return WalkLengthTo(position) <= WanderRadius * 2f;
+        }
+
+        // 아래 값은 직렬화하지 않는다 — [SerializeReference] 상태의 새 필드는 기존 프리팹에 0으로 들어간다.
+
+        /// <summary>돌아다닐 반경(m). 자기 차를 중심으로 잰다.</summary>
+        private const float WanderRadius = 12f;
+
+        private const float WanderMinFromCar = 4f;
+
+        private const int WanderTries = 20;
+
+        /// <summary>한 번 걸어가는 한계 시간(초). 막혀서 제자리걸음을 하면 새 자리를 고른다.</summary>
+        private const float WanderWalkLimit = 12f;
+
+        private const float WanderPauseMin = 1f;
+
+        private const float WanderPauseMax = 3f;
+
+        /// <summary>돌아다니는 동안 차가 섰는지 보는 간격(초).</summary>
+        private const float CarPollInterval = 0.25f;
+
+        /// <summary>닿지 못한 차를 후보에서 빼 두는 시간(초). 그 사이 차가 조금 움직이거나 길이 열릴 수 있어 영영 빼지는 않는다.</summary>
+        private const float UnreachableForgetSeconds = 8f;
+
+        [NonSerialized] private Car _unreachableCar;
+        [NonSerialized] private float _unreachableUntil;
+
+        private void MarkUnreachable(Transform target)
+        {
+            _unreachableCar = target != null ? target.GetComponentInParent<Car>() : null;
+            _unreachableUntil = Time.time + UnreachableForgetSeconds;
+        }
+
+        public override void Reset()
+        {
+            _unreachableCar = null;
+        }
+
+        /// <summary>차를 때릴 때 차 몸체 표면에서 설 거리(m). 몸 반지름(0.5)에 조금 더한 값이라 사실상 붙어 선다.
+        /// 차가 파낸 NavMesh 구멍도 몸 반지름만큼 넓어 이보다 가까이는 갈 수 없다.
+        /// 직렬화하지 않는다 — [SerializeReference] 상태의 새 필드는 기존 프리팹에 0으로 들어간다.</summary>
+        private const float CarPunchReach = 0.6f;
+
+        private const int CarApproachRetries = 2;
+
+        /// <summary>대상이 없어졌는지. 차는 풀로 돌아가도 파괴되지 않으므로 꺼졌거나 다시 움직이기 시작했으면(떠나는 중) 사라진 것으로 본다.</summary>
+        private static bool IsGone(Transform target)
+        {
+            if (target == null || !target.gameObject.activeInHierarchy)
+            {
+                return true;
+            }
+
+            Car car = target.GetComponentInParent<Car>();
+            return car != null && !car.IsArrived;
+        }
+
+        /// <summary>차를 때리기엔 멀리 섰는지. 설 거리에 멈춤 오차(stoppingDistance)만큼 여유를 둔다.</summary>
+        private static bool IsTooFarFromCar(Transform target, Vector3 from)
+        {
+            Car car = target.GetComponentInParent<Car>();
+            return car != null && CarLandings.DistanceToBody(car, from) > CarPunchReach + 0.5f;
+        }
+
+        /// <summary>때릴 때 바라볼 곳. 차면 가장 가까운 몸체 표면, 아니면 대상 위치.</summary>
+        private static Vector3 AimPoint(Transform target, Vector3 from)
+        {
+            Car car = target.GetComponentInParent<Car>();
+            return car != null && CarLandings.TryClosestPointOnBody(car, from, out Vector3 surface) ? surface : target.position;
         }
 
         private HashDataSO PickClip()
@@ -150,6 +423,18 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         /// NavMesh가 대상 밑을 덮지 않으면 영영 도착하지 못한다.</summary>
         private Vector3 GetApproachPoint(Transform target, Vector3 from)
         {
+            // 차는 길쭉해서 중심에서 재면 옆에서는 멀고 앞뒤에서는 붙는다. 차 몸체 표면에서 재 주먹이 닿는 거리에 선다.
+            Car car = target.GetComponentInParent<Car>();
+            if (car != null && CarLandings.TryClosestPointOnBody(car, from, out Vector3 surface))
+            {
+                Vector3 outward = from - surface;
+                outward.y = 0f;
+                if (outward.sqrMagnitude > 0.0001f)
+                {
+                    return surface + outward.normalized * CarPunchReach;
+                }
+            }
+
             Vector3 toCustomer = from - target.position;
             toCustomer.y = 0f;
 
@@ -163,7 +448,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         }
 
         /// <summary>대상을 찾고, 없으면 <see cref="targetWaitTimeout"/> 동안 다시 찾아본다.
-        /// 남의 차를 때리는 손님은 혼자 온 순간이면 때릴 차가 없어서 곧바로 할 일을 잃기 때문이다.</summary>
+        /// 세워 둔 차에 길이 막혀 자판기에 닿지 못하는 순간이 있어서, 한 번 못 찾았다고 할 일을 버리지 않는다.</summary>
         private async UniTask<Transform> WaitForTarget(CancellationToken ct)
         {
             const float retryInterval = 0.5f;
@@ -235,7 +520,13 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 Car car = sensor.GetComponentInParent<Car>();
 
                 // 자기가 타고 온 차를 때리면 방문 내내 제자리다. 남의 차만 고른다.
-                if (car == null || car == ownCar)
+                // 들어오거나 나가는 중인 차는 뺀다. 고른 순간의 위치로 설 자리를 잡으면 차가 멈춘 곳과 어긋나 허공을 때린다.
+                if (car == null || car == ownCar || !car.IsArrived)
+                {
+                    continue;
+                }
+
+                if (car == _unreachableCar && Time.time < _unreachableUntil)
                 {
                     continue;
                 }

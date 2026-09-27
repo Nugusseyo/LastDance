@@ -30,9 +30,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Modules
             base.Initialize(owner);
 
             _player = (Player)_owner;
-
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
         }
 
         private void LateUpdate()

@@ -3,6 +3,7 @@ using _Works.CJW.Scripts.Customers;
 using _Works.CJW.Scripts.Customers.Data;
 using _Works.CJW.Scripts.ManagingAgents;
 using _Works.CJW.Scripts.MapSystems;
+using _Works.CJW.Scripts.Sounds;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
 
@@ -67,10 +68,14 @@ namespace _Works.CJW.Scripts.Cars
 
         public bool IsArrived => _moveModule == null || _moveModule.IsArrived;
 
+        /// <summary>소리를 내는 창구. 프리팹에 사운드 모듈이 없으면 null이고, 그 차는 소리 없이 달린다.</summary>
+        public ISoundEmitter Sound { get; private set; }
+
         protected override void Awake()
         {
             base.Awake();
             _moveModule = GetModule<ICarMoveModule>();
+            Sound = GetModule<ISoundEmitter>();
 
             // 없으면 IsArrived가 항상 true라 이동 없이 모든 단계를 조용히 통과한다.
             // 증상이 "차가 스폰 자리에서 안 움직임"으로만 보이므로 반드시 남긴다.
@@ -97,40 +102,6 @@ namespace _Works.CJW.Scripts.Cars
             _moveModule ??= GetModule<ICarMoveModule>();
             _moveModule?.ApplyStats(data.MoveSpeed, data.ArriveThreshold);
 
-            ApplyBodyColor(data.BodyColors);
-        }
-
-        /// <summary>후보 중 하나를 골라 차체 색만 갈아끼운다. MaterialPropertyBlock이라 머티리얼 인스턴스가 생기지 않는다.</summary>
-        private void ApplyBodyColor(Color[] candidates)
-        {
-            if (bodyRenderers == null || bodyRenderers.Length == 0)
-            {
-                return;
-            }
-
-            if (candidates == null)
-            {
-                // 색을 지정하지 않은 데이터. 이전 방문의 색이 남지 않게 프리팹 색으로 되돌린다.
-                ClearBodyColor();
-                return;
-            }
-
-            Color color = candidates[UnityEngine.Random.Range(0, candidates.Length)];
-            _mpb ??= new MaterialPropertyBlock();
-
-            for (int i = 0; i < bodyRenderers.Length; i++)
-            {
-                Renderer renderer = bodyRenderers[i];
-                if (renderer == null)
-                {
-                    continue;
-                }
-
-                // 다른 곳에서 걸어둔 오버라이드를 지우지 않도록 기존 블록을 읽어와서 색만 덮는다.
-                renderer.GetPropertyBlock(_mpb);
-                _mpb.SetColor(BodyColorId, color);
-                renderer.SetPropertyBlock(_mpb);
-            }
         }
 
         private void ClearBodyColor()

@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Brawler Customer
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.CustomerDataSO
   poolItem: {fileID: 11400000, guid: 4842f099d15f7dd458eb24f0e9907feb, type: 2}
-  <customerType>k__BackingField: 5
+  <CustomerType>k__BackingField: 9
   moveSpeed: 3.5
   angularSpeed: 120
   stoppingDistance: 0.2
   spawnWeight: 1
+  ridesAlone: 0
+  comesInPairs: 1

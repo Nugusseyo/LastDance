@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using _Works.CJW.Scripts.Cars;
 using _Works.CJW.Scripts.Customers.Visit.CustomerFSM;
 using _Works.CJW.Scripts.Customers.Visit.States;
+using _Works.CJW.Scripts.MapSystems;
 using _Works.CJW.Scripts.ManagingAgents;
 using _Works.Shared.Boarding;
 using DevLib.ObjectPool.Runtime;
@@ -33,6 +34,12 @@ namespace _Works.CJW.Scripts.Customers.Visit
         public Car Car => _context.Car;
         public IReadOnlyList<AbstractCustomer> Customers => _context.Customers;
 
+        /// <summary>손님이 다른 차를 훔쳐 떠나 이 방문의 차가 버려졌는지. 방문을 닫을 때 차를 풀로 돌리지 않고 자리도 비우지 않는다.</summary>
+        public bool IsCarAbandoned => _context.Abandoning;
+
+        /// <summary>손님이 훔쳐 탄 차. 버려진 방문이 아니면 null이다.</summary>
+        public StealableCar StolenCar => _context.StolenCar;
+
         /// <summary>Leaving까지 끝났을 때 발생. 구독자가 <see cref="ReturnToPool"/>을 호출하면 된다.</summary>
         public event Action<VisitSession> Completed;
         public event Action<VisitPhase> OnStateChanged;
@@ -51,10 +58,11 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <param name="arrivalRotation">정차했을 때 차가 바라볼 방향.</param>
         /// <param name="shopPoint">하차한 손님이 향할 가게 안 위치.</param>
         /// <param name="exitPoint">방문이 끝난 차량이 빠져나갈 위치.</param>
+        /// <param name="mapData">주차 자리·주유기 지점. 퇴장하는 차가 줄 사이를 가로지르지 않게 본다.</param>
         /// <remarks>손님 한 명씩 처리할 때의 간격은 차의 CarDataSO에서 온다.</remarks>
         public void Begin(Car car, IReadOnlyList<AbstractCustomer> customers,
                           Vector3 arrivalPoint, Quaternion arrivalRotation,
-                          Vector3 shopPoint, Vector3 exitPoint)
+                          Vector3 shopPoint, Vector3 exitPoint, MapDataSo mapData = null)
         {
             _context.Clear();
             _context.Car = car;
@@ -62,6 +70,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             _context.ArrivalRotation = arrivalRotation;
             _context.ShopPoint = shopPoint;
             _context.ExitPoint = exitPoint;
+            _context.MapData = mapData;
             _context.Interval = car.BoardingInterval;
 
             ApplyStateOverrides(car);
@@ -132,9 +141,38 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
         }
 
+        /// <summary>손님이 다른 차를 훔치러 나설 때 부른다. 이때부터 출발·퇴치 요청을 무시해, 훔치는 도중에 자기 차로 불려 가지 않게 한다.</summary>
+        public void BeginAbandon(StealableCar stolen)
+        {
+            _context.Abandoning = true;
+            _context.StolenCar = stolen;
+        }
+
+        /// <summary>훔치러 가다 실패했을 때 부른다. 평소 흐름(자기 차로 돌아와 떠나기)으로 되돌린다.</summary>
+        public void CancelAbandon()
+        {
+            _context.Abandoning = false;
+            _context.StolenCar = null;
+        }
+
+        /// <summary>훔친 차가 맵을 빠져나갔을 때 부른다. 부른 손님의 상태가 끝난 뒤인 다음 틱에 방문을 닫는다.</summary>
+        public void FinishAbandon()
+        {
+            if (_context.Abandoning)
+            {
+                _context.AbandonDone = true;
+            }
+        }
+
         /// <summary>가게 볼일이 끝나 손님들을 태워 보낼 때 호출한다.</summary>
         public void RequestDeparture()
         {
+            // 손님이 차를 훔쳐 떠나는 중이다. 부르면 훔치던 손님이 자기 차로 되돌아온다.
+            if (_context.Abandoning)
+            {
+                return;
+            }
+
             if (Phase != VisitPhase.Waiting)
             {
                 Debug.LogWarning($"[VisitSession] {Phase} 단계에서는 출발을 요청할 수 없습니다.");
@@ -147,13 +185,29 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>손님을 쫓아낸다. 어느 단계에서든 부를 수 있다. 무엇이 이걸 부를지는 아직 정하지 않았다.</summary>
         public void Repel()
         {
-            if (Phase is VisitPhase.None or VisitPhase.Completed or VisitPhase.Leaving)
+            if (_context.Abandoning || Phase is VisitPhase.None or VisitPhase.Completed or VisitPhase.Leaving)
             {
                 return;
             }
 
             // 밖에 나와 있는 손님이 있으면 태우고 나서 보낸다. 곧장 Leaving으로 뛰면 손님이 허공에 남는다.
             ChangeState(HasCustomerOutside() ? VisitPhase.Boarding : VisitPhase.Leaving);
+        }
+
+        /// <summary>방문에서 손님 하나를 뺀다. 죽은 손님처럼 더는 차에 태울 수 없는 손님에게 쓴다.
+        /// 뺀 손님의 행동은 끊고, 풀 반납은 부른 쪽이 한다 — 세션은 이 손님을 다시 건드리지 않는다.
+        /// 남은 손님만으로 방문이 이어지고, 아무도 안 남으면 차는 빈 채로 떠난다.</summary>
+        public bool Remove(AbstractCustomer customer)
+        {
+            if (customer == null || !_context.Customers.Remove(customer))
+            {
+                return false;
+            }
+
+            // 행동을 끊으면 이 손님의 Phase 실행이 곧바로 끝나, 세션이 이 손님을 기다리지 않는다.
+            customer.Fsm?.Stop();
+            customer.BindSession(null);
+            return true;
         }
 
         private bool HasCustomerOutside()
@@ -180,6 +234,13 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return;
             }
 
+            // 손님이 훔친 차로 떠났다. 버려진 차는 자리에 남기고 방문만 닫는다.
+            if (_context.AbandonDone)
+            {
+                ChangeState(VisitPhase.Completed);
+                return;
+            }
+
             VisitPhase next = _current.Tick(_context, dt);
             if (next != _current.Phase)
             {
@@ -203,7 +264,11 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 pool.Push(customer);
             }
 
-            pool.Push(_context.Car);
+            // 버려진 차는 자리에 그대로 남긴다. 치우는 쪽(VisitDirector.ClearAbandonedCar)이 나중에 반납한다.
+            if (!_context.Abandoning)
+            {
+                pool.Push(_context.Car);
+            }
 
             _context.Clear();
             _current = null;

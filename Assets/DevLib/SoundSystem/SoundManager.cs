@@ -40,6 +40,7 @@ namespace DevLib.SoundSystem
         {
             SoundPlayer player = poolManager.Pop<SoundPlayer>(soundItem);
             player.transform.position = evt.Position;
+            player.SetFollow(evt.Follow);
             player.PlaySound(evt.ClipData);
             player.OnSoundFinished += HandleSoundFinish;
 

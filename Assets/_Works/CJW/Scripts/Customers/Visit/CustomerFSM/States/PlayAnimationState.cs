@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DevLib.AnimatorSystem;
+using DevLib.SoundSystem;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -15,6 +16,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("재생할 클립 후보. 여럿이면 매번 하나를 무작위로 고른다. 손님마다 다른 춤을 추게 하는 방법이다.")]
         [SerializeField] private HashDataSO[] clips;
 
+        [Tooltip("켜면 클립을 무작위 대신 이번 방문의 갈래(CustomerContext.PickVariant)로 고른다. 춤마다 대사가 다를 때 SpeechState의 lineIndices와 같은 순서로 클립을 넣는다.")]
+        [SerializeField] private bool matchVariant;
+
         [Tooltip("재생 시간(초). 0이면 Phase가 바뀌거나 인터럽트가 들어올 때까지 계속한다.")]
         [SerializeField, Min(0f)] private float duration = 6f;
 
@@ -26,6 +30,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
         [Tooltip("몸을 돌리는 각속도(도/초).")]
         [SerializeField, Min(1f)] private float turnSpeed = 360f;
+
+        [Header("사운드")]
+        [Tooltip("연출을 시작할 때 낼 소리. 화내는 몸짓이면 고함, 춤이면 흥얼거림처럼 클립에 맞춰 넣는다.")]
+        [SerializeField] private SoundClipSo startSound;
 
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
         {
@@ -43,7 +51,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 await FaceTowards(Ctx.Visit.Car.transform.position, turnSpeed, ct);
             }
 
-            HashDataSO clip = clips[Random.Range(0, clips.Length)];
+            HashDataSO clip = clips[matchVariant ? Ctx.PickVariant(clips.Length) : Random.Range(0, clips.Length)];
 
             float time = duration;
             if (time > 0f && jitter > 0f)
@@ -51,6 +59,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 time += Random.Range(0f, jitter);
             }
 
+            Ctx.Customer.Sound?.Play(startSound);
             await PlayAction(clip, time, ct);
 
             return VisitOutcome.Done;

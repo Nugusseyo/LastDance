@@ -4,19 +4,20 @@ using UnityEngine.InputSystem;
 
 namespace _Works.JJH._02_Scripts.Agents.Players
 {
-    [CreateAssetMenu(fileName = "Player Input", menuName = "SO/Player Input")]
+    [CreateAssetMenu(fileName = "Player Input", menuName = "Scriptable Objects/Player Input")]
     public class PlayerInputSO : ScriptableObject, Controls.IPlayerActions
     {
         [SerializeField] private UIInputSO uiInputSO;
+
         public event Action OnAttackKeyPressed;
         public event Action OnThrowAttackKeyPressed;
         public event Action OnInteractKeyPressed;
-        public event Action OnChangeWeaponKeyPressed;
+        public event Action OnUseKeyPressed;
 
         public Vector2 MoveDirection { get; private set; }
         public Vector2 LookDirection { get; private set; }
         public bool IsSprinting { get; private set; }
-
+        public bool IsInteractHeld { get; private set; }
 
         private Controls _control;
 
@@ -28,7 +29,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players
                 _control.Player.SetCallbacks(this);
             }
 
-            _control.Player.Enable();
+            SetEnable(true);
 
             if (uiInputSO != null)
                 uiInputSO.InitializeInput(_control);
@@ -48,6 +49,9 @@ namespace _Works.JJH._02_Scripts.Agents.Players
                     _control.Player.Enable();
                 else
                     _control.Player.Disable();
+                
+                Cursor.lockState = enable ? CursorLockMode.Locked : CursorLockMode.Confined;
+                Cursor.visible = !enable;
             }
         }
 
@@ -85,12 +89,17 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         {
             if (context.performed)
                 OnInteractKeyPressed?.Invoke();
+
+            if (context.started)
+                IsInteractHeld = true;
+            else if (context.canceled)
+                IsInteractHeld = false;
         }
 
-        public void OnChangeWeapon(InputAction.CallbackContext context)
+        public void OnUse(InputAction.CallbackContext context)
         {
             if (context.performed)
-                OnChangeWeaponKeyPressed?.Invoke();
+                OnUseKeyPressed?.Invoke();
         }
     }
 }

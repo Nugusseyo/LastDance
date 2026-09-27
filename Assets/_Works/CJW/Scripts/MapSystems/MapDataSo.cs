@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace _Works.CJW.Scripts.MapSystems
 {
@@ -129,6 +130,50 @@ namespace _Works.CJW.Scripts.MapSystems
                 }
 
                 pick--;
+            }
+
+            return false;
+        }
+
+        /// <summary>랜덤 점을 NavMesh에 붙일 때 허용하는 높이 차(m). 손님 몸 기준점이 바닥보다 떠 있어도 찾도록 넉넉히 둔다.</summary>
+        private const float RandomSampleHeight = 2f;
+
+        /// <summary>랜덤 점이 옆으로 이만큼(m) 넘게 끌려가 붙으면 버린다. 건물 안에 떨어진 점이 모두 벽가로 몰리는 걸 막는다.</summary>
+        private const float RandomMaxSnap = 0.5f;
+
+        /// <summary>구운 NavMesh 위에서 <paramref name="center"/> 반경 <paramref name="radius"/>(m) 안의 한 점을 무작위로 뽑는다.
+        /// 등록된 지점과 상관없이 바닥 아무 데나 고르는 조회다 — 손님이 매번 다른 자리에서 소란을 피우게 할 때 쓴다.
+        /// <paramref name="filter"/>의 NavMesh 위에 붙은 점만 받고, <paramref name="accept"/>가 있으면 그것도 통과해야 한다.
+        /// 걸어서 닿는지·너무 먼지 같은 판단은 에이전트를 아는 쪽이 <paramref name="accept"/>로 넘긴다.</summary>
+        public bool TryGetRandomPosition(Vector3 center, float radius, NavMeshQueryFilter filter, int tries,
+            Predicate<Vector3> accept, out Vector3 position)
+        {
+            position = center;
+
+            // 원 안에서 고르게 뽑고 NavMesh에 붙인다. NavMesh 삼각형에서 뽑으면 넓은 바닥의 큰 삼각형은
+            // 무게중심이 반경 밖에 놓여 발밑 바닥이 통째로 후보에서 빠진다.
+            for (int attempt = 0; attempt < tries; attempt++)
+            {
+                Vector2 offset = UnityEngine.Random.insideUnitCircle * radius;
+                Vector3 point = center + new Vector3(offset.x, 0f, offset.y);
+
+                if (!NavMesh.SamplePosition(point, out NavMeshHit hit, RandomSampleHeight, filter))
+                {
+                    continue;
+                }
+
+                Vector3 snap = hit.position - point;
+                snap.y = 0f;
+                if (snap.sqrMagnitude > RandomMaxSnap * RandomMaxSnap)
+                {
+                    continue;
+                }
+
+                if (accept == null || accept(hit.position))
+                {
+                    position = hit.position;
+                    return true;
+                }
             }
 
             return false;
@@ -288,7 +333,64 @@ namespace _Works.CJW.Scripts.MapSystems
 
         // ScriptableObject의 런타임 상태는 에디터에서 플레이를 멈춰도 남는다.
         // 죽은 지점이 목록에 남지 않도록 로드/언로드 시점에 비운다.
-        private void OnEnable() => _points.Clear();
-        private void OnDisable() => _points.Clear();
+        private readonly List<Vector3[]> _carRoutes = new();
+
+        /// <summary>차가 실제로 다니는 길(꺾은선들). VisitDirector가 시작할 때 차 NavMesh로 계산해 넣는다.
+        /// 손님이 오래 머물 자리를 고를 때 이 길을 피하면 드나드는 차에 치이거나 길을 막지 않는다.</summary>
+        public IReadOnlyList<Vector3[]> CarRoutes => _carRoutes;
+
+        public void SetCarRoutes(IEnumerable<Vector3[]> routes)
+        {
+            _carRoutes.Clear();
+            foreach (Vector3[] route in routes)
+            {
+                if (route != null && route.Length > 0)
+                {
+                    _carRoutes.Add(route);
+                }
+            }
+
+            Changed?.Invoke();
+        }
+
+        /// <summary>차가 다니는 길까지의 수평 거리(m). 길이 없으면 무한대.</summary>
+        public float DistanceToCarRoute(Vector3 point)
+        {
+            float best = float.PositiveInfinity;
+            Vector2 p = new(point.x, point.z);
+
+            for (int r = 0; r < _carRoutes.Count; r++)
+            {
+                Vector3[] route = _carRoutes[r];
+                if (route.Length == 1)
+                {
+                    best = Mathf.Min(best, Vector2.Distance(p, new Vector2(route[0].x, route[0].z)));
+                    continue;
+                }
+
+                for (int i = 1; i < route.Length; i++)
+                {
+                    Vector2 a = new(route[i - 1].x, route[i - 1].z);
+                    Vector2 b = new(route[i].x, route[i].z);
+                    Vector2 ab = b - a;
+                    float t = ab.sqrMagnitude > 0.0001f ? Mathf.Clamp01(Vector2.Dot(p - a, ab) / ab.sqrMagnitude) : 0f;
+                    best = Mathf.Min(best, Vector2.Distance(p, a + ab * t));
+                }
+            }
+
+            return best;
+        }
+
+        private void OnEnable()
+        {
+            _points.Clear();
+            _carRoutes.Clear();
+        }
+
+        private void OnDisable()
+        {
+            _points.Clear();
+            _carRoutes.Clear();
+        }
     }
 }

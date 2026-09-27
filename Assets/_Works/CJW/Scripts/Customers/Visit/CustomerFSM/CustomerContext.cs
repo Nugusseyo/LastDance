@@ -1,4 +1,4 @@
-using _Works.CJW.Scripts.Customers.Data;using _Works.CJW.Scripts.MapSystems;
+﻿using _Works.CJW.Scripts.Customers.Data;using _Works.CJW.Scripts.MapSystems;
 using JetBrains.Annotations;
 using Resources.DataBase.Human_Data;
 using UnityEngine;
@@ -34,8 +34,32 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
         [CanBeNull]
         public CustomerContext Partner;
 
-        /// <summary>짝과 만나기로 한 지점. <see cref="CustomerRendezvousSO"/>가 둘의 중간으로 정해 양쪽에 같은 값을 넣는다.</summary>
+        /// <summary>짝과 만나 내가 설 자리. <see cref="CustomerRendezvousSO"/>가 만날 지점 양쪽으로 나눠 준다.</summary>
         public Vector3 MeetPoint;
+
+        /// <summary>짝과 주고받기(공격·방어)를 시작한 시각. 둘이 같은 값을 써야 차례가 맞는다. 아직 시작 전이면 음수.
+        /// 먼저 준비된 쪽이 자기와 상대에게 함께 넣는다.</summary>
+        public float ExchangeStartTime = -1f;
+
+        /// <summary>이번 방문에서 고른 갈래. 대사와 춤처럼 여러 후보 중 하나를 고르는 상태들이 같은 값을 써서 서로 짝이 맞게 한다. 아직 안 골랐으면 음수.</summary>
+        public int Variant = -1;
+
+        /// <summary>후보 <paramref name="count"/>개 중 이번 방문의 갈래를 돌려준다. 처음 부를 때 한 번 정한다.
+        /// 짝이 먼저 골랐으면 그 다음 갈래를 골라 두 사람이 겹치지 않게 한다(싸우는 두 손님의 대사가 다르도록).</summary>
+        public int PickVariant(int count)
+        {
+            if (count <= 1)
+            {
+                return 0;
+            }
+
+            if (Variant < 0)
+            {
+                Variant = Partner != null && Partner.Variant >= 0 ? Partner.Variant + 1 : Random.Range(0, 1 << 16);
+            }
+
+            return Variant % count;
+        }
         /// <summary>이 방문에서 배정받은 좌석 번호. 하차 순서와 승차 좌석에 모두 쓰인다.</summary>
         public int SeatIndex { get; private set; }
         public CustomerDataSO Data => Customer != null ? Customer.Data : null;
@@ -47,15 +71,21 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             MapData = mapData;
         }
 
+        /// <summary>이번 방문에서 이미 차 반대편으로 옮겨 봤는지. 옮겨도 막히면 계속 오가지 않도록 한 번만 허용한다.</summary>
+        public bool RelocatedAroundCar { get; set; }
+
         public void SetVisit(VisitContext visit, int seatIndex = 0)
         {
             Visit = visit;
             SeatIndex = seatIndex;
+            RelocatedAroundCar = false;
         }
 
         /// <summary>풀 반납 시 호출. 풀링에서는 OnDestroy가 거의 불리지 않으므로 여기가 유일한 정리 지점이다.</summary>
         public void Reset()
         {
+            RelocatedAroundCar = false;
+
             // 상태가 취소로 끊겨 자기 finally를 못 지났을 수 있다. 마지막 안전망으로 여기서 짝을 맞춘다.
             // 빼먹으면 손님이 반납되어도 그 지점이 점유 상태로 남는다.
             if (RentedPosition != null)
@@ -78,6 +108,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             Visit = null;
             Target = null;
             MeetPoint = Vector3.zero;
+            ExchangeStartTime = -1f;
+            Variant = -1;
             SeatIndex = 0;
         }
     }

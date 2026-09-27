@@ -80,7 +80,7 @@ namespace _Works.CJW.Scripts.Test
 
         private void Capture()
         {
-            Car[] cars = FindObjectsOfType<Car>();
+            Car[] cars = FindObjectsByType<Car>(FindObjectsSortMode.None);
 
             for (int i = 0; i < cars.Length; i++)
             {

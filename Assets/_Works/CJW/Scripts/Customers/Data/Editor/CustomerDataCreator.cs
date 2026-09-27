@@ -968,7 +968,7 @@ namespace _Works.CJW.Scripts.Customers.Data.Editor
             name.AddToClassList("cd-existing-row__name");
             row.Add(name);
 
-            Label meta = new($"{asset.customerType} · 가중치 {asset.SpawnWeight:0.##}");
+            Label meta = new($"{asset.CustomerType} · 가중치 {asset.SpawnWeight:0.##}");
             meta.AddToClassList("cd-existing-row__meta");
             row.Add(meta);
 

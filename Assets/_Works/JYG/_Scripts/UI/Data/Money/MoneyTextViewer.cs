@@ -1,63 +1,47 @@
 using System;
-using System.Collections;
-using DevLib.ObjectPool.Runtime;
 using DG.Tweening;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using IPoolable = DevLib.ObjectPool.Runtime.IPoolable;
 
 namespace _Works.JYG._Scripts.UI.Data.Money
 {
-    //TODO : 여기 구조 이상한거 바로잡기
-    public class MoneyTextViewer : MonoBehaviour, IPoolable
+    public class MoneyTextViewer : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI moneyTmp;
+        [SerializeField] private Color greenColor = Color.green;
+        [SerializeField] private Color redColor = Color.red;
         private Transform goalObject;
-        [SerializeField] private Vector2 offset;
-        [SerializeField] private Vector2 stPosOffset;
         private Transform parent;
 
         [Header("DOTween Setting")] 
         [SerializeField] private float duration = 2f;
         [SerializeField] private Ease ease = Ease.InOutQuint;
-
-        private const string PLUS = "+";
-        private const string MINUS = "-";
-
-        private RectTransform goalRectTrm;
         
         public RectTransform RectTrm => transform as RectTransform;
 
-        private void Awake()
+        public void InitializeViewer(Transform goal)
         {
-            if(goalObject != null)
-                goalRectTrm = goalObject.transform as RectTransform;
-        }
-
-        public void MovingText(int value, Transform parent, Transform goal)
-        {
-            transform.SetParent(parent);
             goalObject = goal;
-            goalRectTrm = goalObject.transform as RectTransform;
-            
-            string sign = value >= 0 ? PLUS : MINUS;
-            moneyTmp.text = sign + value;
-            RectTrm.DOKill();
-            if (goalRectTrm == null) return;
-
-            RectTrm.DOAnchorPos(goalRectTrm.anchoredPosition + offset, duration)
-                .SetEase(ease)
-                .SetUpdate(true);
         }
 
-        [field:SerializeField] public PoolItemSO PoolItem { get; set; }
-        public GameObject GameObject => gameObject;
-        public void ResetItem()
+        public void SetText(string text, bool isGreen)
+        {
+            moneyTmp.color = isGreen ? greenColor : redColor;
+            moneyTmp.SetText(text);
+        }
+        
+        public void MoveToGoal(Action onComplete)
         {
             RectTrm.DOKill();
-
-            RectTrm.anchoredPosition = goalRectTrm.anchoredPosition + stPosOffset;
+            moneyTmp.alpha = 1;
+            
+            Sequence seq = DOTween.Sequence();
+            seq.Append(
+                RectTrm.DOMove(goalObject.position, duration)
+                    .SetEase(ease)
+                    .SetUpdate(true)
+                    .OnComplete(() => onComplete?.Invoke()));
+            seq.Join(moneyTmp.DOFade(0, duration).SetEase(ease));
         }
     }
 }

@@ -69,6 +69,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1224f78c79e462d41bc4749a4b4024d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Modules.AgentRenderer
+  AnimationEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: _Works.JJH._02_Scripts.Agents.Players.Grabs.PlayerGrabModule,
+          Assembly-CSharp
+        m_MethodName: DestroyCurrentItem
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &284137104690763900
 GameObject:
   m_ObjectHideFlags: 0
@@ -1387,7 +1403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fc44d95e70193449bb0f500afc3ff0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.PlayerCamera
-  playerCamera: {fileID: 7915963362557089639}
+  <CameraTrans>k__BackingField: {fileID: 0}
   sensitivity: 70
   minVertical: -80
   maxVertical: 80

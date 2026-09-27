@@ -42,6 +42,8 @@ namespace _Works.JYG._Scripts.UI.StoreUI
         public IDataContainer<float> RealStoreValue => _realStoreValue;
         public StoreItem CurItem => _item;
 
+        public event Action<StoreItem> OnValueChanged;
+
         public void UpgradeInit(StoreItem item, List<UpgradeDataWrapper> upgradeData, Action buyLogic, IntegerDataContainer moneyManager) //Class 받아야 함. // 받았음.
         {
             barInitializer.InitializeBar(item.maxlevel);
@@ -57,6 +59,9 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             
             _moneyManager = moneyManager;
             _moneyManager.OnValueChanged += HandlePriceChanged;
+            
+            if (_moneyManager != null)
+                HandlePriceChanged(_moneyManager.Value, _moneyManager.Value);
         }
         
         
@@ -89,9 +94,13 @@ namespace _Works.JYG._Scripts.UI.StoreUI
                 barInitializer.SetColor(i, true);
             }
 
-            UpdateUI(item);
-
             SetStatusWithLevel();
+            UpdateUI(item);
+            
+            if (_moneyManager != null)
+                HandlePriceChanged(_moneyManager.Value, _moneyManager.Value);
+            
+            OnValueChanged?.Invoke(_item);
         }
         
         private void UpdateUI(StoreItem item)
@@ -102,13 +111,11 @@ namespace _Works.JYG._Scripts.UI.StoreUI
             {
                 priceBG.color = MaxColor;
                 buyButton.enabled = false;
+                priceTmp.text = Max;
             }
 
-            if (item.price != CurItem.price)
-            {
-                priceTmp.text = TextConvert.Get(item.price, "$");
-                countTmp.text = GetStringWithUpgradeType(item.value.ValueType, item.value.Value);
-            }
+            priceTmp.text = TextConvert.Get(item.price, "$");
+            countTmp.text = GetStringWithUpgradeType(item.value.ValueType, item.value.Value);
         }
 
         private void SetStatusWithLevel()

@@ -16,7 +16,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [SerializeField] private MapPointType targetPoint = MapPointType.Table;
 
         [Tooltip("이 시간 안에 도착하지 못하면 Timeout으로 끝낸다. 0이면 무제한.")]
-        [SerializeField, Min(0f)] private float timeout = 15f;
+        [SerializeField, Min(0f)] private float timeout = 40f;
 
         [Tooltip("켜면 그 종류의 지점이 하나도 없을 때 가게 안 위치로라도 간다. 끄면 제자리에 선다.")]
         [SerializeField] private bool fallbackToShopPoint = true;

@@ -21,11 +21,11 @@ TagManager:
   - RearBumper
   - FrontBumper
   - Hood
-  - Weapon
+  - Item
   - VendingMachine
-  - 
-  - 
-  - 
+  - GasStation
+  - FuelDoor
+  - Customer
   - 
   - 
   - 

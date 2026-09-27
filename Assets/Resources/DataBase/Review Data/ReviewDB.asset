@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40bd5ff9d61f2bd41b718da8f1380642, type: 3}
+  m_Name: ReviewDB
+  m_EditorClassIdentifier: Assembly-CSharp::Resources.DataBase.Review_Data.ReviewDB
+  ReviewSheet:
+  - index: 1
+    type: 1
+    content: 
+  - index: 2
+    type: 2
+    content: 
+  - index: 3
+    type: 1
+    content: 
+  - index: 4
+    type: 2
+    content: 
+  - index: 5
+    type: 2
+    content: 
+  - index: 6
+    type: 2
+    content: 
+  - index: 7
+    type: 2
+    content: 
+  - index: 8
+    type: 1
+    content: 
+  - index: 9
+    type: 2
+    content: 
+  - index: 10
+    type: 2
+    content: 
+  - index: 11
+    type: 2
+    content: 
+  NameSheet:
+  - name: "\uC870\uC724\uADDC"
+  - name: "\uB178\uD604\uC6B0"
+  - name: "\uB9C8\uC774\uD074"
+  - name: "\uC7AD\uC2A8"
+  - name: "\uBE4C\uB9AC\uC9C4"
+  - name: NotMyLove

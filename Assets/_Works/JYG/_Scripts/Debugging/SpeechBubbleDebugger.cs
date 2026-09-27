@@ -20,7 +20,7 @@ namespace _Works.JYG._Scripts.Debugging
             if (Keyboard.current.yKey.wasPressedThisFrame)
             {
                 SpeechBubble bubble = poolManager.Pop<SpeechBubble>(item);
-                bubble.InitializeBubble(type);
+                bubble.InitializeBubble(type, 0);
                 //StartCoroutine(DestroyBubble(2f, bubble));
             }
         }
