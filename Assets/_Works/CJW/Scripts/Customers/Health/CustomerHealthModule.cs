@@ -2,6 +2,7 @@ using System;
 using _Works.CJW.Scripts.Customers.Ragdoll;
 using _Works.Shared.Combat;
 using Cysharp.Threading.Tasks;
+using DevLib.AnimatorSystem;
 using DevLib.ModuleSystem;
 using DevLib.ObjectPool.Runtime;
 using DevLib.SoundSystem;
@@ -31,7 +32,13 @@ namespace _Works.CJW.Scripts.Customers.Health
         [SerializeField] private PoolManagerSO poolManager;
 
         [Header("반응")]
-        [Tooltip("켜면 죽지 않을 만큼 맞았을 때 때린 쪽에게 덤빈다. 전투 상태가 없는 손님은 대신 도망친다.")]
+        [Tooltip("죽지 않을 만큼 맞았을 때 트는 피격 클립(Animator 상태 이름).")]
+        [SerializeField] private HashDataSO hitClip;
+
+        [Tooltip("피격 클립을 틀고 움찔하는 시간(초). 이 동안은 하던 행동을 멈춘다.")]
+        [SerializeField, Min(0f)] private float hitDuration = 0.6f;
+
+        [Tooltip("켜면 움찔한 뒤 때린 쪽에게 덤빈다. 전투 상태가 없는 손님은 대신 도망친다. 둘 다 없으면 하던 행동으로 돌아간다.")]
         [SerializeField] private bool fightBack = true;
 
         [Header("사운드")]
@@ -103,6 +110,9 @@ namespace _Works.CJW.Scripts.Customers.Health
 
             if (_customer != null)
             {
+                // 머리 위 대사도 같이 접는다. 안 그러면 쓰러진 몸 위에 요구하던 말이 끝까지 떠 있다.
+                _customer.Fsm?.Context?.EndSpeech();
+
                 // 방문에서 먼저 뺀다. 남겨 두면 차가 죽은 손님이 타기를 영영 기다리고, 방문을 닫을 때 풀에 한 번 더 넣는다.
                 if (_customer.Session == null || !_customer.Session.Remove(_customer))
                 {
@@ -155,20 +165,16 @@ namespace _Works.CJW.Scripts.Customers.Health
 
         private void React(HitInfo hit)
         {
-            if (!fightBack || _customer == null || _customer.Fsm == null)
+            if (_customer == null || _customer.Fsm == null)
             {
                 return;
             }
 
-            // 전투 상태가 없는 손님은 EnterCombat이 아무것도 하지 않는다. 그때는 도망 상태를 찾는다.
-            if (hit.Attacker != null && _customer.Fsm.CanFight)
-            {
-                _customer.Fsm.EnterCombat(hit.Attacker.transform);
-            }
-            else
-            {
-                _customer.Fsm.RunAway();
-            }
+            // 움찔한 뒤 덤빌지(전투 상태가 없으면 도망) 하던 걸 이어 할지는 FSM이 전투·도망 상태를 보고 고른다.
+            // 때린 사람이 있으면 그쪽을, 없으면(던진 물건) 날아온 쪽을 본다.
+            Transform attacker = hit.Attacker != null ? hit.Attacker.transform : null;
+            Vector3 hitFrom = attacker != null ? attacker.position : _customer.transform.position - hit.Direction;
+            _customer.Fsm.TakeHit(hitClip, hitDuration, hitFrom, attacker, fightBack);
         }
     }
 }

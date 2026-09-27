@@ -104,6 +104,13 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
                 }
             }
 
+            // 같은 줄 앞자리에 차가 아직 서 있다(주유를 먼저 받은 뒤차가 먼저 떠나는 경우). 곧장 퇴장 지점으로 가면
+            // 앞차를 곧 움직일 차로 보고 그 뒤에 선 채 앞차가 떠날 때까지 기다린다. 줄 옆 빈 곳으로 먼저 비켜 나온다.
+            if (TryEscapeParkedBlocker(context))
+            {
+                return;
+            }
+
             // 퇴장 지점을 등진 차가(입구를 가로막고 옆으로 서 있던 차 등) 곧장 퇴장 지점으로 가면 NavMesh 최단 경로가
             // 주차 줄 사이 틈을 대각선으로 가로질러 서 있는 차에 끼인다. 줄에서 떨어진 길로 빠져나올 지점을 먼저 고른다.
             if (!facingExit && TryFindClearDepart(context, out Vector3 clearDepart))
@@ -223,6 +230,324 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
             }
 
             return bestScore < float.PositiveInfinity;
+        }
+
+        /// <summary>앞을 막은 차가 서 있다고 볼 거리(m). 차 앞 범퍼에서 이 안에 선 차가 있으면 곧게 빠져나갈 수 없다.</summary>
+        private const float ParkedBlockerLookAhead = 6f;
+
+        /// <summary>앞차 반경에 더해 옆으로 이만큼(m) 안이면 앞을 막은 것으로 본다. 내 차 폭의 절반쯤.</summary>
+        private const float ParkedBlockerSideMargin = 1.5f;
+
+        /// <summary>줄 옆으로 비켜 나올 지점의 옆 거리(m) 후보.</summary>
+        private static readonly float[] EscapeSideDistances = { 4.5f, 5.5f, 6.5f };
+
+
+        /// <summary>줄 옆으로 비켜 나올 지점의 앞뒤 위치(m) 후보. 모두 차 뒤쪽이다 — 앞차와 범퍼 사이가 한두 m뿐이라
+        /// 앞으로 틀면 곧바로 앞차에 걸려 멈춘다. 뒤쪽 옆을 겨누면 이동 모듈이 먼저 후진해 각을 벌린 뒤 빠져나온다.</summary>
+        private static readonly float[] EscapeForwardOffsets = { -3.5f, -5f, -2f };
+
+        /// <summary>후진으로 물러날 수 있는지 볼 거리(m). 뒤에도 차가 서 있으면 앞뒤로 갇혀 비켜 나올 수 없다.</summary>
+        private const float EscapeReverseCheck = 5f;
+
+        /// <summary>옆으로 6m보다 덜 비키는 만큼 1m마다 더하는 비용(m).</summary>
+        private const float EscapeTightPenalty = 6f;
+
+        /// <summary>서 있는 앞차에 막혀 있으면 빠져나갈 계획을 세워 출발시킨다. 막혀 있지 않으면 false.
+        /// 앞차와 붙어 있으면 먼저 곧게 물러나 사이를 벌리고, 줄 옆 빈 곳이 있으면 그리로, 없으면 곧장 퇴장 지점으로 간다.</summary>
+        private bool TryEscapeParkedBlocker(VisitContext context)
+        {
+            if (!IsBlockedByParkedCar(context.Car, out float frontGap))
+            {
+                return false;
+            }
+
+            // 앞차와 붙어 있으면 핸들을 다 꺾어도 앞차 옆으로 돌 각이 안 나온다. 먼저 곧게 물러나 사이를 벌린다.
+            float needed = PassGap - frontGap;
+            float backOff = CanReverse(context.Car, out float room) ? Mathf.Clamp(needed, 0f, room) : 0f;
+
+            // 뒤에도 차가 서 있어 거의 못 물러선다(두 차 사이에 낀 차). 제자리에서 앞뒤로 오가며 열린 옆쪽으로 차를 튼 뒤 빠져나간다.
+            if (needed > 0.5f && backOff < Mathf.Min(needed, MinUsefulBackOff) && TryChooseOpenSide(context.Car, out Vector3 turnTo))
+            {
+                context.Departing = false;
+                context.Car.MoveTo(context.ExitPoint);
+                context.Car.TurnInPlace(turnTo);
+                Debug.Log($"[Leaving] {context.Car.name}이(가) 앞뒤 차 사이에 끼어(앞 {frontGap:F1}m, 물러설 수 있는 거리 {room:F1}m) 제자리에서 옆으로 틀어 나갑니다.", context.Car);
+                return true;
+            }
+
+            if (TryFindSideEscape(context, out Vector3 escape))
+            {
+                context.DepartPoint = escape;
+                context.Departing = true;
+                context.Car.MoveTo(escape);
+            }
+            else
+            {
+                context.Departing = false;
+                context.Car.MoveTo(context.ExitPoint);
+            }
+
+            if (backOff > 0.5f)
+            {
+                context.Car.BackOff(backOff);
+                Debug.Log($"[Leaving] {context.Car.name}이(가) 앞차와 {frontGap:F1}m 붙어 있어 {backOff:F1}m 물러났다가 나갑니다.", context.Car);
+            }
+
+            return true;
+        }
+
+        /// <summary>이보다 적게밖에 못 물러서면 물러서기로는 앞차 옆으로 돌 각이 안 나온다고 보고 제자리 회전을 한다(m).</summary>
+        private const float MinUsefulBackOff = 2.5f;
+
+        /// <summary>제자리에서 틀 때 옆쪽에서 앞으로 기울일 각도(도). 90도면 옆으로 곧게, 작을수록 앞쪽으로 비스듬히.</summary>
+        private const float TurnOutAngle = 65f;
+
+        /// <summary>차 좌우 중 빠져나갈 수 있는 쪽을 고른다. 옆으로 2.5~4.5m 지점이 차 NavMesh 위이고 비어 있으며 내 자리에서 끊기지 않고 닿는 곳이
+        /// 많은 쪽. 고른 쪽으로 <see cref="TurnOutAngle"/>만큼 튼 방향을 돌려준다.</summary>
+        private static bool TryChooseOpenSide(Car car, out Vector3 direction)
+        {
+            direction = default;
+            Transform t = car.transform;
+            Vector3 forward = t.forward;
+            forward.y = 0f;
+            forward.Normalize();
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+
+            Vector3 origin = t.position;
+            if (CarNavMesh.SamplePosition(origin, out NavMeshHit ground, 2f))
+            {
+                origin = ground.position;
+            }
+
+            int bestScore = 0;
+            int bestSide = 0;
+            for (int side = -1; side <= 1; side += 2)
+            {
+                int score = 0;
+                for (float lateral = 2.5f; lateral <= 4.6f; lateral += 1f)
+                {
+                    for (float ahead = -1f; ahead <= 1.1f; ahead += 2f)
+                    {
+                        Vector3 candidate = origin + right * (side * lateral) + forward * ahead;
+                        if (!TrySampleCarMesh(candidate, out Vector3 point) || !CarTraffic.IsAreaClear(point, 1.2f))
+                        {
+                            continue;
+                        }
+
+                        // 내 자리는 서 있던 동안 내 구멍이 나 있을 수 있다. 거기서 끊긴 건 넘긴다.
+                        if (CarNavMesh.Raycast(point, origin, out NavMeshHit hit) && PlanarDistance(hit.position, origin) > 2.2f)
+                        {
+                            continue;
+                        }
+
+                        score++;
+                    }
+                }
+
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestSide = side;
+                }
+            }
+
+            if (bestSide == 0)
+            {
+                return false;
+            }
+
+            direction = Quaternion.AngleAxis(bestSide * TurnOutAngle, Vector3.up) * forward;
+            return true;
+        }
+
+        /// <summary>서 있는 앞차에 막혀 제자리인 채 이 시간(초)이 지나면 빠져나갈 계획을 다시 세운다.
+        /// 물러서다 뒤로 들어오는 차에 막히는 등 첫 계획이 틀어져도, 그 차가 지나가면 다시 물러서 빠져나간다.</summary>
+        private const float EscapeRetryInterval = 4f;
+
+        /// <summary>앞차 중심까지 이만큼(m)은 떨어져야 앞차 옆으로 돌아 나갈 각이 나온다. 8m 간격 줄에서 1m만 물러서면 앞차 옆구리에 다시 걸렸다.</summary>
+        private const float PassGap = 11f;
+
+        /// <summary>물러설 때 뒤에 비어 있어야 하는 최대 거리(m).</summary>
+        private const float MaxBackOff = 6f;
+
+        /// <summary>뒤로 얼마나 물러설 수 있는지. 뒤 범퍼 뒤로 차가 있으면 그 앞까지만.</summary>
+        private static bool CanReverse(Car car, out float room)
+        {
+            ICarTrafficSensor self = car.GetModule<ICarTrafficSensor>();
+            Transform t = car.transform;
+            Vector3 forward = t.forward;
+            forward.y = 0f;
+            forward.Normalize();
+            Vector3 rearBumper = (self != null ? self.Center : t.position) - forward * (self != null ? self.BoundingRadius * 0.9f : 2.5f);
+
+            for (room = MaxBackOff; room >= 1f; room -= 1f)
+            {
+                // 물러선 뒤에도 뒤차와 1m는 떨어져 있어야 한다.
+                if (CarTraffic.IsSegmentClear(rearBumper, rearBumper - forward * (room + 1f), 1.2f, self) &&
+                    TrySampleCarMesh(t.position - forward * room, out _))
+                {
+                    return true;
+                }
+            }
+
+            room = 0f;
+            return false;
+        }
+
+        /// <summary>차 정면 바로 앞에 서 있는 차가 있는지. 움직이는 차는 곧 비키니 뺀다. <paramref name="gap"/>은 앞차 중심까지의 앞쪽 거리(m).</summary>
+        private static bool IsBlockedByParkedCar(Car car, out float gap)
+        {
+            gap = float.PositiveInfinity;
+            ICarTrafficSensor self = car.GetModule<ICarTrafficSensor>();
+            Transform t = car.transform;
+            Vector3 forward = t.forward;
+            forward.y = 0f;
+            forward.Normalize();
+
+            Vector3 center = self != null ? self.Center : t.position;
+            float halfLength = self != null ? self.BoundingRadius * 0.9f : 3f;
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+
+            IReadOnlyList<ICarTrafficSensor> sensors = CarTraffic.Sensors;
+            for (int i = 0; i < sensors.Count; i++)
+            {
+                ICarTrafficSensor other = sensors[i];
+                if (ReferenceEquals(other, self))
+                {
+                    continue;
+                }
+
+                Vector3 velocity = other.Velocity;
+                velocity.y = 0f;
+                if (velocity.sqrMagnitude > ParkedSpeed * ParkedSpeed)
+                {
+                    continue;
+                }
+
+                // 정면만 보지 않는다. 비켜 나오다 조금 틀어진 차는 앞차가 비스듬히 앞에 걸려 선다.
+                // 내 차 폭과 앞차 반경을 합친 띠 안에 앞차 중심이 들면 막힌 것으로 본다.
+                Vector3 rel = other.Center - center;
+                rel.y = 0f;
+                float ahead = Vector3.Dot(rel, forward);
+                float side = Mathf.Abs(Vector3.Dot(rel, right));
+                if (ahead > 0f && ahead <= halfLength + ParkedBlockerLookAhead + other.BoundingRadius &&
+                    side <= other.BoundingRadius + ParkedBlockerSideMargin)
+                {
+                    gap = Mathf.Min(gap, ahead);
+                }
+            }
+
+            return !float.IsPositiveInfinity(gap);
+        }
+
+        /// <summary>줄 옆(차 좌우)으로 비켜 나올 지점을 찾는다. 그 지점이 차 NavMesh 위이고 비어 있으며, 내 자리에서 끊기지 않고 닿고,
+        /// 거기서 퇴장 지점까지 서 있는 차를 스치지 않는 길이 있어야 한다. 그중 퇴장까지 가장 짧은 곳을 고른다.</summary>
+        private bool TryFindSideEscape(VisitContext context, out Vector3 escape)
+        {
+            escape = default;
+            Car car = context.Car;
+            Transform t = car.transform;
+            ICarTrafficSensor self = car.GetModule<ICarTrafficSensor>();
+            float bodyHalfWidth = 1.2f;
+
+            Vector3 origin = t.position;
+            if (CarNavMesh.SamplePosition(origin, out NavMeshHit ground, 2f))
+            {
+                origin = ground.position;
+            }
+
+            Vector3 forward = t.forward;
+            forward.y = 0f;
+            forward.Normalize();
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+
+            // 뒤에도 차가 서 있으면 앞뒤로 갇혔다. 물러설 수 없으니 비켜 나올 수도 없다.
+            Vector3 rearBumper = (self != null ? self.Center : t.position) - forward * (self != null ? self.BoundingRadius * 0.9f : 2.5f);
+            if (!CarTraffic.IsSegmentClear(rearBumper, rearBumper - forward * EscapeReverseCheck, bodyHalfWidth, self))
+            {
+                Debug.Log($"[Leaving] {car.name}이(가) 앞뒤로 막혀 줄 옆으로 비켜 나올 수 없어 앞차를 기다립니다.", car);
+                return false;
+            }
+
+            float best = float.PositiveInfinity;
+            int noMesh = 0, notClear = 0, cut = 0, parkedNear = 0, noPath = 0, pathBlocked = 0;
+            for (int s = -1; s <= 1; s += 2)
+            {
+                for (int d = 0; d < EscapeSideDistances.Length; d++)
+                {
+                    for (int f = 0; f < EscapeForwardOffsets.Length; f++)
+                    {
+                        Vector3 candidate = origin + right * (s * EscapeSideDistances[d]) + forward * EscapeForwardOffsets[f];
+
+                        if (!TrySampleCarMesh(candidate, out Vector3 point))
+                        {
+                            noMesh++;
+                            continue;
+                        }
+
+                        if (!CarTraffic.IsAreaClear(point, departClearRadius))
+                        {
+                            notClear++;
+                            continue;
+                        }
+
+                        // 비켜 나오는 길이 끊기면(주유기 섬·벽) 안 된다. 내 자리는 내 구멍이라 거기서 끊긴 건 넘긴다.
+                        if (CarNavMesh.Raycast(point, origin, out NavMeshHit hit) &&
+                            PlanarDistance(hit.position, origin) > bodyHalfWidth + 1f)
+                        {
+                            cut++;
+                            continue;
+                        }
+
+                        if (!IsClearOfParkedCars(origin, point, self))
+                        {
+                            parkedNear++;
+                            continue;
+                        }
+
+                        if (!NavMesh.CalculatePath(point, context.ExitPoint, CarNavMesh.Filter, _departPath) ||
+                            _departPath.status != NavMeshPathStatus.PathComplete)
+                        {
+                            noPath++;
+                            continue;
+                        }
+
+                        Vector3[] corners = _departPath.corners;
+                        float length = PlanarDistance(origin, point);
+                        bool clear = true;
+                        for (int i = 1; i < corners.Length && clear; i++)
+                        {
+                            length += PlanarDistance(corners[i - 1], corners[i]);
+                            clear = IsClearOfParkedCars(corners[i - 1], corners[i], self);
+                        }
+
+                        if (!clear)
+                        {
+                            pathBlocked++;
+                            continue;
+                        }
+
+                        // 바짝 붙은 옆 지점은 차가 틀 공간이 모자라 제자리에서 못 빠져나온다. 멀찍이 비키는 쪽을 먼저 고른다.
+                        float lateral = Mathf.Abs(Vector3.Dot(point - origin, right));
+                        float score = length + (lateral > 1f ? Mathf.Max(0f, 6f - lateral) * EscapeTightPenalty : 0f);
+                        if (score < best)
+                        {
+                            best = score;
+                            escape = point;
+                        }
+                    }
+                }
+            }
+
+            if (best < float.PositiveInfinity)
+            {
+                Debug.Log($"[Leaving] {car.name}이(가) 앞차에 막혀 줄 옆({escape.x:F1},{escape.z:F1})으로 비켜 나옵니다.", car);
+                return true;
+            }
+
+            Debug.Log($"[Leaving] {car.name}이(가) 앞차에 막혔는데 줄 옆으로 비켜 나올 곳이 없어 곧장 퇴장 지점으로 갑니다. " +
+                      $"(탈락: NavMesh 밖 {noMesh}, 차가 있음 {notClear}, 길 끊김 {cut}, 서 있는 차 옆 {parkedNear}, 퇴장 길 없음 {noPath}, 퇴장 길에 차 {pathBlocked})", car);
+            return false;
         }
 
         private static bool TrySampleCarMesh(Vector3 position, out Vector3 point)
@@ -345,7 +670,13 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
             if (context.Departing)
             {
                 // 빠져나올 지점에 닿기 전에 목적지를 바꾼다. 닿고 나서 바꾸면 거기서 한 번 서게 된다.
-                bool near = PlanarDistance(context.Car.transform.position, context.DepartPoint) <= departSwitchDistance;
+                // 차 뒤쪽 목표(후진해 줄에서 빠지는 중)는 거의 닿을 때까지 바꾸지 않는다. 일찍 바꾸면 아직 줄 안이라 앞차 쪽 길을 다시 탄다.
+                Transform carTransform = context.Car.transform;
+                Vector3 toDepart = context.DepartPoint - carTransform.position;
+                bool behind = Vector3.Dot(toDepart, carTransform.forward) < 0f &&
+                              Mathf.Abs(Vector3.Dot(toDepart, carTransform.right)) < 1.5f;
+                float switchDistance = behind ? 1f : departSwitchDistance;
+                bool near = PlanarDistance(carTransform.position, context.DepartPoint) <= switchDistance;
                 if (near || context.Car.IsArrived || !context.Car.HasCompletePath)
                 {
                     context.Departing = false;
@@ -400,11 +731,26 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
                 context.LeaveProgressPoint = position;
                 context.LeaveStallElapsed = 0f;
                 context.LeaveHonkElapsed = 0f;
+                context.LeaveEscapeElapsed = 0f;
                 return false;
             }
 
-            if (IsBlockedAhead(context.Car))
+            if (context.Car.IsManeuvering)
             {
+                // 제자리에서 도는 중이다. 앞으로 나아가지 않아도 막힌 게 아니니 아무것도 세지 않는다.
+                context.LeaveStallElapsed = 0f;
+                context.LeaveEscapeElapsed = 0f;
+            }
+            else if (IsBlockedAhead(context.Car))
+            {
+                // 앞차가 서 있는 차면 기다려도 안 비킨다(아직 자기 볼일 중). 잠시 뒤 빠져나갈 계획을 다시 세운다.
+                context.LeaveEscapeElapsed += dt;
+                if (context.LeaveEscapeElapsed >= EscapeRetryInterval)
+                {
+                    context.LeaveEscapeElapsed = 0f;
+                    TryEscapeParkedBlocker(context);
+                }
+
                 // 앞차를 기다리는 중이다. 한동안 안 비키면 경적을 울린다.
                 context.LeaveHonkElapsed += dt;
                 if (honkInterval > 0f && context.LeaveHonkElapsed >= honkInterval)
@@ -416,6 +762,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
             else
             {
                 context.LeaveHonkElapsed = 0f;
+                context.LeaveEscapeElapsed = 0f;
                 context.LeaveStallElapsed += dt;
 
                 // 막는 차도 없는데 서 있다. 조향이 좁은 곳에서 굳었을 수 있으니 이동을 처음부터 다시 시킨다.

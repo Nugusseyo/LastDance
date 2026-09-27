@@ -145,6 +145,36 @@ namespace _Works.CJW.Scripts.Cars
         private float _backoffRemaining;
         private float _backoffTimer;
 
+        /// <summary>이번 물러서기를 포기하기까지의 시간(초). 교착을 풀 때는 짧게, 밖에서 거리를 정해 물러설 때는 그 거리만큼 넉넉히.</summary>
+        private float _backoffLimit = BackoffTimeout;
+
+        /// <summary>제자리 회전(N자 회전) 중인지와 그 상태. 앞뒤로 한 번 오갈 때마다 핸들을 반대로 꺾어 같은 쪽으로 돈다.</summary>
+        private bool _turning;
+        private Vector3 _turnGoal;
+        private int _turnDir = 1;
+        private float _turnSwing;
+        private float _turnTime;
+
+        /// <summary>한 번에 앞이나 뒤로 가는 최대 거리(m). 최소 회전 반경이 2m면 1m에 약 30도 돈다.</summary>
+        private const float TurnSwingMax = 1.2f;
+
+        /// <summary>제자리 회전 속도(m/s).</summary>
+        private const float TurnSpeed = 1.2f;
+
+        /// <summary>범퍼와 다른 차 사이에 남길 여유(m).</summary>
+        private const float TurnMargin = 0.35f;
+
+        /// <summary>목표 방향과 이 각도(도) 안으로 들어오면 회전을 끝낸다.</summary>
+        private const float TurnDoneAngle = 15f;
+
+        /// <summary>이 시간(초)이 지나도 못 돌면 포기하고 그대로 출발한다.</summary>
+        private const float TurnTimeout = 25f;
+
+        public bool IsManeuvering => _turning;
+
+        /// <summary>출발을 미루는 동안 받은 물러서기. 실제로 출발할 때(StartPath) 건다 — 먼저 걸면 StartPath가 지운다.</summary>
+        private float _pendingBackoff;
+
         private bool _hasDestination;
 
         /// <summary>후진 중인지. 기어를 바꾸려면 먼저 속도가 0이 되어야 한다.</summary>
@@ -293,6 +323,10 @@ namespace _Works.CJW.Scripts.Cars
                 return;
             }
 
+            // 새 목적지는 이전 목적지에 걸어 둔 물러서기·제자리 회전을 이어받지 않는다.
+            _pendingBackoff = 0f;
+            _turning = false;
+
             // 풀에서 꺼낸 차는 풀 위치(차 NavMesh 밖일 수 있음)에서 켜져 에이전트가 NavMesh에 붙지 못한 채로 온다.
             // 지금 자리로 옮겨 붙여 본 뒤에도 안 되면 그때 포기한다.
             if (!_agent.isOnNavMesh)
@@ -378,6 +412,179 @@ namespace _Works.CJW.Scripts.Cars
 
             _remaining = float.PositiveInfinity;
             _endDistance = float.PositiveInfinity;
+
+            if (_pendingBackoff > 0f)
+            {
+                StartBackoff(_pendingBackoff);
+                _pendingBackoff = 0f;
+            }
+        }
+
+        public void BackOff(float distance)
+        {
+            if (distance <= 0f || !_hasDestination)
+            {
+                return;
+            }
+
+            // 서 있다 출발하는 차는 경로 계산을 두 프레임 미룬다. 그때 물러서기가 지워지지 않게 출발할 때 건다.
+            if (_pendingFrames > 0)
+            {
+                _pendingBackoff = distance;
+                return;
+            }
+
+            StartBackoff(distance);
+        }
+
+        public void TurnInPlace(Vector3 direction)
+        {
+            direction.y = 0f;
+            if (!_hasDestination || direction.sqrMagnitude < 1e-4f)
+            {
+                return;
+            }
+
+            _turning = true;
+            _turnGoal = direction.normalized;
+            _turnDir = HasTurnRoom(1) ? 1 : -1;
+            _turnSwing = 0f;
+            _turnTime = 0f;
+            _backoffRemaining = 0f;
+            _pendingBackoff = 0f;
+        }
+
+        /// <summary>앞뒤로 조금씩 오가며 목표 방향으로 튼다. 전진할 때는 목표 쪽으로, 후진할 때는 반대로 꺾어 같은 쪽으로 돈다.
+        /// 범퍼 앞(뒤)에 다른 차가 닿거나 NavMesh가 끝나거나 한 번에 갈 거리를 다 가면 멈춰 방향을 바꾼다.</summary>
+        private void TickTurn(float dt)
+        {
+            _turnTime += dt;
+
+            Vector3 forward = transform.forward;
+            forward.y = 0f;
+            float angle = Vector3.SignedAngle(forward, _turnGoal, Vector3.up);
+
+            if (Mathf.Abs(angle) <= TurnDoneAngle || _turnTime > TurnTimeout)
+            {
+                if (_turnTime > TurnTimeout)
+                {
+                    Debug.LogWarning($"[CarSteering] {name}이(가) {TurnTimeout}초 안에 제자리에서 다 돌지 못해 그대로 출발합니다. (남은 각도 {angle:F0}도)", this);
+                }
+
+                FinishTurn();
+                return;
+            }
+
+            float side = Mathf.Sign(angle);
+            bool room = _turnSwing < TurnSwingMax && HasTurnRoom(_turnDir);
+
+            if (!room)
+            {
+                // 이번 방향으로는 더 못 간다. 세운 뒤 반대로 간다.
+                _speed = Mathf.MoveTowards(_speed, 0f, _brakeAccel * dt);
+                if (Mathf.Abs(_speed) <= 0.05f)
+                {
+                    _speed = 0f;
+                    _turnSwing = 0f;
+                    _turnDir = -_turnDir;
+
+                    // 앞뒤 모두 한 발짝도 못 가면 돌 수 없다. 그대로 출발시켜 평소 처리(기다리기·물러서기)에 맡긴다.
+                    if (!HasTurnRoom(_turnDir) && !HasTurnRoom(-_turnDir))
+                    {
+                        Debug.LogWarning($"[CarSteering] {name}이(가) 앞뒤가 모두 막혀 제자리에서 돌 수 없습니다.", this);
+                        FinishTurn();
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                _speed = Mathf.MoveTowards(_speed, TurnSpeed * _turnDir, _accel * dt);
+            }
+
+            // 전진은 목표 쪽으로, 후진은 반대로 꺾는다. 그래야 둘 다 같은 쪽으로 돈다.
+            float steerTarget = side * _turnDir * _maxSteerAngle * Mathf.Deg2Rad;
+            _steer = Mathf.MoveTowards(_steer, steerTarget, _steerRate * Mathf.Deg2Rad * dt);
+            float curvature = CarSteeringSolver.SteerToCurvature(_steer, _wheelBase);
+
+            Integrate(curvature, transform.position.y - _rideHeight, dt);
+            _turnSwing += Mathf.Abs(_speed) * dt;
+        }
+
+        private void FinishTurn()
+        {
+            _turning = false;
+            _speed = 0f;
+            _steer = 0f;
+            _reversing = false;
+            _reverseTravelled = 0f;
+
+            // 방향이 바뀌었으니 경로를 지금 자리에서 다시 뽑는다.
+            StartPath(_destination);
+        }
+
+        /// <summary>앞(dir=1)이나 뒤(dir=-1)로 조금 더 가도 되는지. 범퍼 양 끝과 가운데 바로 앞에 다른 차가 없고, 범퍼 가운데가 NavMesh 안이어야 한다.</summary>
+        private bool HasTurnRoom(int dir)
+        {
+            Vector3 forward = transform.forward;
+            forward.y = 0f;
+            forward.Normalize();
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+
+            Vector2 half = _traffic != null ? TrafficHalfSize() : new Vector2(1f, 2.3f);
+            Vector3 center = _traffic != null ? _traffic.Center : transform.position;
+            Vector3 bumper = center + forward * (dir * (half.y + TurnMargin));
+
+            var sensors = CarTraffic.Sensors;
+            for (int k = -1; k <= 1; k++)
+            {
+                Vector3 point = bumper + right * (k * half.x);
+                for (int i = 0; i < sensors.Count; i++)
+                {
+                    if (!ReferenceEquals(sensors[i], _traffic) && sensors[i].Overlaps(point, 0.1f))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            Vector3 ground = transform.position - Vector3.up * _rideHeight;
+            Vector3 target = bumper;
+            target.y = ground.y;
+            return CarNavMesh.SamplePosition(ground, out NavMeshHit from, 2f) &&
+                   !CarNavMesh.Raycast(from.position, target, out NavMeshHit _);
+        }
+
+        /// <summary>교통 센서 차체의 반폭·반길이. 센서가 네 모서리만 알려 주므로 거기서 잰다.</summary>
+        private Vector2 TrafficHalfSize()
+        {
+            _cornerBuffer ??= new Vector3[4];
+            _traffic.GetCorners(_cornerBuffer);
+            Vector3 forward = transform.forward;
+            forward.y = 0f;
+            forward.Normalize();
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+            Vector3 center = _traffic.Center;
+
+            float x = 0f, z = 0f;
+            for (int i = 0; i < 4; i++)
+            {
+                Vector3 d = _cornerBuffer[i] - center;
+                x = Mathf.Max(x, Mathf.Abs(Vector3.Dot(d, right)));
+                z = Mathf.Max(z, Mathf.Abs(Vector3.Dot(d, forward)));
+            }
+
+            return new Vector2(x, z);
+        }
+
+        private Vector3[] _cornerBuffer;
+
+        private void StartBackoff(float distance)
+        {
+            _backoffRemaining = distance;
+            _backoffTimer = 0f;
+            _backoffLimit = distance / _reverseSpeed + 2f;
+            _blockedTime = 0f;
         }
 
         public void Stop()
@@ -388,6 +595,8 @@ namespace _Works.CJW.Scripts.Cars
             _reversing = false;
             _reverseTravelled = 0f;
             _backoffRemaining = 0f;
+            _pendingBackoff = 0f;
+            _turning = false;
             _blockedTime = 0f;
             _retryCount = 0;
             _giveUp = false;
@@ -436,6 +645,13 @@ namespace _Works.CJW.Scripts.Cars
                 {
                     return;
                 }
+            }
+
+            // 제자리 회전 중에는 경로를 따라가지 않는다. 다 돌면 FinishTurn이 경로를 다시 뽑는다.
+            if (_turning)
+            {
+                TickTurn(dt);
+                return;
             }
 
             _endDistance = CarPathTracker.HorizontalDistance(transform.position, _destination);
@@ -515,7 +731,7 @@ namespace _Works.CJW.Scripts.Cars
                     _reverseTravelled += Mathf.Abs(_speed) * dt;
                 }
 
-                if (IsReverseBlocked() || _backoffTimer > BackoffTimeout)
+                if (IsReverseBlocked() || _backoffTimer > _backoffLimit)
                 {
                     _backoffRemaining = 0f;
                 }
@@ -800,6 +1016,7 @@ namespace _Works.CJW.Scripts.Cars
             _blockedTime = 0f;
             _backoffRemaining = _backoffDistance;
             _backoffTimer = 0f;
+            _backoffLimit = BackoffTimeout;
         }
 
         /// <summary>회전은 속도에 비례해서만(θ̇ = v·κ), 이동은 항상 정면으로만.</summary>

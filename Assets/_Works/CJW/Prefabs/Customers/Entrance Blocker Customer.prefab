@@ -235,8 +235,30 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3755322571624575713, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6262371334996253537}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7189175007966602525, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3408113303838837629}
   m_SourcePrefab: {fileID: 100100000, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+--- !u!1 &1055594651902347463 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7189175007966602525, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+  m_PrefabInstance: {fileID: 7882193432524238298}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3408113303838837629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1055594651902347463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f0442a68545331448e4cf10fe62183f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Animation.ActionAnimatorModule
+  crossFade: 0.1
+  exitClip: {fileID: 11400000, guid: 4aa00dabdbbb49f284c98aa9587ac5ff, type: 2}
 --- !u!195 &1279597066472179435 stripped
 NavMeshAgent:
   m_CorrespondingSourceObject: {fileID: 8980503021522971441, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}

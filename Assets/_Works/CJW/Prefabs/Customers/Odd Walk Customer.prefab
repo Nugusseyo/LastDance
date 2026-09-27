@@ -275,6 +275,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: managedReferences[4377106815191875666].lateSeconds
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: managedReferences[4377106929555079262].poolManager
       value: 
       objectReference: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
@@ -311,6 +315,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7189175007966602525, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5369252933812456644}
+    - targetCorrespondingSourceObject: {fileID: 7189175007966602525, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5453771963366800829}
   m_SourcePrefab: {fileID: 100100000, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
 --- !u!195 &3221208462557916599 stripped
 NavMeshAgent:
@@ -339,6 +346,20 @@ MonoBehaviour:
   swaySpeed: 0.6
   irregularity: 0.35
   activeOnStart: 1
+--- !u!114 &5453771963366800829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3733549482134659995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f0442a68545331448e4cf10fe62183f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Animation.ActionAnimatorModule
+  crossFade: 0.1
+  exitClip: {fileID: 11400000, guid: 4aa00dabdbbb49f284c98aa9587ac5ff, type: 2}
 --- !u!4 &7208215807304512615 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3755322571624575713, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}

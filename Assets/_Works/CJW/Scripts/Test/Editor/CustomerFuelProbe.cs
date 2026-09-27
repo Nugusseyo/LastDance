@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using _Works.CJW.Scripts.Customers;
+using _Works.CJW.Scripts.Customers.Visit;
+using _Works.CJW.Scripts.Sounds;
 using _Works.CJW.Scripts.Customers.Visit.CustomerFSM;
 using _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States;
 using _Works.JJH._02_Scripts.Agents.Players.Grabs;
@@ -27,7 +29,7 @@ namespace _Works.CJW.Scripts.Test.Editor
         private const string RunIndexKey = "CJW.CustomerFuel.RunIndex";
         private const string OutDir = "Temp/CustomerSim";
 
-        private const int TargetCount = 2;
+        private const int TargetCount = 3;
         private const float TimeScale = 3f;
         private const float GiveUpSeconds = 400f;
 
@@ -44,12 +46,15 @@ namespace _Works.CJW.Scripts.Test.Editor
         /// <summary>주유가 끝난 뒤 다음 행동으로 넘어가야 하는 시간(초).</summary>
         private const float ReleaseWithin = 2f;
 
-        private enum Step { WaitArrive, IdleWait, Fueling, EarlyRelease, FuelingFull, AfterEnd, Done }
+        /// <summary>주유가 끝난 뒤 차가 출발(Waiting을 벗어남)해야 하는 시간(초).</summary>
+        private const float DepartWithin = 17f;
+
+        private enum Step { WaitArrive, IdleWait, Fueling, EarlyRelease, FuelingFull, AfterEnd, Depart, Done }
 
         private sealed class Target
         {
             public AbstractCustomer Customer;
-            public OilingState State;
+            public CustomerState State;
             public FuelDoor Door;
             public string Name;
             public Step Step;
@@ -59,6 +64,12 @@ namespace _Works.CJW.Scripts.Test.Editor
             public Action OnEnded;
             public int CompletedCount;
             public Action OnCompleted;
+
+            /// <summary>주유기에 닿기 전에 주유를 끝내 보는 대상. 손님이 걸어가는 도중에 주유가 끝나도 놓치지 않는지 본다.</summary>
+            public bool Early;
+
+            /// <summary>차에서 내리지 않고 주유를 기다리는 손님(InCarFuelState).</summary>
+            public bool InCar;
         }
 
         private static readonly List<Target> Targets = new();
@@ -66,7 +77,6 @@ namespace _Works.CJW.Scripts.Test.Editor
         private static readonly StringBuilder Log = new();
         private static readonly List<string> Errors = new();
         private static FuelInjector _injector;
-        private static bool _injectorCreated;
         private static int _pass;
         private static int _fail;
         private static float _startTime;
@@ -112,16 +122,18 @@ namespace _Works.CJW.Scripts.Test.Editor
             _lastTick = Time.time;
             Time.timeScale = TimeScale;
 
-            _injector = Object.FindFirstObjectByType<FuelInjector>();
-            _injectorCreated = _injector == null;
-            if (_injectorCreated)
+            // 플레이어의 주입기는 쓰지 않는다. 플레이어가 매 프레임 "키를 누르고 있는지" 보고 주유를 취소하므로
+            // 입력을 넣을 수 없는 여기서는 게이지가 차기 전에 끊긴다. 설정(레이어 마스크·시간)만 베낀 따로 된 주입기를 쓴다.
+            FuelInjector playerInjector = Object.FindFirstObjectByType<FuelInjector>();
+            _injector = new GameObject("[FuelProbe] Injector").AddComponent<FuelInjector>();
+            if (playerInjector != null)
             {
-                _injector = new GameObject("[FuelProbe] Injector").AddComponent<FuelInjector>();
+                EditorUtility.CopySerialized(playerInjector, _injector);
             }
 
             Application.logMessageReceived += OnLog;
             EditorApplication.update += Tick;
-            Write($"시작 {SessionState.GetInt(RunIndexKey, 1)}회차, 주입기: {(_injectorCreated ? "씬에 없어 임시로 만듦" : _injector.name)}");
+            Write($"시작 {SessionState.GetInt(RunIndexKey, 1)}회차, 주입기: 임시(설정은 {(playerInjector != null ? playerInjector.name : "기본값")})");
         }
 
         private static void OnLog(string condition, string stackTrace, LogType type)
@@ -178,7 +190,15 @@ namespace _Works.CJW.Scripts.Test.Editor
                     continue;
                 }
 
-                if (c.Fsm?.Machine?.Current is not OilingState state || c.Fsm.Context?.RentedPosition == null)
+                CustomerState state = c.Fsm?.Machine?.Current;
+                bool inCar = state is InCarFuelState;
+                if (!inCar && (state is not OilingState || c.Fsm.Context?.RentedPosition == null))
+                {
+                    continue;
+                }
+
+                // 차 안 손님은 한 명만, 걸어가는 손님은 두 명까지 본다.
+                if (inCar ? Targets.Any(x => x.InCar) : Targets.Count(x => !x.InCar) >= 2)
                 {
                     continue;
                 }
@@ -192,6 +212,8 @@ namespace _Works.CJW.Scripts.Test.Editor
                     Name = $"{c.name}#{c.GetInstanceID()}",
                     Step = Step.WaitArrive,
                     StepAt = Time.time,
+                    InCar = inCar,
+                    Early = !inCar && Targets.Count(x => !x.InCar) == 1,
                 };
 
                 if (t.Door == null)
@@ -207,7 +229,9 @@ namespace _Works.CJW.Scripts.Test.Editor
                 t.OnCompleted = () => t.CompletedCount++;
                 t.Door.OnFuelingCompleted += t.OnCompleted;
                 Targets.Add(t);
-                Write($"대상 {t.Name}: 차 {c.Session.Car.name}, 주유기 {c.Fsm.Context.RentedPosition.Position}");
+                Write(inCar
+                    ? $"대상 {t.Name}: 차 {c.Session.Car.name}, 차 안에서 주유 기다림"
+                    : $"대상 {t.Name}: 차 {c.Session.Car.name}, 주유기 {c.Fsm.Context.RentedPosition.Position}");
             }
         }
 
@@ -219,6 +243,34 @@ namespace _Works.CJW.Scripts.Test.Editor
             switch (t.Step)
             {
                 case Step.WaitArrive:
+                    if (t.InCar)
+                    {
+                        // 차 안에서 2초 기다리게 둔 뒤 주유를 끝낸다. 그동안은 계속 기다려야 한다.
+                        if (now - t.StepAt < 2f)
+                        {
+                            return;
+                        }
+
+                        Check(ReferenceEquals(current, t.State), $"{t.Name} 주유 전 차 안에서 계속 기다림: {current?.GetType().Name ?? "-"}");
+                        t.Door.NotifyFuelingStarted();
+                        t.Door.NotifyFuelingCompleted();
+                        Write($"{t.Name}: 차 안 손님 주유 완료");
+                        t.Step = Step.AfterEnd;
+                        t.StepAt = now;
+                        return;
+                    }
+
+                    if (t.Early && ReferenceEquals(current, t.State) && !IsWaitingOn(t.Door, c))
+                    {
+                        // 손님이 아직 주유기로 걸어가는 중이다. 플레이어가 먼저 주유를 끝낸 셈 치고 주유구에 바로 완료를 알린다.
+                        t.Door.NotifyFuelingStarted();
+                        t.Door.NotifyFuelingCompleted();
+                        Write($"{t.Name}: 주유기에 닿기 전에 주유 완료 (주유기까지 {Planar(c.transform.position, c.Fsm.Context.RentedPosition?.Position ?? c.transform.position):F1}m 남음)");
+                        t.Step = Step.AfterEnd;
+                        t.StepAt = now;
+                        return;
+                    }
+
                     if (!ReferenceEquals(current, t.State))
                     {
                         Write($"{t.Name}: 도착 전에 OilingState를 벗어남({current?.GetType().Name ?? "-"}) — 이동 실패로 보고 제외");
@@ -250,7 +302,15 @@ namespace _Works.CJW.Scripts.Test.Editor
                     // 주유를 기다리는 동안 머리 위에 요구 말풍선("가득이요")이 떠 있어야 한다.
                     SpeechBubble bubble = Object.FindObjectsByType<SpeechBubble>(FindObjectsSortMode.None)
                         .FirstOrDefault(b => b.isActiveAndEnabled && Planar(b.transform.position, c.transform.position) < 1f);
-                    Check(bubble != null, $"{t.Name} 주유 기다리는 동안 말풍선 보임: {(bubble != null ? bubble.GetComponentInChildren<TMPro.TMP_Text>()?.text : "없음")}");
+                    // 주유 뒤에 말하는 손님(네고)은 아직 말하지 않았다. 이미 말을 꺼낸 손님만 본다.
+                    if (c.Fsm.Context.LineIndex > 0)
+                    {
+                        Check(bubble != null, $"{t.Name} 주유 기다리는 동안 말풍선 보임: {(bubble != null ? bubble.GetComponentInChildren<TMPro.TMP_Text>()?.text : "없음")}");
+                    }
+                    else
+                    {
+                        Write($"{t.Name}: 주유 전에 말하지 않는 손님이라 말풍선 검사 건너뜀");
+                    }
 
                     t.Step = Step.IdleWait;
                     t.StepAt = now;
@@ -276,6 +336,7 @@ namespace _Works.CJW.Scripts.Test.Editor
                     bool started = _injector.TryStartFueling(t.Door);
                     Check(started && t.Door.IsFueling && _injector.IsFueling,
                           $"{t.Name} 주유 시작: TryStartFueling={started}, door.IsFueling={t.Door.IsFueling}");
+                    CheckFuelSound(t, true);
                     t.Step = Step.Fueling;
                     t.StepAt = now;
                     return;
@@ -291,6 +352,7 @@ namespace _Works.CJW.Scripts.Test.Editor
                     _injector.CancelFueling();
                     Check(!t.Door.IsFueling && t.CompletedCount == 0,
                           $"{t.Name} 중간에 손 뗌: door.IsFueling={t.Door.IsFueling}, 완료 {t.CompletedCount}회");
+                    CheckFuelSound(t, false);
                     t.Step = Step.EarlyRelease;
                     t.StepAt = now;
                     return;
@@ -339,10 +401,41 @@ namespace _Works.CJW.Scripts.Test.Editor
                     Check(moved, $"{t.Name} 주유 끝나고 {now - t.StepAt:F2}s 뒤 다음 행동으로: {current?.GetType().Name ?? "-"}");
                     Check(!IsWaitingOn(t.Door, c), $"{t.Name} 주유구 구독 해제");
                     Check(c.Fsm?.Context?.RentedPosition == null, $"{t.Name} 주유기 자리 반납");
+                    CheckFuelSound(t, false);
+
+                    // 주유를 받았으니 요구하던 말풍선("가득이요")은 접혀야 한다. 주유 뒤에 할 대사가 있는 손님은 새 말풍선으로 바뀐다.
+                    SpeechBubble left = Object.FindObjectsByType<SpeechBubble>(FindObjectsSortMode.None)
+                        .FirstOrDefault(b => b.isActiveAndEnabled && Planar(b.transform.position, c.transform.position) < 1f);
+                    bool nextLine = current is SpeechState;
+                    Check(left == null || nextLine,
+                          $"{t.Name} 주유 끝나면 요구 말풍선 접힘: {(left != null ? $"{(nextLine ? "다음 대사로 바뀜" : "남아 있음")} '{left.GetComponentInChildren<TMPro.TMP_Text>()?.text}'" : "없음")}");
+                    t.Step = Step.Depart;
+                    t.StepAt = now;
+                    return;
+
+                case Step.Depart:
+                    VisitPhase phase = c.Session != null ? c.Session.Phase : VisitPhase.None;
+                    bool departed = phase != VisitPhase.Waiting;
+                    if (!departed && now - t.StepAt < DepartWithin)
+                    {
+                        return;
+                    }
+
+                    Check(departed, $"{t.Name} 주유 끝나고 {now - t.StepAt:F2}s 뒤 차가 출발 단계로: {phase}");
                     Cleanup(t);
                     t.Step = Step.Done;
                     return;
             }
+        }
+
+        /// <summary>주유하는 동안 차가 주유 소리를 반복하고, 손을 떼면 끄는지.</summary>
+        private static void CheckFuelSound(Target t, bool fueling)
+        {
+            ISoundEmitter sound = t.Customer.Session?.Car != null ? t.Customer.Session.Car.Sound : null;
+            string loop = sound?.CurrentLoop != null ? sound.CurrentLoop.name : "없음";
+            bool isFuelLoop = loop == "Refueling";
+            Check(sound != null && isFuelLoop == fueling,
+                  $"{t.Name} {(fueling ? "주유 중 주유 소리 켜짐" : "주유 멈추면 주유 소리 꺼짐")}: 반복 소리 {loop}");
         }
 
         /// <summary>플레이어가 차 왼쪽 옆 1.5m, 눈높이 근처에서 주유구를 보고 쏜 레이가 FuelDoor 레이어 마스크로 이 주유구에 걸리는지.</summary>
