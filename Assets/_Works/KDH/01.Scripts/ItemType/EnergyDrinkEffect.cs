@@ -11,7 +11,7 @@ namespace _Works.KDH._01.Scripts.ItemType
 
         public void Apply()
         {
-            eventChannel.RaiseEvent(ItemEvents.SpeedBoostEvent.Init(itemSO.Multiplier, itemSO.Duration));
+            eventChannel.RaiseEvent(ItemEvents.SpeedBoostEvent.Init(itemSO.Value, itemSO.Duration));
         }
     }
 }
