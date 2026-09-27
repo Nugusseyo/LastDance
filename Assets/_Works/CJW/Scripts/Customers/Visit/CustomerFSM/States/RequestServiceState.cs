@@ -116,7 +116,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             // 조르는 몸짓을 틀어 둔다. 끝내는 건 finally가 한다.
             if (waitClip != null)
             {
-                customer.ActionAnimator?.Begin(waitClip);
+                customer.ActionAnimator?.Begin(waitClip, true);
             }
 
             try

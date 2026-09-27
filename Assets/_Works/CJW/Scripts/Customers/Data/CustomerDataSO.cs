@@ -13,7 +13,7 @@ namespace _Works.CJW.Scripts.Customers.Data
         [SerializeField] private PoolItemSO poolItem;
 
         [Header("손님 타입")]
-        [field: SerializeField] public CustomerType customerType { get; private set; }
+        [field: SerializeField] public CustomerType CustomerType { get; private set; }
 
         [Header("이동")]
         [Tooltip("0보다 크면 NavMeshAgent의 speed를 이 값으로 덮어쓴다.")]

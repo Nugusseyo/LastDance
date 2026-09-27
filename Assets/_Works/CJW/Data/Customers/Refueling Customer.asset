@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Refueling Customer
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.CustomerDataSO
   poolItem: {fileID: 11400000, guid: c88f4bf24ea92c9428c5186b88525443, type: 2}
-  <customerType>k__BackingField: 1
+  <CustomerType>k__BackingField: 1
   moveSpeed: 3.5
   angularSpeed: 120
   stoppingDistance: 0.2

@@ -627,7 +627,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>None(일반 손님)은 역할이 아니라서 중복 허용. 특수 역할만 한 번 태우면 다음 좌석 후보에서 제외한다.</summary>
         private void MarkRoleTaken(CustomerDataSO customerData)
         {
-            CustomerType role = CustomerRoles.RoleOf(customerData.customerType);
+            CustomerType role = CustomerRoles.RoleOf(customerData.CustomerType);
             if (role != CustomerType.None)
             {
                 _takenRoles.Add(role);
@@ -683,7 +683,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 }
 
                 // 종류가 아니라 역할로 거른다. 주유 손님(내리는 쪽·차에 남는 쪽)은 한 차에 하나만 탄다.
-                CustomerType role = CustomerRoles.RoleOf(data.customerType);
+                CustomerType role = CustomerRoles.RoleOf(data.CustomerType);
                 if (role != CustomerType.None && _takenRoles.Contains(role))
                 {
                     continue;

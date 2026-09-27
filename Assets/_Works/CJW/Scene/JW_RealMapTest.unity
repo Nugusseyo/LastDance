@@ -482,9 +482,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 286742700}
     m_Modifications:
+    - target: {fileID: 7136934916642091466, guid: 3a463f60cabf52447901499f73902131, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7349552986776355119, guid: 3a463f60cabf52447901499f73902131, type: 3}
       propertyPath: m_Name
       value: Petrol_pump_2_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7349552986776355119, guid: 3a463f60cabf52447901499f73902131, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7977294602321730453, guid: 3a463f60cabf52447901499f73902131, type: 3}
       propertyPath: m_RootOrder
@@ -529,6 +537,10 @@ PrefabInstance:
     - target: {fileID: 7977294602321730453, guid: 3a463f60cabf52447901499f73902131, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8839880674105288647, guid: 3a463f60cabf52447901499f73902131, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3658,7 +3670,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 816267413571972158, guid: 2f8522fa04b356648908a9ca570f0895, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -4791,7 +4804,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 816267413571972158, guid: 2f8522fa04b356648908a9ca570f0895, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -5755,6 +5769,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Petrol_pump_2 (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 4644310054762544325, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5081820273693068320, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 5420143517938034303, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -5798,6 +5820,10 @@ PrefabInstance:
     - target: {fileID: 5420143517938034303, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6854668024653339181, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11062,7 +11088,7 @@ Transform:
   m_GameObject: {fileID: 808283163}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.347, y: 4.712, z: -14.373}
+  m_LocalPosition: {x: 3.11, y: 4.712, z: -14.373}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12714,7 +12740,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 816267413571972158, guid: 2f8522fa04b356648908a9ca570f0895, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -13724,7 +13751,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
+  m_VoxelSize: 0.11666667
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: d7d7c3382a0fb9f478e36228cf36c605, type: 2}
   m_BuildHeightMesh: 0
@@ -14289,7 +14316,7 @@ Transform:
   m_GameObject: {fileID: 1028379732}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.347, y: 4.712, z: -20.53}
+  m_LocalPosition: {x: 3.11, y: 4.712, z: -20.53}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14783,9 +14810,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 286742700}
     m_Modifications:
+    - target: {fileID: 7136934916642091466, guid: 3a463f60cabf52447901499f73902131, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7349552986776355119, guid: 3a463f60cabf52447901499f73902131, type: 3}
       propertyPath: m_Name
       value: Petrol_pump_2_1 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7349552986776355119, guid: 3a463f60cabf52447901499f73902131, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7977294602321730453, guid: 3a463f60cabf52447901499f73902131, type: 3}
       propertyPath: m_RootOrder
@@ -14830,6 +14865,10 @@ PrefabInstance:
     - target: {fileID: 7977294602321730453, guid: 3a463f60cabf52447901499f73902131, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8839880674105288647, guid: 3a463f60cabf52447901499f73902131, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15198,7 +15237,7 @@ Transform:
   m_GameObject: {fileID: 1089720250}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.687, y: 4.67, z: -5.595}
+  m_LocalPosition: {x: 6.857, y: 4.67, z: -5.595}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15776,7 +15815,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 816267413571972158, guid: 2f8522fa04b356648908a9ca570f0895, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -16132,6 +16172,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Petrol_pump_2
       objectReference: {fileID: 0}
+    - target: {fileID: 4644310054762544325, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5081820273693068320, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 5420143517938034303, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -16175,6 +16223,10 @@ PrefabInstance:
     - target: {fileID: 5420143517938034303, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6854668024653339181, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -17690,7 +17742,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 816267413571972158, guid: 2f8522fa04b356648908a9ca570f0895, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -17726,7 +17779,7 @@ Transform:
   m_GameObject: {fileID: 1293601670}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.347, y: 4.67, z: -3.908}
+  m_LocalPosition: {x: 3.11, y: 4.67, z: -3.908}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -20835,7 +20888,7 @@ Transform:
   m_GameObject: {fileID: 1495426758}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.58, y: 4.759, z: -13.561}
+  m_LocalPosition: {x: 6.75, y: 4.759, z: -13.561}
   m_LocalScale: {x: 4.48, y: 1, z: 3.74}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -23284,6 +23337,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Petrol_pump_2 (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 4644310054762544325, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5081820273693068320, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 5420143517938034303, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -23327,6 +23388,10 @@ PrefabInstance:
     - target: {fileID: 5420143517938034303, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6854668024653339181, guid: 78dfa232b13431147b998fbb2b349fcb, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -23819,6 +23884,7 @@ MonoBehaviour:
   carData: {fileID: 11400000, guid: 63532797998eed14fbe758bb2cfa7aad, type: 2}
   exitPoint: {fileID: 885458535}
   exitRadius: 6
+  driveAwaySound: {fileID: 0}
 --- !u!1 &1682024764
 GameObject:
   m_ObjectHideFlags: 0
@@ -25423,6 +25489,7 @@ MonoBehaviour:
   carData: {fileID: 11400000, guid: 38d16dabbf62d824fb355b1a72d59384, type: 2}
   exitPoint: {fileID: 885458535}
   exitRadius: 6
+  driveAwaySound: {fileID: 0}
 --- !u!1001 &1786812053
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27315,7 +27382,7 @@ Transform:
   m_GameObject: {fileID: 1958462592}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.347, y: 4.759, z: -7.256}
+  m_LocalPosition: {x: 3.11, y: 4.759, z: -7.256}
   m_LocalScale: {x: 4.48, y: 1, z: 3.74}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -27746,7 +27813,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 816267413571972158, guid: 2f8522fa04b356648908a9ca570f0895, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -28595,7 +28663,7 @@ Transform:
   m_GameObject: {fileID: 2065003568}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.62, y: 4.712, z: -20.74}
+  m_LocalPosition: {x: 6.79, y: 4.712, z: -20.74}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -33201,6 +33269,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Car.CarSeller
   carBasePrice: 300
   wheelDefaultPrice: 50
+  RefuelingPrice: 50
   wheelLayerMask:
     serializedVersion: 2
     m_Bits: 0

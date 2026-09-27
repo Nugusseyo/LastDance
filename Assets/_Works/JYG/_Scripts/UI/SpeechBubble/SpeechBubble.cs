@@ -60,12 +60,14 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
             if (tmp == null)
             {
                 Debug.LogError("말풍선의 tmp가 지정되지 않아 Initialize가 불가능합니다. 취소 됨.");
+                EndSpeech();
                 return;
             }
 
             if (!humanDBs.TryGetValue(humanType, out var list) || list == null || list.Count == 0)
             {
                 Debug.LogWarning($"해당 human상태에 맞는 데이터가 존재하지 않습니다. : {humanType}");
+                EndSpeech();
                 return;
             }
 
@@ -76,6 +78,7 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
             if (stringList == null || stringList.Count == 0)
             {
                 Debug.LogWarning($"[SpeechBubble] 출력할 대사 데이터가 비어있습니다. : {humanType}, Index: {index}");
+                EndSpeech();
                 return;
             }
 
@@ -117,9 +120,15 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
                     break;
             }
 
+            _speechCoroutine = null;
+            EndSpeech();
+        }
+
+        //대사를 띄우지 못했을 때도 기다리는 쪽이 멈추지 않도록 끝났다고 알리고 풀로 돌아간다.
+        private void EndSpeech()
+        {
             OnSpeechEnd?.Invoke();
             poolManager.Push(this);
-            _speechCoroutine = null;
         }
 
         private void OnDisable()

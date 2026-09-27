@@ -84,7 +84,7 @@ namespace _Works.CJW.Scripts.Test.Editor
                     continue;
                 }
 
-                sb.AppendLine($"{data.name}\ttype={data.customerType}\t프리팹주유={data.WantsFuel}\t주유손님={_Works.CJW.Scripts.Customers.Data.CustomerRoles.WantsFuel(data)}");
+                sb.AppendLine($"{data.name}\ttype={data.CustomerType}\t프리팹주유={data.WantsFuel}\t주유손님={_Works.CJW.Scripts.Customers.Data.CustomerRoles.WantsFuel(data)}");
             }
 
             Directory.CreateDirectory(OutDir);
@@ -241,6 +241,7 @@ namespace _Works.CJW.Scripts.Test.Editor
             Knocked.Clear();
             _Works.CJW.Scripts.Cars.CarHitTargets.Hit += OnCarHit;
             EditorApplication.update += Tick;
+            CustomerSimSoundTap.Begin(Elapsed, Write);
 
             Write($"run {SessionState.GetInt(RunIndexKey, 0) + 1}/{TotalRuns} 시작 (timeScale {TimeScale}, {SimSeconds}s)");
         }
@@ -311,6 +312,7 @@ namespace _Works.CJW.Scripts.Test.Editor
             }
 
             Heartbeat();
+            CustomerSimSoundTap.Tick();
 
             // 쓰러졌던 손님이 일어서면 날아간 거리와 일어선 자리를 남긴다.
             if (Knocked.Count > 0)
@@ -500,6 +502,8 @@ namespace _Works.CJW.Scripts.Test.Editor
             {
                 summary.AppendLine($"  [x{w.Value}] {w.Key}");
             }
+
+            CustomerSimSoundTap.End(summary);
 
             File.WriteAllText($"{OutDir}/run_{runIndex + 1}.txt", summary + "\n----- 로그 -----\n" + Log);
 

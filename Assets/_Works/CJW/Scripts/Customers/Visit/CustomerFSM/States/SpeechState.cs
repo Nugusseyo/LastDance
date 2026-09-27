@@ -56,27 +56,37 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             Transform anchor = Ctx.Customer.transform;
             bubble.transform.position = anchor.position + offset;
 
-            bubble.InitializeBubble(Ctx.Customer.HumanType);
+            bubble.InitializeBubble(Ctx.Customer.HumanType, (int)Ctx.Data.CustomerType);
             Ctx.Customer.Sound?.Play(speechSound);
             Debug.Log("[SpeechState] 말풍선 시작", Ctx.Customer);
 
-            while (!ended)
+            try
             {
-                // 플레이 종료처럼 말풍선이나 손님이 먼저 파괴되면 더 따라다닐 대상이 없다.
-                if (bubble == null || anchor == null)
+                while (!ended)
                 {
-                    return VisitOutcome.Done;
+                    // 플레이 종료처럼 말풍선이나 손님이 먼저 파괴되면 더 따라다닐 대상이 없다.
+                    if (bubble == null || anchor == null)
+                    {
+                        return VisitOutcome.Done;
+                    }
+
+                    bubble.transform.position = anchor.position + offset;
+
+                    // 인터럽트나 Phase 전환이면 여기서 취소로 빠져나간다.
+                    // 말풍선은 남은 시간을 마저 세고 스스로 풀로 돌아가므로 따로 치우지 않는다.
+                    await UniTask.Yield(PlayerLoopTiming.Update, ct);
                 }
 
-                bubble.transform.position = anchor.position + offset;
-
-                // 인터럽트나 Phase 전환이면 여기서 취소로 빠져나간다.
-                // 말풍선은 남은 시간을 마저 세고 스스로 풀로 돌아가므로 따로 치우지 않는다.
-                await UniTask.Yield(PlayerLoopTiming.Update, ct);
+                return VisitOutcome.Done;
             }
-
-            bubble.OnSpeechEnd -= OnSpeechEnd;
-            return VisitOutcome.Done;
+            finally
+            {
+                // 취소로 빠져나가도 풀에 돌아간 말풍선이 이 손님의 핸들러를 계속 들고 있지 않게 한다.
+                if (bubble != null)
+                {
+                    bubble.OnSpeechEnd -= OnSpeechEnd;
+                }
+            }
         }
     }
 }

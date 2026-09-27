@@ -21,7 +21,7 @@ namespace _Works.CJW.Scripts.Customers.Data
         /// 역할 하나로만 거르면 그런 손님과 주유 손님이 한 차에 함께 탄다.</summary>
         public static bool WantsFuel(CustomerDataSO data)
         {
-            return data != null && (RoleOf(data.customerType) == CustomerType.Refueling || data.WantsFuel);
+            return data != null && (RoleOf(data.CustomerType) == CustomerType.Refueling || data.WantsFuel);
         }
     }
 }

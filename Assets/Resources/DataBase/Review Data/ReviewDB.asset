@@ -15,21 +15,19 @@ MonoBehaviour:
   ReviewSheet:
   - index: 1
     type: 1
-    content: "\uC5EC\uAE30.\uC8FC\uC720\uC18C\uAC00.\uCC38.\uD130\uAC00.\uC88B\uB124\uC694.^^"
+    content: 
   - index: 2
     type: 1
-    content: "G\u3154\u3141\uB9C8 T.\uBE0C@\uC774 \uC8FC#\uC720!\uC18C \uD3FC \uCA4C\uB124.
-      \uAC80\uC0C9\uCC3D\uC5D0 \uAC80\uC0C9 \u3131\u3131"
+    content: 
   - index: 3
     type: 2
-    content: "\uC8FC\uC720\uC18C\uC5D0\uC11C \uAE30\uB984 \uB0C4\uC0C8\uAC00 \uB098\uC694."
+    content: 
   - index: 4
     type: 2
-    content: "\uC5EC\uAE30 \uAE30\uB984\uAC12\uC774 \uBB3C\uBCF4\uB2E4 \uBE44\uC300\uB4EF
-      \u314B\u314B"
+    content: 
   - index: 5
     type: 3
-    content: "\uC5EC\uAE34 \uCC38\uAE30\uB984\uC73C\uB85C \uAE30\uB984 \uCC44\uC6B0\uB098\uBCA0"
+    content: 
   NameSheet:
   - name: "\uC870\uC724\uADDC"
   - name: "\uB178\uD604\uC6B0"

@@ -80,7 +80,7 @@ namespace _Works.CJW.Scripts.Customers.Animation
 
         public async UniTask PlayFor(HashDataSO clip, float duration, CancellationToken ct)
         {
-            Begin(clip);
+            Begin(clip, true);
 
             try
             {

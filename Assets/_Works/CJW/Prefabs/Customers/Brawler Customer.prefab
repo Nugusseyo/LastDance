@@ -134,6 +134,7 @@ MonoBehaviour:
   - Phase: 2
     States:
     - rid: 4377106771376341118
+    - rid: 4377106771376341130
   - Phase: 3
     States:
     - rid: 4377106771376341119
@@ -159,6 +160,13 @@ MonoBehaviour:
         stagger: 0
         jitter: 0.2
         unboardSound: {fileID: 0}
+    - rid: 4377106771376341130
+      type: {class: JoinRendezvousState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
+      data:
+        condition:
+          rid: -2
+        rendezvous: {fileID: 11400000, guid: 96819d8b25e4230499c447e4381b735c, type: 2}
+        meetKey: fight
     - rid: 4377106771376341119
       type: {class: MeetUpState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
       data:

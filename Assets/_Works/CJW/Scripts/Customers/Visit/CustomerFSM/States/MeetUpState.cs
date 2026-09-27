@@ -63,7 +63,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
             try
             {
-                if (!rendezvous.TryPair(meetKey, Ctx, out CustomerContext _))
+                // 하차 때 JoinRendezvousState로 이미 짝을 맺었으면 그대로 이어받는다.
+                // 다시 TryPair를 부르면 맺은 짝을 두고 등록소에 새로 올라가 버린다.
+                bool paired = Ctx.Partner != null && ReferenceEquals(Ctx.Partner.Partner, Ctx);
+                if (!paired && !rendezvous.TryPair(meetKey, Ctx, out CustomerContext _))
                 {
                     // 내가 먼저 왔다. 짝이 나를 집어갈 때까지 기다린다.
                     float deadline = Time.time + waitTimeout;

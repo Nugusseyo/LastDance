@@ -97,15 +97,16 @@ namespace _Works.CJW.Scripts.Customers.Movement
                 agent = owner.GetComponentInParent<NavMeshAgent>(true);
             }
 
-            // 애니메이터는 렌더러 모듈이 들고 있다. 모듈이 없는 프리팹만 계층에서 직접 찾는다.
+            // 애니메이터는 렌더러 모듈이 들고 있다. 렌더러가 아직 초기화되지 않았거나 없으면 계층에서 직접 찾는다.
             if (animator == null)
             {
                 animator = _renderer?.Animator;
             }
 
+            // 모듈 초기화 순서는 정해져 있지 않다. 손님은 Animator가 visual 자식에 있으므로 자식까지 찾는다.
             if (animator == null && owner != null)
             {
-                animator = owner.GetComponentInParent<Animator>(true);
+                animator = owner.GetComponentInChildren<Animator>(true);
             }
 
             if (agent == null)

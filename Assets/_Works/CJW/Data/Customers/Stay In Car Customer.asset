@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Stay In Car Customer
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Data.CustomerDataSO
   poolItem: {fileID: 11400000, guid: ab006801092c78a4193644fd5692d72f, type: 2}
-  <customerType>k__BackingField: 20
+  <CustomerType>k__BackingField: 20
   moveSpeed: 3.5
   angularSpeed: 120
   stoppingDistance: 0.2

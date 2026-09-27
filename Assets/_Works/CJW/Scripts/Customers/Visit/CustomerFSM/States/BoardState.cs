@@ -54,6 +54,12 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
             VisitOutcome moved = await WalkToCar(car, ChooseBoardingPoint(car, seat.position), ct);
 
+            // 걸어오는 사이 차가 사라졌으면(플레이 종료, 차 정리) 탈 자리가 없다.
+            if (car == null || seat == null)
+            {
+                return VisitOutcome.Failed;
+            }
+
             AbstractCustomer customer = Ctx.Customer;
             if (customer.Boarding == null)
             {
