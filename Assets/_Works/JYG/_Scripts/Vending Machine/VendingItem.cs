@@ -34,6 +34,7 @@ namespace _Works.JYG.Data.Vending_Machine
             _vendingItem = itemData.itemSO;
             
             _moneyManager = moneyManager;
+            price = itemData.price;
 
             buyButton.onClick.AddListener(HandleBuyButtonPressed);
             

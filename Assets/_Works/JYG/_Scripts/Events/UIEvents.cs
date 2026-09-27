@@ -9,6 +9,9 @@ namespace _Works.JYG._Scripts.Events
         public static readonly DurationEvent DurationEvent = new DurationEvent();
         
         public static readonly ReviewEvent ReviewEvent = new ReviewEvent();
+        
+        public static readonly RefuelingEvent RefuelingEvent = new RefuelingEvent();
+        public static readonly ScrapEvent ScrapEvent = new ScrapEvent();
     }
 
     #region GaugeEvents
@@ -41,13 +44,44 @@ namespace _Works.JYG._Scripts.Events
 
     public class ReviewEvent : GameEvent
     {
+        public int Index { get; set; }
         public int PlusValue { get; set; }
         public ReviewType ReviewType { get; set; }
 
-        public ReviewEvent IncreaseValue(int plusValue, ReviewType reviewType)
+        public ReviewEvent Review(int index, ReviewType reviewType)
         {
-            PlusValue = plusValue;
+            Index = index;
             ReviewType = reviewType;
+            return this;
+        }
+    }
+    
+    #endregion
+    
+    #region Money Events
+
+    public class RefuelingEvent : GameEvent
+    {
+        public int MoneyValue { get; set; }
+
+        public RefuelingEvent Init(int moneyValue)
+        {
+            MoneyValue = moneyValue;
+            return this;
+        }
+    }
+
+    public class ScrapEvent : GameEvent
+    {
+        public int CarValue { get; set; }
+        public int DisassembledWheel { get; set; }
+        public int WheelPrice { get; set; }
+
+        public ScrapEvent Init(int carValue, int disassembledWheel, int wheelPrice)
+        {
+            CarValue = carValue;
+            DisassembledWheel = disassembledWheel;
+            WheelPrice = wheelPrice;
             return this;
         }
     }

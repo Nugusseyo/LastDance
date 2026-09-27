@@ -28,7 +28,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players
                 _control.Player.SetCallbacks(this);
             }
 
-            _control.Player.Enable();
+            SetEnable(true);
 
             if (uiInputSO != null)
                 uiInputSO.InitializeInput(_control);
@@ -48,6 +48,9 @@ namespace _Works.JJH._02_Scripts.Agents.Players
                     _control.Player.Enable();
                 else
                     _control.Player.Disable();
+                
+                Cursor.lockState = enable ? CursorLockMode.Locked : CursorLockMode.Confined;
+                Cursor.visible = !enable;
             }
         }
 
