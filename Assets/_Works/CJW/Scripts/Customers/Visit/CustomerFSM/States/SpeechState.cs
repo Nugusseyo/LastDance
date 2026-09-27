@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 {
-    /// <summary>손님 머리 위에 말풍선을 띄운다. 기본은 말풍선이 끝날 때까지 기다리고, runAlongside를 켜면 띄우자마자 다음 행동으로 넘어가 행동과 동시에 대사가 나온다.
+    /// <summary>손님 머리 위에 말풍선을 띄운다. 대사는 HumanDB에서 (손님의 HumanType, lineIndices 중 하나)로 찾고, lineIndices가 비어 있으면 말하지 않는다. 기본은 말풍선이 끝날 때까지 기다리고, runAlongside를 켜면 띄우자마자 다음 행동으로 넘어가 행동과 동시에 대사가 나온다.
     /// 말풍선의 수명은 SpeechBubble이 쥐고 스스로 풀에 돌아가므로 이 상태는 Push하지 않는다.</summary>
     [Serializable]
     public sealed class SpeechState : CustomerState
@@ -19,6 +19,11 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
         [Tooltip("말풍선 프리팹의 풀 아이템.")]
         [SerializeField] private PoolItemSO bubbleItem;
+
+        [Header("대사")]
+        [Tooltip("HumanDB의 대사 index 후보. 비우면 이 손님은 말하지 않는다.\n" +
+                 "여럿이면 방문마다 하나를 고른다(CustomerContext.PickVariant). 춤처럼 같은 갈래를 쓰는 상태와 짝이 맞고, 싸우는 짝과는 서로 다른 대사가 된다.")]
+        [SerializeField] private int[] lineIndices;
 
         [Header("표시")]
         [Tooltip("손님 기준으로 말풍선을 띄울 위치(m). 머리 위로 올리려면 y를 키운다.")]
@@ -34,6 +39,12 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
         {
+            if (lineIndices == null || lineIndices.Length == 0)
+            {
+                // 말하지 않는 손님. 상태는 모든 손님에 달아 두고 대사만 비워 구분한다.
+                return VisitOutcome.Done;
+            }
+
             if (poolManager == null || bubbleItem == null)
             {
                 Debug.LogWarning("[SpeechState] 풀 또는 말풍선 아이템이 비어 있어 말풍선을 건너뜁니다.", Ctx.Customer);
@@ -54,9 +65,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             // 구독은 InitializeBubble보다 먼저 건다. 대사가 없으면 그 안에서 바로 OnSpeechEnd가 불린다.
             UniTask following = FollowUntilEnd(bubble, anchor, runAlongside ? CancellationToken.None : ct);
 
-            bubble.InitializeBubble(Ctx.Customer.HumanType, (int)Ctx.Data.CustomerType);
+            int lineIndex = lineIndices[Ctx.PickVariant(lineIndices.Length)];
+            bubble.InitializeBubble(Ctx.Customer.HumanType, lineIndex);
             Ctx.Customer.Sound?.Play(speechSound);
-            Debug.Log($"[SpeechState] {Ctx.Customer.name} 말풍선 시작", Ctx.Customer);
+            Debug.Log($"[SpeechState] {Ctx.Customer.name} 말풍선 시작 (대사 {lineIndex})", Ctx.Customer);
 
             if (runAlongside)
             {

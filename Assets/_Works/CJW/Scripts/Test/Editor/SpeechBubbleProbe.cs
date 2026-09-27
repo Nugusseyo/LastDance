@@ -63,39 +63,75 @@ namespace _Works.CJW.Scripts.Test.Editor
             Debug.Log("[SpeechBubbleProbe] Temp/CustomerSim/bubble.txt");
         }
 
-        /// <summary>손님 데이터마다 SpeechBubble이 (HumanType, CustomerType)으로 찾게 될 DB 행을 적는다. 결과는 Temp/CustomerSim/bubble_db.txt.</summary>
+        /// <summary>손님 프리팹마다 SpeechState.lineIndices와 그 index로 찾게 될 DB 행을 적는다. 결과는 Temp/CustomerSim/bubble_db.txt.</summary>
         [MenuItem("Tools/CJW/Dump Speech Lines")]
         private static void DumpLines()
         {
             var sb = new StringBuilder();
             var db = UnityEngine.Resources.Load<HumanDB>("DataBase/Human Data/HumanDB");
 
-            foreach (string guid in AssetDatabase.FindAssets("t:CustomerDataSO"))
+            foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Works/CJW/Prefabs/Customers" }))
             {
-                var data = AssetDatabase.LoadAssetAtPath<_Works.CJW.Scripts.Customers.Data.CustomerDataSO>(AssetDatabase.GUIDToAssetPath(guid));
-                GameObject prefab = data.PoolItem != null ? data.PoolItem.prefab : null;
-                var customer = prefab != null ? prefab.GetComponent<_Works.CJW.Scripts.Customers.AbstractCustomer>() : null;
-                if (customer == null)
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid));
+                var customer = prefab.GetComponent<_Works.CJW.Scripts.Customers.AbstractCustomer>();
+                var fsm = prefab.GetComponentInChildren<_Works.CJW.Scripts.Customers.Visit.CustomerFSM.CustomerFSMModule>(true);
+                if (customer == null || fsm == null)
                 {
-                    sb.AppendLine($"{data.name}: 프리팹/손님 없음");
                     continue;
                 }
 
                 HumanType human = customer.HumanType;
-                int index = (int)data.CustomerType;
-                HumanData exact = null, first = null;
-                foreach (HumanData row in db.Sheet1)
+                var so = new SerializedObject(fsm);
+                SerializedProperty sequences = so.FindProperty("sequences");
+                var line = new StringBuilder($"{prefab.name}	{human}");
+                int speechStates = 0;
+
+                for (int i = 0; i < sequences.arraySize; i++)
                 {
-                    if (row.type != human) continue;
-                    first ??= row;
-                    if (row.index == index) exact = row;
+                    SerializedProperty states = sequences.GetArrayElementAtIndex(i).FindPropertyRelative("States");
+                    for (int j = 0; j < states.arraySize; j++)
+                    {
+                        SerializedProperty state = states.GetArrayElementAtIndex(j);
+                        if (state.managedReferenceValue is _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States.PlayAnimationState)
+                        {
+                            SerializedProperty clips = state.FindPropertyRelative("clips");
+                            line.Append($"	춤 matchVariant={state.FindPropertyRelative("matchVariant").boolValue} [");
+                            for (int k = 0; k < clips.arraySize; k++)
+                            {
+                                line.Append((k > 0 ? ", " : "") + (clips.GetArrayElementAtIndex(k).objectReferenceValue?.name ?? "null"));
+                            }
+
+                            line.Append("]");
+                        }
+
+                        if (state.managedReferenceValue is not _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States.SpeechState)
+                        {
+                            continue;
+                        }
+
+                        speechStates++;
+                        SerializedProperty indices = state.FindPropertyRelative("lineIndices");
+                        line.Append($"	말풍선 alongside={state.FindPropertyRelative("runAlongside").boolValue} 대사:");
+                        if (indices.arraySize == 0)
+                        {
+                            line.Append(" 없음(말 안 함)");
+                        }
+
+                        for (int k = 0; k < indices.arraySize; k++)
+                        {
+                            int index = indices.GetArrayElementAtIndex(k).intValue;
+                            HumanData exact = null;
+                            foreach (HumanData row in db.Sheet1)
+                            {
+                                if (row.type == human && row.index == index) exact = row;
+                            }
+
+                            line.Append(exact != null ? $" [{index}] {exact.contents1}" : $" [{index}] {human} 행 없음!");
+                        }
+                    }
                 }
 
-                string speech = prefab.GetComponentInChildren<_Works.CJW.Scripts.Customers.Visit.CustomerFSM.CustomerFSMModule>(true) is { } fsm
-                                && EditorJsonUtility.ToJson(fsm).Contains("bubbleItem") ? "말풍선O" : "말풍선X";
-                HumanData used = exact ?? first;
-                sb.AppendLine($"{data.name}\t{data.CustomerType}({index})\t{human}\t{speech}\t" +
-                              (used == null ? "대사 없음 → 바로 닫힘" : $"{(exact != null ? "일치" : "없음→첫 행")} DB {used.index}: {used.contents1}"));
+                sb.AppendLine(speechStates == 0 ? $"{line}	SpeechState 없음!" : line.ToString());
             }
 
             Directory.CreateDirectory("Temp/CustomerSim");

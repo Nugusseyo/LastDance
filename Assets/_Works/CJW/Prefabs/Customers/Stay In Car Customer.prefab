@@ -149,7 +149,9 @@ MonoBehaviour:
           rid: -2
         poolManager: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
         bubbleItem: {fileID: 11400000, guid: 2a00163c0ed52214a828e00935dbf2e5, type: 2}
+        lineIndices: 01000000
         offset: {x: 0, y: 2.2, z: 0}
+        runAlongside: 0
         speechSound: {fileID: 0}
 --- !u!114 &7400742253367986626
 MonoBehaviour:
@@ -368,3 +370,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1224f78c79e462d41bc4749a4b4024d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Modules.AgentRenderer
+  AnimationEvent:
+    m_PersistentCalls:
+      m_Calls: []

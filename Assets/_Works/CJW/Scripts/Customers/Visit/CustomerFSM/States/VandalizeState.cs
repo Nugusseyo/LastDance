@@ -71,6 +71,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("한 대의 세기. 맞는 쪽이 이 값을 어떻게 쓸지는 그쪽이 정한다.")]
         [SerializeField, Min(0f)] private float power = 1f;
 
+        [Tooltip("켜면 대상 앞까지 가서 동작만 하고 때리지는 않는다(타격·타격 소리 없음). 남의 차 앞에서 말을 걸거나 자판기 앞에서 서성이는 정상 손님에 쓴다.\n" +
+                 "기본값을 false로 둔 건 이 필드가 없던 프리팹이 기존처럼 때리게 하기 위해서다.")]
+        [SerializeField] private bool noContact;
+
         [Header("사운드")]
         [Tooltip("주먹이 대상에 닿을 때마다 낼 소리. 맞은 자리에서 난다.")]
         [SerializeField] private SoundClipSo hitSound;
@@ -207,9 +211,12 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
                 // 때리는 동작이 끝난 뒤에 알린다. 먼저 알리면 소리와 이펙트가 주먹보다 앞선다.
                 Vector3 point = AimPoint(target, customer.transform.position);
-                customer.Sound?.Play(hitSound, point);
+                if (!noContact)
+                {
+                    customer.Sound?.Play(hitSound, point);
+                }
 
-                if (victim != null && victim.CanTakeHit)
+                if (!noContact && victim != null && victim.CanTakeHit)
                 {
                     Vector3 direction = point - customer.transform.position;
                     direction.y = 0f;
