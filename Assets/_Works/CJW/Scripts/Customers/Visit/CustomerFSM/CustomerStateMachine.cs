@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using _Works.CJW.Scripts.MapSystems;
 using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
@@ -34,6 +35,26 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
         public CustomerState Current { get; private set; }
 
         public bool IsRunning => _lifetime != null;
+
+        /// <summary>이 Phase 시퀀스에서 처음 걸어갈 지점의 종류. 걸어갈 상태가 없으면 None.
+        /// 조건이 붙은 상태도 그대로 센다 — 내리는 순간에는 조건이 어떻게 풀릴지 알 수 없다.</summary>
+        public MapPointType FirstDestination(VisitPhase phase)
+        {
+            if (!_sequences.TryGetValue(phase, out CustomerState[] sequence))
+            {
+                return MapPointType.None;
+            }
+
+            for (int i = 0; i < sequence.Length; i++)
+            {
+                if (sequence[i] is IDestinationState destination && destination.Destination != MapPointType.None)
+                {
+                    return destination.Destination;
+                }
+            }
+
+            return MapPointType.None;
+        }
 
         public CustomerStateMachine(CustomerContext ctx)
         {
@@ -202,6 +223,20 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             _generation++;
             int generation = _generation;
 
+            // 쓰러져 있으면 일어설 때까지 다음 행동을 시작하지 않는다. 인터럽트가 걸릴 상태가 없던 틈(행동과 행동 사이,
+            // 시퀀스가 다 끝난 뒤)에 치여도, 누운 채로 걷기·탑승을 시작하지 않게 여기서 막는다.
+            if (_ctx.Customer != null && _ctx.Customer.IsKnockedDown)
+            {
+                try
+                {
+                    await UniTask.WaitWhile(() => _ctx.Customer != null && _ctx.Customer.IsKnockedDown, cancellationToken: outer);
+                }
+                catch (OperationCanceledException)
+                {
+                    return new RunResult(false, VisitOutcome.Failed);
+                }
+            }
+
             Current = state;
             CancellationTokenSource runningCts = CancellationTokenSource.CreateLinkedTokenSource(outer);
             _running = runningCts;
@@ -230,7 +265,12 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
                 }
 
                 runningCts.Dispose();
-                Current = null;
+
+                // 단계가 바뀌면 취소된 이전 상태의 finally가 새 상태가 시작된 뒤에 돈다. 그때 새 상태를 지우지 않는다.
+                if (ReferenceEquals(Current, state))
+                {
+                    Current = null;
+                }
             }
         }
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using _Works.CJW.Scripts.Cars;
 using _Works.CJW.Scripts.Customers.Data;
@@ -69,7 +69,16 @@ namespace _Works.CJW.Scripts.Customers.Visit
         [Tooltip("0보다 크면 그 시간 뒤에 자동으로 출발시킨다. 청소 시스템 연결 전 확인용.")]
         [SerializeField] private float autoDepartSeconds;
 
+        private sealed class AbandonedCar
+        {
+            public Car Car;
+            public RentableMapPosition Slot;
+        }
+
         private readonly List<ActiveVisit> _activeVisits = new();
+
+        /// <summary>손님이 다른 차를 훔쳐 떠나며 버리고 간 차. 치울 때까지 주차 자리를 차지한다.</summary>
+        private readonly List<AbandonedCar> _abandonedCars = new();
         private readonly Stack<VisitSession> _sessionPool = new();
 
         private readonly List<AbstractCustomer> _spawnBuffer = new();
@@ -80,6 +89,16 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>이번 방문에서 이미 태운 특수 역할(<see cref="CustomerRoles.RoleOf"/>로 묶은 값). None(일반 손님)은 역할이 아니므로 여기 들어가지 않고, 여럿 태울 수 있다.</summary>
         private readonly HashSet<CustomerType> _takenRoles = new();
 
+        /// <summary>이번 방문에 주유를 원하는 손님을 이미 태웠는지. 역할과 따로 본다 — <see cref="CustomerRoles.WantsFuel"/> 참고.</summary>
+        private bool _fuelTaken;
+
+        /// <summary>앞 차에 탄 짝 손님을 기다리는 종류. 다음 차는 이 손님을 첫 좌석에 태운다.</summary>
+        private CustomerDataSO _pendingPartner;
+
+        /// <summary>이번에 태운 손님 중 짝이 필요한 종류(없으면 null)와, 이번 차가 앞 차의 짝을 태웠는지.</summary>
+        private CustomerDataSO _spawnedPairStarter;
+        private bool _spawnedPartner;
+
         private float _spawnTimer;
 
         /// <summary>자리 점수 함수. 스폰마다 람다를 새로 만들지 않으려고 한 번만 묶어둔다.</summary>
@@ -89,6 +108,12 @@ namespace _Works.CJW.Scripts.Customers.Visit
         private const float ClearApproachBonus = 100000f;
 
         public int ActiveVisitCount => _activeVisits.Count;
+
+        /// <summary>손님이 버리고 간 차의 수. 치울 때까지 그만큼 주차 자리가 줄어 있다.</summary>
+        public int AbandonedCarCount => _abandonedCars.Count;
+
+        /// <summary>버려진 차가 늘거나 치워질 때 발생. 인자는 남은 대수다.</summary>
+        public event Action<int> AbandonedCarCountChanged;
 
         /// <summary>방문이 시작될 때 발생. 세션이 이미 Arriving 단계라 Car와 Customers를 바로 읽을 수 있다.</summary>
         public event Action<VisitSession> VisitStarted;
@@ -107,6 +132,55 @@ namespace _Works.CJW.Scripts.Customers.Visit
         private void OnDisable()
         {
             UnRegisterAgent(this);
+        }
+
+        /// <summary>지점들은 OnEnable에서 등록되므로, 모두 모인 Start에서 차가 다닐 길을 계산해 맵에 알린다.</summary>
+        private void Start()
+        {
+            if (enabled)
+            {
+                mapData.SetCarRoutes(BuildCarRoutes());
+            }
+        }
+
+        /// <summary>차가 다니는 길을 차 NavMesh로 계산한다. 스폰 → 각 주차 자리 → 출구, 스폰 → 입구 → 출구.
+        /// 순회 길은 넣지 않는다. 주차장을 한 바퀴 둘러 거의 전부를 덮어, 손님이 머물 자리가 멀리 밀려나기 때문이다(순회 차는 드물다).
+        /// 주차장이 빈 채로 계산하므로 차가 서 있을 때 돌아가는 길은 빠질 수 있다. 쓰는 쪽이 여유 거리를 둔다.</summary>
+        private List<Vector3[]> BuildCarRoutes()
+        {
+            var routes = new List<Vector3[]>();
+            var path = new UnityEngine.AI.NavMeshPath();
+            UnityEngine.AI.NavMeshQueryFilter filter = CarNavMesh.Filter;
+
+            void Add(Vector3 from, Vector3 to)
+            {
+                if (CarNavMesh.SamplePosition(from, out UnityEngine.AI.NavMeshHit a, 3f) &&
+                    CarNavMesh.SamplePosition(to, out UnityEngine.AI.NavMeshHit b, 3f) &&
+                    UnityEngine.AI.NavMesh.CalculatePath(a.position, b.position, filter, path) &&
+                    path.status != UnityEngine.AI.NavMeshPathStatus.PathInvalid)
+                {
+                    routes.Add(path.corners);
+                }
+                else
+                {
+                    // 차 NavMesh로 못 이으면 직선이라도 남긴다. 아무것도 없으면 그 길 위에 손님이 설 수 있다.
+                    routes.Add(new[] { from, to });
+                }
+            }
+
+            foreach (MapPosition slot in mapData.GetAll(MapPointType.ParkingSlot))
+            {
+                Add(spawnPoint.position, slot.Position);
+                Add(slot.Position, exitPoint.position);
+            }
+
+            foreach (MapPosition entrance in mapData.GetAll(MapPointType.Entrance))
+            {
+                Add(spawnPoint.position, entrance.Position);
+                Add(entrance.Position, exitPoint.position);
+            }
+
+            return routes;
         }
 
         /// <summary>틱 대상 등록을 이벤트 채널로 요청한다.</summary>
@@ -211,7 +285,8 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return null;
             }
 
-            CarDataSO carData = WeightedPicker.Pick(AvailableCarData(), data => data.SpawnWeight);
+            // 짝을 기다리는 손님이 있으면 그 손님을 태울 수 있는 차 종류만 뽑는다.
+            CarDataSO carData = WeightedPicker.Pick(AvailableCarData(_pendingPartner), data => data.SpawnWeight);
             if (carData == null || carData.PoolItem == null)
             {
                 Debug.LogError("[VisitDirector] 뽑을 수 있는 차 데이터가 없습니다. CarDataSO의 풀 항목과 가중치를 확인하세요.", this);
@@ -238,6 +313,17 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return null;
             }
 
+            // 짝으로 오는 손님을 태웠으면 다음 차에 짝을 태워 곧바로 보낸다. 짝을 태운 차였다면 기다림을 끝낸다.
+            if (_spawnedPartner)
+            {
+                _pendingPartner = null;
+            }
+            else if (_spawnedPairStarter != null)
+            {
+                _pendingPartner = _spawnedPairStarter;
+                _spawnTimer = 0f;
+            }
+
             VisitSession session = RentSession();
             session.Completed += OnVisitCompleted;
 
@@ -252,7 +338,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
             session.Begin(car, _spawnBuffer,
                           slot.Position, slot.Rotation,
-                          shopPoint.position, exitPoint.position);
+                          shopPoint.position, exitPoint.position, mapData);
 
             VisitStarted?.Invoke(session);
 
@@ -261,8 +347,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
         private readonly List<CarDataSO> _carPickBuffer = new();
 
-        /// <summary>동시 대수 제한(CarDataSO.MaxConcurrent)에 걸리지 않은 차 종류만 추린다.</summary>
-        private List<CarDataSO> AvailableCarData()
+        /// <summary>동시 대수 제한(CarDataSO.MaxConcurrent)에 걸리지 않은 차 종류만 추린다.
+        /// mustCarry가 있으면 그 손님을 태울 수 있는 차 종류만 남긴다.</summary>
+        private List<CarDataSO> AvailableCarData(CustomerDataSO mustCarry = null)
         {
             _carPickBuffer.Clear();
 
@@ -275,6 +362,11 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 }
 
                 if (data.MaxConcurrent > 0 && CountActive(data) >= data.MaxConcurrent)
+                {
+                    continue;
+                }
+
+                if (mustCarry != null && Array.IndexOf(data.Customers ?? defaultCustomerDataList, mustCarry) < 0)
                 {
                     continue;
                 }
@@ -300,11 +392,13 @@ namespace _Works.CJW.Scripts.Customers.Visit
             return count;
         }
 
-        /// <summary>자리 점수. 진입 직선이 막히지 않은 자리가 먼저고, 그중에서는 스폰 지점에서 먼(안쪽) 자리가 먼저다.
-        /// 입구 쪽 자리부터 채우면 뒤에 온 차가 그 차를 지나 안쪽으로 들어가야 해서, 자리 앞 직선에서 서로 막힌다.</summary>
+        /// <summary>자리 점수. 진입 직선이 막히지 않은 자리가 먼저고, 그중에서는 입구에서 먼(안쪽) 자리가 먼저다.
+        /// 입구 쪽 자리부터 채우면 뒤에 온 차가 그 차를 지나 안쪽으로 들어가야 해서, 자리 앞 직선에서 서로 막힌다.
+        /// 스폰 지점이 아니라 입구를 기준으로 삼는 이유는, 차가 스폰된 뒤 도로를 돌아 입구로 들어오는 맵에서는
+        /// 스폰에서 먼 자리가 오히려 입구 바로 앞일 수 있기 때문이다.</summary>
         private float ScoreSlot(RentableMapPosition slot)
         {
-            Vector3 delta = slot.Position - spawnPoint.position;
+            Vector3 delta = slot.Position - EntryPosition(slot.Position);
             delta.y = 0f;
 
             float score = delta.magnitude;
@@ -315,6 +409,14 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
 
             return score;
+        }
+
+        /// <summary>차가 주차장에 들어서는 곳. 맵에 입구 지점이 있으면 그걸 쓰고, 없으면 스폰 지점으로 물러선다.</summary>
+        private Vector3 EntryPosition(Vector3 from)
+        {
+            return mapData.TryGetNearest(MapPointType.Entrance, from, out MapPosition entrance)
+                ? entrance.Position
+                : spawnPoint.position;
         }
 
         /// <summary>지금 이 자리에 차를 보내도 아무도 멈춰 세우지 않는지. 진입 직선이 비어 있고,
@@ -418,6 +520,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
         {
             _spawnBuffer.Clear();
             _takenRoles.Clear();
+            _fuelTaken = false;
 
             // 차가 자기 손님 목록을 들고 있으면 그쪽이 우선. 없으면 디렉터의 기본 목록을 쓴다.
             CustomerDataSO[] pool = carData.Customers ?? defaultCustomerDataList;
@@ -436,9 +539,24 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
 
             int count = Random.Range(customerRange.x, customerRange.y + 1);
+            _spawnedPairStarter = null;
+            _spawnedPartner = false;
+
+            // 앞 차의 짝이 기다리고 있으면 첫 좌석에 그 짝을 태운다. 추첨하지 않으니 가중치와 상관없이 반드시 탄다.
+            if (_pendingPartner != null)
+            {
+                if (!SpawnIntoBuffer(car, _pendingPartner))
+                {
+                    ReturnSpawnBuffer();
+                    return false;
+                }
+
+                _spawnedPartner = true;
+                MarkRoleTaken(_pendingPartner);
+            }
 
             // 좌석마다 독립으로 뽑으면 한 차의 구성이 통제되지 않는다. 이미 태운 사람을 보고 후보를 좁힌다.
-            for (int i = 0; i < count; i++)
+            while (_spawnBuffer.Count < count)
             {
                 CustomerDataSO customerData = PickForSeat(pool);
 
@@ -448,33 +566,23 @@ namespace _Works.CJW.Scripts.Customers.Visit
                     break;
                 }
 
-                if (customerData.PoolItem == null)
+                if (!SpawnIntoBuffer(car, customerData))
                 {
-                    Debug.LogError("[VisitDirector] 뽑을 수 있는 손님 데이터가 없습니다. CustomerDataSO의 풀 항목과 가중치를 확인하세요.", this);
                     ReturnSpawnBuffer();
                     return false;
                 }
 
-                AbstractCustomer customer = poolManager.Pop<AbstractCustomer>(customerData.PoolItem);
-
-                if (customer == null)
+                if (customerData.ComesInPairs)
                 {
-                    Debug.LogError($"[VisitDirector] 손님을 꺼내지 못했습니다: {customerData.PoolItem.name}", this);
-                    ReturnSpawnBuffer();
-                    return false;
+                    _spawnedPairStarter = customerData;
                 }
 
-                customer.Setup(customerData);
+                MarkRoleTaken(customerData);
 
-                // 좌석에 붙기 전까지 NavMesh 밖에 서 있지 않도록 차 위치로 옮겨둔다.
-                customer.transform.position = car.transform.position;
-                _spawnBuffer.Add(customer);
-
-                // None(일반 손님)은 역할이 아니라서 중복 허용. 특수 역할만 한 번 태우면 다음 좌석 후보에서 제외한다.
-                CustomerType role = CustomerRoles.RoleOf(customerData.customerType);
-                if (role != CustomerType.None)
+                // 혼자 오는 손님을 태웠으면 더 태우지 않는다.
+                if (customerData.RidesAlone)
                 {
-                    _takenRoles.Add(role);
+                    break;
                 }
             }
 
@@ -484,6 +592,75 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return false;
             }
 
+            DropExtraFuelCustomers(carData);
+            return true;
+        }
+
+        /// <summary>마지막 안전장치. 추첨에서 이미 거르지만, 어떤 경로로든 주유 손님이 둘 이상 탔으면 첫 사람만 남기고 풀로 돌린다.
+        /// 한 차에 주유 손님이 둘이면 주유기 하나를 두고 둘이 기다리는 그림이 되어 기획과 어긋난다.</summary>
+        private void DropExtraFuelCustomers(CarDataSO carData)
+        {
+            bool kept = false;
+
+            for (int i = 0; i < _spawnBuffer.Count; i++)
+            {
+                AbstractCustomer customer = _spawnBuffer[i];
+                if (!CustomerRoles.WantsFuel(customer.Data))
+                {
+                    continue;
+                }
+
+                if (!kept)
+                {
+                    kept = true;
+                    continue;
+                }
+
+                Debug.LogError($"[VisitDirector] {carData.name}에 주유 손님이 둘 이상 탈 뻔해 {customer.Data.name}을(를) 내렸습니다. " +
+                               "추첨 조건을 거치지 않은 경로가 있는지 확인해야 합니다.", this);
+                poolManager.Push(customer);
+                _spawnBuffer.RemoveAt(i);
+                i--;
+            }
+        }
+
+        /// <summary>None(일반 손님)은 역할이 아니라서 중복 허용. 특수 역할만 한 번 태우면 다음 좌석 후보에서 제외한다.</summary>
+        private void MarkRoleTaken(CustomerDataSO customerData)
+        {
+            CustomerType role = CustomerRoles.RoleOf(customerData.CustomerType);
+            if (role != CustomerType.None)
+            {
+                _takenRoles.Add(role);
+            }
+
+            if (CustomerRoles.WantsFuel(customerData))
+            {
+                _fuelTaken = true;
+            }
+        }
+
+        /// <summary>손님 하나를 풀에서 꺼내 태울 목록에 넣는다. 꺼내지 못하면 false.</summary>
+        private bool SpawnIntoBuffer(Car car, CustomerDataSO customerData)
+        {
+            if (customerData.PoolItem == null)
+            {
+                Debug.LogError("[VisitDirector] 뽑을 수 있는 손님 데이터가 없습니다. CustomerDataSO의 풀 항목과 가중치를 확인하세요.", this);
+                return false;
+            }
+
+            AbstractCustomer customer = poolManager.Pop<AbstractCustomer>(customerData.PoolItem);
+
+            if (customer == null)
+            {
+                Debug.LogError($"[VisitDirector] 손님을 꺼내지 못했습니다: {customerData.PoolItem.name}", this);
+                return false;
+            }
+
+            customer.Setup(customerData);
+
+            // 좌석에 붙기 전까지 NavMesh 밖에 서 있지 않도록 차 위치로 옮겨둔다.
+            customer.transform.position = car.transform.position;
+            _spawnBuffer.Add(customer);
             return true;
         }
 
@@ -506,8 +683,27 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 }
 
                 // 종류가 아니라 역할로 거른다. 주유 손님(내리는 쪽·차에 남는 쪽)은 한 차에 하나만 탄다.
-                CustomerType role = CustomerRoles.RoleOf(data.customerType);
+                CustomerType role = CustomerRoles.RoleOf(data.CustomerType);
                 if (role != CustomerType.None && _takenRoles.Contains(role))
+                {
+                    continue;
+                }
+
+                // 주유를 원하는 손님은 종류가 달라도 한 차에 하나만 탄다.
+                if (_fuelTaken && CustomerRoles.WantsFuel(data))
+                {
+                    continue;
+                }
+
+                // 혼자 오는 손님은 첫 좌석에서만 뽑힌다. 이미 누가 탔으면 후보에서 뺀다.
+                if (data.RidesAlone && _spawnBuffer.Count > 0)
+                {
+                    continue;
+                }
+
+                // 짝으로 오는 손님은 짝을 태운 차가 곧바로 뒤따라올 수 있을 때만 뽑힌다.
+                // 이미 짝을 기다리는 중이거나 이 차 다음에 빈 자리·방문 여유가 없으면 혼자 남게 된다.
+                if (data.ComesInPairs && !CanSendPartner(data))
                 {
                     continue;
                 }
@@ -516,6 +712,15 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
 
             return WeightedPicker.Pick(_pickBuffer, data => data.SpawnWeight);
+        }
+
+        /// <summary>지금 뽑는 차 뒤로 짝을 태운 차 한 대를 더 보낼 수 있는지. 지금 차는 자리를 이미 빌렸고 방문 목록에는 아직 없다.</summary>
+        private bool CanSendPartner(CustomerDataSO partner)
+        {
+            return _pendingPartner == null &&
+                   _activeVisits.Count + 2 <= maxConcurrentVisits &&
+                   mapData.AvailableCountOf(MapPointType.ParkingSlot) >= 1 &&
+                   AvailableCarData(partner).Count > 0;
         }
 
         private void ReturnSpawnBuffer()
@@ -532,9 +737,15 @@ namespace _Works.CJW.Scripts.Customers.Visit
         {
             session.Completed -= OnVisitCompleted;
 
+            // ReturnToPool이 세션을 비우므로 필요한 값을 먼저 읽는다.
+            bool abandoned = session.IsCarAbandoned;
+            Car car = session.Car;
+            StealableCar stolen = session.StolenCar;
+
             // ReturnToPool이 목록을 비우므로 등록 해제를 먼저 끝낸다.
+            // 버려진 차도 더는 움직이지 않으니 틱에서 뺀다. 차 자체는 자리에 남아 다른 차가 피해 간다.
             UnRegisterAgent(session);
-            UnRegisterAgent(session.Car);
+            UnRegisterAgent(car);
 
             IReadOnlyList<AbstractCustomer> customers = session.Customers;
             for (int i = 0; i < customers.Count; i++)
@@ -544,6 +755,12 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
             session.ReturnToPool(poolManager);
 
+            // 훔친 차는 손님을 풀로 돌린 다음에 치운다. 먼저 끄면 좌석에 앉은 손님까지 함께 꺼진다.
+            if (stolen != null)
+            {
+                stolen.Vanish();
+            }
+
             for (int i = _activeVisits.Count - 1; i >= 0; i--)
             {
                 if (_activeVisits[i].Session != session)
@@ -551,13 +768,50 @@ namespace _Works.CJW.Scripts.Customers.Visit
                     continue;
                 }
 
-                // 빌린 자리는 반드시 짝을 맞춰 돌려준다.
-                mapData.ReleaseParkingSlot(_activeVisits[i].Slot);
+                if (abandoned)
+                {
+                    // 버려진 차가 자리를 계속 차지한다. 자리는 차를 치울 때 돌려준다.
+                    _abandonedCars.Add(new AbandonedCar { Car = car, Slot = _activeVisits[i].Slot });
+                    AbandonedCarCountChanged?.Invoke(_abandonedCars.Count);
+                }
+                else
+                {
+                    // 빌린 자리는 반드시 짝을 맞춰 돌려준다.
+                    mapData.ReleaseParkingSlot(_activeVisits[i].Slot);
+                }
+
                 _activeVisits.RemoveAt(i);
                 break;
             }
 
             _sessionPool.Push(session);
+        }
+
+        /// <summary>버려진 차 중 하나를 고른다. 치우는 상호작용이 생기면 플레이어가 가리킨 차를 넘기면 된다.</summary>
+        public bool TryGetAbandonedCar(int index, out Car car)
+        {
+            car = index >= 0 && index < _abandonedCars.Count ? _abandonedCars[index].Car : null;
+            return car != null;
+        }
+
+        /// <summary>버려진 차를 치운다. 차를 풀로 돌려보내고 차지하던 주차 자리를 비운다. 버려진 차가 아니면 false.</summary>
+        public bool ClearAbandonedCar(Car car)
+        {
+            for (int i = 0; i < _abandonedCars.Count; i++)
+            {
+                if (_abandonedCars[i].Car != car)
+                {
+                    continue;
+                }
+
+                mapData.ReleaseParkingSlot(_abandonedCars[i].Slot);
+                poolManager.Push(car);
+                _abandonedCars.RemoveAt(i);
+                AbandonedCarCountChanged?.Invoke(_abandonedCars.Count);
+                return true;
+            }
+
+            return false;
         }
 
         private VisitSession RentSession() => _sessionPool.Count > 0 ? _sessionPool.Pop() : new VisitSession();

@@ -3,6 +3,7 @@ using _Works.CJW.Scripts.Customers;
 using _Works.CJW.Scripts.Customers.Data;
 using _Works.CJW.Scripts.ManagingAgents;
 using _Works.CJW.Scripts.MapSystems;
+using _Works.CJW.Scripts.Sounds;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
 
@@ -67,10 +68,14 @@ namespace _Works.CJW.Scripts.Cars
 
         public bool IsArrived => _moveModule == null || _moveModule.IsArrived;
 
+        /// <summary>소리를 내는 창구. 프리팹에 사운드 모듈이 없으면 null이고, 그 차는 소리 없이 달린다.</summary>
+        public ISoundEmitter Sound { get; private set; }
+
         protected override void Awake()
         {
             base.Awake();
             _moveModule = GetModule<ICarMoveModule>();
+            Sound = GetModule<ISoundEmitter>();
 
             // 없으면 IsArrived가 항상 true라 이동 없이 모든 단계를 조용히 통과한다.
             // 증상이 "차가 스폰 자리에서 안 움직임"으로만 보이므로 반드시 남긴다.

@@ -1,3 +1,4 @@
+﻿using _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States;
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
@@ -34,6 +35,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
 
         [Tooltip("도망칠 때 갈아탈 상태.")]
         [SerializeReference] private CustomerState flee;
+
+        /// <summary>전투 상태가 꽂혀 있어 <see cref="EnterCombat"/>이 실제로 무언가를 하는지.</summary>
+        public bool CanFight => combat != null;
 
         private AbstractCustomer _customer;
 
@@ -87,6 +91,37 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             Machine.Bind(flee);
         }
 
+        /// <summary>시퀀스 어딘가에서 주유를 원하는지. 초기화 전에도 직렬화된 값만 보므로 프리팹 에셋에 바로 물어볼 수 있다.</summary>
+        public bool WantsFuel
+        {
+            get
+            {
+                if (sequences == null)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < sequences.Length; i++)
+                {
+                    CustomerState[] states = sequences[i]?.States;
+                    if (states == null)
+                    {
+                        continue;
+                    }
+
+                    for (int j = 0; j < states.Length; j++)
+                    {
+                        if (states[j] != null && states[j].WantsFuel)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+        }
+
         /// <summary>방문 시작. VisitSession.Begin이 손님마다 호출한다.</summary>
         public void Begin(VisitContext visit, int seatIndex)
         {
@@ -116,6 +151,26 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             Machine.Context.Target = target;
             Machine.Interrupt(combat);
         }
+
+        /// <summary>쓰러짐. 하던 행동을 끊고 일어설 때까지 기다린 뒤 그 행동을 처음부터 다시 한다.
+        /// 쓰러짐은 어느 손님이든 같아서 프리팹에 두지 않고 코드로 하나 만든다.</summary>
+        public void KnockDown()
+        {
+            if (Machine == null)
+            {
+                return;
+            }
+
+            if (_knockedDown == null)
+            {
+                _knockedDown = new KnockedDownState();
+                Machine.Bind(_knockedDown);
+            }
+
+            Machine.Interrupt(_knockedDown);
+        }
+
+        private KnockedDownState _knockedDown;
 
         /// <summary>도망. 어느 상태에서든 호출할 수 있다.</summary>
         public void RunAway()

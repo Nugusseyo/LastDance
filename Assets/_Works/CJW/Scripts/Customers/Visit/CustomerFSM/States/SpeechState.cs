@@ -2,12 +2,14 @@ using System;
 using System.Threading;
 using _Works.JYG._Scripts.UI.SpeechBubble;
 using Cysharp.Threading.Tasks;
+using DevLib.SoundSystem;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 {
-    /// <summary>손님 머리 위에 말풍선을 띄우고 스스로 끝날 때까지 기다린다. 말풍선의 수명은 SpeechBubble이 쥐고 스스로 풀에 돌아가므로 이 상태는 Push하지 않는다.</summary>
+    /// <summary>손님 머리 위에 말풍선을 띄운다. 기본은 말풍선이 끝날 때까지 기다리고, runAlongside를 켜면 띄우자마자 다음 행동으로 넘어가 행동과 동시에 대사가 나온다.
+    /// 말풍선의 수명은 SpeechBubble이 쥐고 스스로 풀에 돌아가므로 이 상태는 Push하지 않는다.</summary>
     [Serializable]
     public sealed class SpeechState : CustomerState
     {
@@ -21,6 +23,14 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Header("표시")]
         [Tooltip("손님 기준으로 말풍선을 띄울 위치(m). 머리 위로 올리려면 y를 키운다.")]
         [SerializeField] private Vector3 offset = new(0f, 2.2f, 0f);
+
+        [Tooltip("켜면 말풍선을 띄우자마자 다음 상태로 넘어간다. 말풍선은 대사가 끝날 때까지 손님을 따라다닌다.\n" +
+                 "끄면(기본) 대사가 끝날 때까지 이 상태에 머문다. 기본값을 false로 둔 건 이 필드가 없던 프리팹이 기존처럼 기다리게 하기 위해서다.")]
+        [SerializeField] private bool runAlongside;
+
+        [Header("사운드")]
+        [Tooltip("말풍선이 뜰 때 낼 소리(웅얼거리는 말소리).")]
+        [SerializeField] private SoundClipSo speechSound;
 
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
         {
@@ -38,39 +48,74 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 return VisitOutcome.Done;
             }
 
+            Transform anchor = Ctx.Customer.transform;
+            Follow(bubble, anchor);
+
+            // 구독은 InitializeBubble보다 먼저 건다. 대사가 없으면 그 안에서 바로 OnSpeechEnd가 불린다.
+            UniTask following = FollowUntilEnd(bubble, anchor, runAlongside ? CancellationToken.None : ct);
+
+            bubble.InitializeBubble(Ctx.Customer.HumanType, (int)Ctx.Data.CustomerType);
+            Ctx.Customer.Sound?.Play(speechSound);
+            Debug.Log($"[SpeechState] {Ctx.Customer.name} 말풍선 시작", Ctx.Customer);
+
+            if (runAlongside)
+            {
+                // 이 상태의 토큰은 다음 상태로 넘어가면 취소되므로 따라다니기는 말풍선이 끝날 때까지 따로 돈다.
+                following.Forget();
+                return VisitOutcome.Done;
+            }
+
+            // 인터럽트나 Phase 전환이면 여기서 취소로 빠져나간다.
+            // 말풍선은 남은 시간을 마저 세고 스스로 풀로 돌아가므로 따로 치우지 않는다.
+            await following;
+            return VisitOutcome.Done;
+        }
+
+        /// <summary>말풍선이 끝날 때까지 손님 머리 위를 따라다니게 한다.</summary>
+        private async UniTask FollowUntilEnd(SpeechBubble bubble, Transform anchor, CancellationToken ct)
+        {
             // 이벤트는 await할 수 없으므로 플래그로 바꿔 문다.
             bool ended = false;
-            void OnSpeechEnd()
-            {
-                
-                ended = true;
-            }
+            void OnSpeechEnd() => ended = true;
 
             bubble.OnSpeechEnd += OnSpeechEnd;
 
-            Transform anchor = Ctx.Customer.transform;
+            try
+            {
+                while (!ended)
+                {
+                    // 플레이 종료처럼 말풍선이나 손님이 먼저 파괴되거나, 손님이 풀로 돌아가 꺼지면 더 따라다닐 대상이 없다.
+                    if (bubble == null || anchor == null || !anchor.gameObject.activeInHierarchy)
+                    {
+                        return;
+                    }
+
+                    Follow(bubble, anchor);
+                    await UniTask.Yield(PlayerLoopTiming.Update, ct);
+                }
+            }
+            finally
+            {
+                // 취소로 빠져나가도 풀에 돌아간 말풍선이 이 손님의 핸들러를 계속 들고 있지 않게 한다.
+                if (bubble != null)
+                {
+                    bubble.OnSpeechEnd -= OnSpeechEnd;
+                }
+            }
+        }
+
+        /// <summary>손님 머리 위에 두고 카메라와 같은 방향을 보게 한다.
+        /// 월드 캔버스는 얇은 판이라 회전을 두지 않으면 차 옆(주유구 쪽)에서 볼 때 옆면만 보여 사라진 것처럼 된다.</summary>
+        private void Follow(SpeechBubble bubble, Transform anchor)
+        {
             bubble.transform.position = anchor.position + offset;
 
-            bubble.InitializeBubble(Ctx.Customer.HumanType, 0);
-            Debug.Log("[SpeechState] 말풍선 시작", Ctx.Customer);
-
-            while (!ended)
+            Camera cam = Camera.main;
+            if (cam != null)
             {
-                // 플레이 종료처럼 말풍선이나 손님이 먼저 파괴되면 더 따라다닐 대상이 없다.
-                if (bubble == null || anchor == null)
-                {
-                    return VisitOutcome.Done;
-                }
-
-                bubble.transform.position = anchor.position + offset;
-
-                // 인터럽트나 Phase 전환이면 여기서 취소로 빠져나간다.
-                // 말풍선은 남은 시간을 마저 세고 스스로 풀로 돌아가므로 따로 치우지 않는다.
-                await UniTask.Yield(PlayerLoopTiming.Update, ct);
+                // 판의 앞(+Z)을 카메라 앞과 맞춰야 글자가 뒤집히지 않는다.
+                bubble.transform.rotation = cam.transform.rotation;
             }
-
-            bubble.OnSpeechEnd -= OnSpeechEnd;
-            return VisitOutcome.Done;
         }
     }
 }

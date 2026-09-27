@@ -159,12 +159,12 @@ MonoBehaviour:
     printType: 2
     delayTime: 5
     index: 11
-    contents1: "\uC0AC\uB791\uD588\uB098\uBD10"
-    contents2: "\uC78A\uC744\uC218 \uC5C6\uB098\uBD10"
-    contents3: "\uC790\uAFB8 \uC0DD\uAC01\uB098"
-    contents4: "\uACAC\uB51C\uC218\uAC00 \uC5C6\uC5B4"
-    contents5: "\uD6C4\uD68C\uD558\uB098\uBD10"
-    contents6: "\uB110 \uAE30\uB2E4\uB9AC\uB098\uBD10"
+    contents1: "\uC778\uAC04\uC801\uC778"
+    contents2: "\uC778\uAC04 \uC5EC\uC790"
+    contents3: "\uC0AC\uB098\uC774"
+    contents4: "\uB6F0\uB294\uB188"
+    contents5: "\uADF8\uC704\uC5D0 \uB6F0\uB294\uB188"
+    contents6: 
     contents7: 
     contents8: 
     contents9: 

@@ -1,8 +1,10 @@
-using System;
+﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using _Works.CJW.Scripts.Customers.Interaction;
 using _Works.CJW.Scripts.MapSystems;
+using DevLib.AnimatorSystem;
+using DevLib.SoundSystem;
 using UnityEngine;
 
 namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
@@ -11,8 +13,12 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
     /// 무엇이 그 요구를 들어주는지는 이 상태가 모른다 — <see cref="ICustomerRequest"/>에 답이 들어오기만 기다린다.
     /// 그래서 요구를 처리하는 시스템이 아직 없어도 손님은 기다리다 지쳐 제 갈 길을 가고, 방문은 굳지 않는다.</summary>
     [Serializable]
-    public sealed class RequestServiceState : CustomerState
+    public sealed class RequestServiceState : CustomerState, IDestinationState
     {
+        public MapPointType Destination => requestAt;
+
+        public override bool WantsFuel => requestType == CustomerRequestType.Refuel;
+
         [Header("요구")]
         [Tooltip("무엇을 요구하는지.")]
         [SerializeField] private CustomerRequestType requestType = CustomerRequestType.TireChange;
@@ -25,7 +31,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [SerializeField] private MapPointType requestAt = MapPointType.Garage;
 
         [Tooltip("그 지점까지 걸어갈 때의 한계 시간(초).")]
-        [SerializeField, Min(0f)] private float moveTimeout = 15f;
+        [SerializeField, Min(0f)] private float moveTimeout = 40f;
 
         [Tooltip("걸어서 닿는 지점이 없을 때 다시 찾아볼 시간(초). 줄지어 선 차가 길을 막았다가 떠나면 열린다.")]
         [SerializeField, Min(0f)] private float reachWait = 5f;
@@ -36,9 +42,26 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("몸을 돌리는 각속도(도/초).")]
         [SerializeField, Min(1f)] private float turnSpeed = 360f;
 
+        [Header("연출")]
+        [Tooltip("답을 기다리는 동안 재생할 클립. 비워두면 선 채로 기다린다.")]
+        [SerializeField] private HashDataSO waitClip;
+
         [Header("대기")]
         [Tooltip("답을 기다릴 시간(초). 넘기면 요구를 거두고 다음 행동으로 넘어간다. 0이면 Phase가 바뀔 때까지 기다린다.")]
         [SerializeField, Min(0f)] private float waitTimeout = 30f;
+
+        [Header("사운드")]
+        [Tooltip("요구를 꺼낼 때 낼 소리(\"저기요!\" 같은 부르는 소리).")]
+        [SerializeField] private SoundClipSo requestSound;
+
+        [Tooltip("요구가 받아들여졌을 때 낼 소리.")]
+        [SerializeField] private SoundClipSo acceptedSound;
+
+        [Tooltip("요구가 거절됐을 때 낼 소리.")]
+        [SerializeField] private SoundClipSo rejectedSound;
+
+        [Tooltip("기다리다 지쳐 요구를 거둘 때 낼 소리.")]
+        [SerializeField] private SoundClipSo timeoutSound;
 
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
         {
@@ -88,6 +111,13 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             }
 
             request.Raise(requestType, amount);
+            customer.Sound?.Play(requestSound);
+
+            // 조르는 몸짓을 틀어 둔다. 끝내는 건 finally가 한다.
+            if (waitClip != null)
+            {
+                customer.ActionAnimator?.Begin(waitClip, true);
+            }
 
             try
             {
@@ -98,26 +128,38 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                     if (Time.time > deadline)
                     {
                         // 기다리다 지쳤다. 요구를 거두는 건 finally가 한다.
+                        customer.Sound?.Play(timeoutSound);
                         return VisitOutcome.Timeout;
                     }
 
                     await UniTask.Yield(PlayerLoopTiming.Update, ct);
                 }
 
-                return request.Result switch
+                switch (request.Result)
                 {
-                    CustomerRequestResult.Accepted => VisitOutcome.Done,
+                    case CustomerRequestResult.Accepted:
+                        customer.Sound?.Play(acceptedSound);
+                        return VisitOutcome.Done;
 
                     // 거절도 정상적인 답이다. 방문을 끊지 않고 다음 행동(화내기·퇴장)으로 넘긴다.
-                    CustomerRequestResult.Rejected => VisitOutcome.Blocked,
-                    _ => VisitOutcome.Timeout
-                };
+                    case CustomerRequestResult.Rejected:
+                        customer.Sound?.Play(rejectedSound);
+                        return VisitOutcome.Blocked;
+
+                    default:
+                        return VisitOutcome.Timeout;
+                }
             }
             finally
             {
                 // 퇴치나 Phase 전환으로 끊겨도 여기는 반드시 지난다.
                 // 빼먹으면 답을 기다리는 요구가 영영 열린 채로 남아 UI가 사라진 손님을 계속 가리킨다.
                 Withdraw(true);
+
+                if (waitClip != null)
+                {
+                    customer.ActionAnimator?.End();
+                }
             }
         }
 
