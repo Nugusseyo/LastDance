@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using _Works.CJW.Scripts.Sounds;
 using Cysharp.Threading.Tasks;
 using DevLib.AnimatorSystem;
 using DevLib.SoundSystem;
@@ -32,7 +33,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [SerializeField, Min(1f)] private float turnSpeed = 360f;
 
         [Header("사운드")]
-        [Tooltip("연출을 시작할 때 낼 소리. 화내는 몸짓이면 고함, 춤이면 흥얼거림처럼 클립에 맞춰 넣는다.")]
+        [Tooltip("연출을 시작할 때 낼 소리. 화내는 몸짓이면 고함, 춤이면 흥얼거림처럼 클립에 맞춰 넣는다. loop를 켜면 연출이 끝날 때 함께 끈다.")]
         [SerializeField] private SoundClipSo startSound;
 
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
@@ -59,8 +60,31 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 time += Random.Range(0f, jitter);
             }
 
-            Ctx.Customer.Sound?.Play(startSound);
-            await PlayAction(clip, time, ct);
+            ISoundEmitter sound = Ctx.Customer.Sound;
+
+            // 춤 음악처럼 연출보다 긴 소리는 loop를 켜 두면 연출이 끝날 때 함께 끈다.
+            bool looping = startSound != null && startSound.loop;
+            if (looping)
+            {
+                sound?.PlayLoop(startSound);
+            }
+            else
+            {
+                sound?.Play(startSound);
+            }
+
+            try
+            {
+                await PlayAction(clip, time, ct);
+            }
+            finally
+            {
+                // 취소로 끊겨도 여기는 반드시 지난다. 빼먹으면 춤을 멈추고 걸어가는 내내 음악이 따라다닌다.
+                if (looping && sound != null && sound.CurrentLoop == startSound)
+                {
+                    sound.StopLoop();
+                }
+            }
 
             return VisitOutcome.Done;
         }

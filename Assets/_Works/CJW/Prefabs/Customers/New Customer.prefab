@@ -73,6 +73,7 @@ GameObject:
   - component: {fileID: 5298520500737351372}
   - component: {fileID: 5340750438206744906}
   - component: {fileID: 4916817713162045650}
+  - component: {fileID: 8300954765236288117}
   m_Layer: 0
   m_Name: New Customer
   m_TagString: Untagged
@@ -205,6 +206,7 @@ MonoBehaviour:
           rid: -2
         timeout: 40
         fuelTimeout: 0
+        lateSeconds: 30
     - rid: 4377106771376341108
       type: {class: SpeechState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
       data:
@@ -302,7 +304,7 @@ MonoBehaviour:
   despawnDelay: 3
   poolManager: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
   fightBack: 1
-  damagedSound: {fileID: 0}
+  damagedSound: {fileID: 11400000, guid: a4e1202c4a7640d4baa4db68977c3335, type: 2}
   deathSound: {fileID: 0}
 --- !u!114 &4916817713162045650
 MonoBehaviour:
@@ -317,6 +319,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Sounds.SoundEmitterModule
   soundChannel: {fileID: 11400000, guid: fa8239ba7d936984d851fe904b2da6cc, type: 2}
+--- !u!114 &8300954765236288117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7189175007966602525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 676fae61fafa4054eb45888e38e68835, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Appearance.CustomerAppearanceModule
+  lookSet: {fileID: 11400000, guid: b141f1b7c7aac4c45a959e747d19de1f, type: 2}
 --- !u!1001 &7055313361249625156
 PrefabInstance:
   m_ObjectHideFlags: 0

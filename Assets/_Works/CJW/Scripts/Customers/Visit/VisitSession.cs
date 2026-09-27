@@ -44,6 +44,20 @@ namespace _Works.CJW.Scripts.Customers.Visit
         public event Action<VisitSession> Completed;
         public event Action<VisitPhase> OnStateChanged;
 
+        /// <summary>이 방문의 손님이 주유를 받았다.</summary>
+        public event Action<AbstractCustomer> Fueled
+        {
+            add => _context.Fueled += value;
+            remove => _context.Fueled -= value;
+        }
+
+        /// <summary>이 방문의 손님이 주유를 너무 오래 기다렸다.</summary>
+        public event Action<AbstractCustomer> FuelLate
+        {
+            add => _context.FuelLate += value;
+            remove => _context.FuelLate -= value;
+        }
+
         public VisitSession()
         {
             // None과 Completed는 틱이 없는 경계 단계라 상태 객체를 두지 않는다.

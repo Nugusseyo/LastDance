@@ -17,7 +17,7 @@ namespace _Works.JYG._Scripts.Data_Container.Money
         private StoreItem _scrapItem;
         private const int RefuelingBonusIndex = 3; //주유 추가 보너스 인덱스는 3번이다. 
         private const int ScrapBonusIndex = 4; //폐차 보너스 인덱스는 4번이다. 
-        private void Awake()
+        private void Start()
         {
             if (eventChannel != null)
             {

@@ -22,7 +22,6 @@ namespace _Works.JYG._Scripts.UI.Data.Review
         [SerializeField] private float waitTime = 3f;
 
         private ReviewDB _reviewDB;
-        private Dictionary<ReviewType, List<ReviewData>> _reviews;
 
         private void Awake()
         {
@@ -33,12 +32,6 @@ namespace _Works.JYG._Scripts.UI.Data.Review
                 enabled = false;
                 return;
             }
-            
-            _reviews = _reviewDB.ReviewSheet
-                .GroupBy(data => data.type)
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.ToList());
             
             _reviewPool = new ObjectPool<ReviewItem>(
                 HandleCreateViewer,
@@ -51,7 +44,7 @@ namespace _Works.JYG._Scripts.UI.Data.Review
                 );
         }
 
-        public void RequestRandomReview(int newValue, int oldValue, ReviewType type)
+        public void RequestRandomReview(ReviewType type, int index)
         {
             ReviewItem item = _reviewPool.Get();
 
@@ -65,17 +58,25 @@ namespace _Works.JYG._Scripts.UI.Data.Review
                 userName = randomNameData?.name ?? "NameDB Content is Null";
             }
             
-            ReviewData data = _reviews[type][Random.Range(0, _reviews[type].Count)];
-
-            int gap = newValue - oldValue;
-            int starCount;
-            if (gap < 0)
-                starCount = Random.Range(1, 3); //1~2 사이
-            else
-                starCount = Random.Range(4, 6); //4~5 사이
-                
+            ReviewData data = _reviewDB.ReviewSheet.Find(x => x.index == index);
             
-            item.SetReview(userName, data.content, starCount);
+            string content = type switch
+            {
+                ReviewType.Good => data.contentUp,
+                ReviewType.Bad => data.contentDown,
+                ReviewType.Late => data.contentLate,
+                _ => string.Empty
+            };
+
+            int starCount = type switch
+            {
+                ReviewType.Good => 5,
+                ReviewType.Bad => 1,
+                ReviewType.Late => 3,
+                _ => 4
+            };
+            
+            item.SetReview(userName, content, starCount);
         }
         
         #region Pooling

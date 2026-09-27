@@ -4,6 +4,7 @@ using _Works.CJW.Scripts.Cars;
 using _Works.CJW.Scripts.Customers.Data;
 using _Works.CJW.Scripts.ManagingAgents;
 using _Works.CJW.Scripts.MapSystems;
+using _Works.JYG._Scripts.Data_Container.Money;
 using DevLib.EventChannelSystem;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
@@ -31,6 +32,10 @@ namespace _Works.CJW.Scripts.Customers.Visit
         [Header("데이터")]
         [Tooltip("스폰할 차 종류. 인원·간격·속도 같은 개별 수치는 각 CarDataSO 안에 있다.")]
         [SerializeField] private CarDataSO[] carDataList;
+        [Tooltip("평판. 이 값으로 차 등급의 해금을 판단한다.")]
+        [SerializeField] private IntegerDataContainer reputation;
+        [Tooltip("평판별 등급 해금과 등급 가중치. 비워두면 등급 없이 spawnWeight로만 뽑는다.")]
+        [SerializeField] private CarGradeTableSO carGradeTable;
         [Tooltip("차가 손님 목록을 지정하지 않았을 때 쓰는 기본 손님 종류.")]
         [SerializeField] private CustomerDataSO[] defaultCustomerDataList;
         [Tooltip("좌석 하나를 뽑을 때 주유를 원하는 손님 쪽에서 뽑을 확률. 나머지는 그 외 손님 쪽에서 뽑는다.\n" +
@@ -290,7 +295,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
 
             // 짝을 기다리는 손님이 있으면 그 손님을 태울 수 있는 차 종류만 뽑는다.
-            CarDataSO carData = WeightedPicker.Pick(AvailableCarData(_pendingPartner), data => data.SpawnWeight);
+            CarDataSO carData = PickCarData(AvailableCarData(_pendingPartner));
             if (carData == null || carData.PoolItem == null)
             {
                 Debug.LogError("[VisitDirector] 뽑을 수 있는 차 데이터가 없습니다. CarDataSO의 풀 항목과 가중치를 확인하세요.", this);
@@ -298,10 +303,11 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return null;
             }
 
-            Car car = poolManager.Pop<Car>(carData.PoolItem);
+            PoolItemSO visual = PickVisual(carData);
+            Car car = poolManager.Pop<Car>(visual);
             if (car == null)
             {
-                Debug.LogError($"[VisitDirector] 차량을 꺼내지 못했습니다. PoolManager에 {carData.PoolItem.name} 항목이 등록되어 있는지 확인하세요.", this);
+                Debug.LogError($"[VisitDirector] 차량을 꺼내지 못했습니다. PoolManager에 {visual.name} 항목이 등록되어 있는지 확인하세요.", this);
                 mapData.ReleaseParkingSlot(slot);
                 return null;
             }
@@ -350,6 +356,98 @@ namespace _Works.CJW.Scripts.Customers.Visit
         }
 
         private readonly List<CarDataSO> _carPickBuffer = new();
+        private readonly List<CarDataSO> _gradePickBuffer = new();
+        private Func<CarGrade, bool> _hasGradeCandidate;
+
+        /// <summary>평판으로 해금된 등급을 가중치로 먼저 뽑고, 그 등급 안에서 spawnWeight로 차를 뽑는다.
+        /// 등급 표·평판이 없거나 뽑을 등급 있는 차가 없으면 후보 전체에서 spawnWeight로 뽑는다.</summary>
+        private CarDataSO PickCarData(List<CarDataSO> candidates)
+        {
+            if (carGradeTable != null && reputation != null)
+            {
+                _hasGradeCandidate ??= grade => HasGrade(_carPickBuffer, grade);
+
+                if (carGradeTable.TryPickGrade(reputation.Value, _hasGradeCandidate, out CarGrade grade))
+                {
+                    _gradePickBuffer.Clear();
+                    for (int i = 0; i < candidates.Count; i++)
+                    {
+                        if (candidates[i].Grade == grade)
+                        {
+                            _gradePickBuffer.Add(candidates[i]);
+                        }
+                    }
+
+                    return WeightedPicker.Pick(_gradePickBuffer, data => data.SpawnWeight);
+                }
+            }
+
+            return WeightedPicker.Pick(candidates, data => data.SpawnWeight);
+        }
+
+        private readonly List<CarDataSO> _visualBuffer = new();
+        private readonly List<CarDataSO> _visualGradeBuffer = new();
+        private Func<CarGrade, bool> _hasVisualCandidate;
+
+        /// <summary>이 방문에 쓸 차 겉모습(풀 항목). randomVisual인 차는 등급 있는 차들의 겉모습 중에서
+        /// 평판으로 등급을 뽑고 그 안에서 spawnWeight로 고른다. 동시 대수 제한은 행동(CarDataSO) 기준이라 여기서는 보지 않는다.</summary>
+        private PoolItemSO PickVisual(CarDataSO carData)
+        {
+            if (!carData.RandomVisual)
+            {
+                return carData.PoolItem;
+            }
+
+            _visualBuffer.Clear();
+            for (int i = 0; i < carDataList.Length; i++)
+            {
+                CarDataSO data = carDataList[i];
+                if (data != null && !data.RandomVisual && data.Grade != CarGrade.None && data.PoolItem != null)
+                {
+                    _visualBuffer.Add(data);
+                }
+            }
+
+            CarDataSO picked = null;
+            if (carGradeTable != null && reputation != null)
+            {
+                _hasVisualCandidate ??= grade => HasGrade(_visualBuffer, grade);
+
+                if (carGradeTable.TryPickGrade(reputation.Value, _hasVisualCandidate, out CarGrade grade))
+                {
+                    _visualGradeBuffer.Clear();
+                    for (int i = 0; i < _visualBuffer.Count; i++)
+                    {
+                        if (_visualBuffer[i].Grade == grade)
+                        {
+                            _visualGradeBuffer.Add(_visualBuffer[i]);
+                        }
+                    }
+
+                    picked = WeightedPicker.Pick(_visualGradeBuffer, data => data.SpawnWeight);
+                }
+            }
+            else
+            {
+                picked = WeightedPicker.Pick(_visualBuffer, data => data.SpawnWeight);
+            }
+
+            return picked != null ? picked.PoolItem : carData.PoolItem;
+        }
+
+        private static bool HasGrade(List<CarDataSO> candidates, CarGrade grade)
+        {
+            for (int i = 0; i < candidates.Count; i++)
+            {
+                // spawnWeight 0은 뽑히지 않아야 하므로 후보로 치지 않는다. 치면 WeightedPicker가 균등 추첨으로 물러나 뽑혀 버린다.
+                if (candidates[i].Grade == grade && candidates[i].SpawnWeight > 0f)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         /// <summary>동시 대수 제한(CarDataSO.MaxConcurrent)에 걸리지 않은 차 종류만 추린다.
         /// mustCarry가 있으면 그 손님을 태울 수 있는 차 종류만 남긴다.</summary>

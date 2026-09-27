@@ -21,7 +21,9 @@ namespace _Works.CJW.Scripts.Sounds
 
         private int _loopChannel;
 
-        public bool IsLooping { get; private set; }
+        public bool IsLooping => CurrentLoop != null;
+
+        public SoundClipSo CurrentLoop { get; private set; }
 
         public override void Initialize(ModuleOwner owner)
         {
@@ -82,7 +84,7 @@ namespace _Works.CJW.Scripts.Sounds
             // 같은 채널로 다시 틀면 SoundManager가 앞의 소리를 끊고 바꿔 끼운다.
             Transform follow = OwnerTransform;
             soundChannel.RaiseEvent(SoundEvents.PlaySoundEvent.Init(follow.position, clip, _loopChannel, follow));
-            IsLooping = true;
+            CurrentLoop = clip;
         }
 
         public void StopLoop()
@@ -92,7 +94,7 @@ namespace _Works.CJW.Scripts.Sounds
                 return;
             }
 
-            IsLooping = false;
+            CurrentLoop = null;
 
             if (soundChannel != null)
             {
