@@ -3922,6 +3922,7 @@ MonoBehaviour:
   reviewContainer: {fileID: 11400000, guid: 15c969aeb15147e4b82d949cb0989643, type: 2}
   increasePercentage: 0.5
   eventChannel: {fileID: 11400000, guid: 5ca454320a311264a830e271fd884517, type: 2}
+  setting: {fileID: 11400000, guid: bfa1b9206afc84d4e98a76e46eefcb24, type: 2}
   OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -3938,6 +3939,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  resGood: 5
+  resBad: -3
+  resLate: -1
 --- !u!1 &8203488154593773326
 GameObject:
   m_ObjectHideFlags: 0
