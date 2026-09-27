@@ -150,52 +150,21 @@ MonoBehaviour:
     contents3: "\uD558.. \uC0AC\uACFC\uD558\uBA74 \uB05D\uB098?"
     contents4: "\uB4E4\uC5B4\uC640"
     contents5: "\uD6C4\uC6B0..\uD6C4"
-    contents6: "\uBC24\uC0C8\uB3C4\uB85D \uD1A0\uD558\uAC8C \uD574\uC904\uAC8C"
+    contents6: 
     contents7: 
-    contents8: 
-    contents9: 
-    contents10: 
-  - type: 1
-    printType: 1
-    delayTime: 30
-    index: 11
-    contents1: "\uD0C0\uC774\uC5B4\uC880 \uC218\uB9AC\uD574 \uC8FC\uC138\uC694"
-    contents2: "\uD0C0\uC774\uC5B4 \uB124\uC9DD \uC804\uBD80 \uAC08\uC544\uC918\uC694"
-    contents3: "\uD0C0\uC774\uC5B4 \uAD50\uCCB4\uC880 \uD560\uAED8\uC694"
-    contents4: "\uC548\uB155\uD558\uC138\uC694 \uD0C0\uC774\uC5B4\uC880 \uBD10\uC8FC\uC138\uC694"
-    contents5: "\uD0C0\uC774\uC5B4 \uB108\uBB34 \uBE44\uC2FC\uAC70 \uC544\uB2C8\uC5D0\uC694?
-      \uAC00\uC7A5 \uC2FC\uAC70\uB85C \uD574\uC8FC\uC138\uC694"
-    contents6: "\uC774\uAC70 \uB354 \uD0C8 \uC218 \uC788\uC744 \uAC83 \uAC19\uC740\uB370...
-      \uB9C8\uBAA8\uC120 \uBCF4\uB2C8\uAE4C \uAC08 \uB54C \uB410\uB124\uC694"
-    contents7: "\uD55C\uAD6D\uD0C0\uC774\uC5B4\uB791 \uAE08\uD638\uB791 \uBB50\uAC00
-      \uB098\uC544\uC694? \uBB34\uB09C\uD55C\uAC70 \uC8FC\uC138\uC694"
     contents8: 
     contents9: 
     contents10: 
   - type: 2
     printType: 2
     delayTime: 5
-    index: 12
+    index: 11
     contents1: "\uC0AC\uB791\uD588\uB098\uBD10"
     contents2: "\uC78A\uC744\uC218 \uC5C6\uB098\uBD10"
     contents3: "\uC790\uAFB8 \uC0DD\uAC01\uB098"
     contents4: "\uACAC\uB51C\uC218\uAC00 \uC5C6\uC5B4"
     contents5: "\uD6C4\uD68C\uD558\uB098\uBD10"
     contents6: "\uB110 \uAE30\uB2E4\uB9AC\uB098\uBD10"
-    contents7: 
-    contents8: 
-    contents9: 
-    contents10: 
-  - type: 2
-    printType: 1
-    delayTime: 5
-    index: 13
-    contents1: "\uACF5\uC9DC\uB85C\uB294 \uBABB\uAC08\uC544\uC8FC\uB098\uC694?"
-    contents2: "\uC800 \uB3C8\uC774 \uC5C6\uC5B4\uC11C \uACF5\uC9DC\uB85C \uAC08\uC544\uC8FC\uC138\uC694"
-    contents3: "\uACF5\uC9DC\uB85C \uAC08\uC544 \uB2EC\uB77C\uACE0\uC694"
-    contents4: "\uACF5\uC9DC\uB85C \uC548\uB2EC\uC544\uC8FC\uBA74 \uCC28 \uC548\uBEBC\uAECD\uB2C8\uB2E4."
-    contents5: "\uC800 \uB3C8 \uBABB\uB0B4\uC694 \uBE68\uB9AC\uC694"
-    contents6: "\uACF5\uC9DC\uB85C \uAC08\uC544 \uC8FC\uC2DC\uB294\uAC74\uAC00\uC694?"
     contents7: 
     contents8: 
     contents9: 

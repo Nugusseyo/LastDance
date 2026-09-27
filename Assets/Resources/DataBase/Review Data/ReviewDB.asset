@@ -17,16 +17,34 @@ MonoBehaviour:
     type: 1
     content: 
   - index: 2
-    type: 1
+    type: 2
     content: 
   - index: 3
-    type: 2
+    type: 1
     content: 
   - index: 4
     type: 2
     content: 
   - index: 5
-    type: 3
+    type: 2
+    content: 
+  - index: 6
+    type: 2
+    content: 
+  - index: 7
+    type: 2
+    content: 
+  - index: 8
+    type: 1
+    content: 
+  - index: 9
+    type: 2
+    content: 
+  - index: 10
+    type: 2
+    content: 
+  - index: 11
+    type: 2
     content: 
   NameSheet:
   - name: "\uC870\uC724\uADDC"

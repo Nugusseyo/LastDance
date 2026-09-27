@@ -1,4 +1,5 @@
 ﻿using _Works.JJH._02_Scripts.Items;
+using _Works.JJH._02_Scripts.Objects;
 using _Works.KDH._01.Scripts.Car;
 using _Works.KDH._01.Scripts.Wrench;
 using DevLib.ModuleSystem;
@@ -13,6 +14,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
         [Header("Layer")]
         [SerializeField] private LayerMask itemLayer;
+        [SerializeField] private LayerMask gasStationLayer;
 
         [Header("Grab")]
         [SerializeField] private Transform weaponHoldPoint;
@@ -20,6 +22,9 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
         [Header("Car")]
         [SerializeField] private PartDetacher partDetacher;
+
+        [Header("Fuel")]
+        [SerializeField] private FuelInjector fuelInjector;
 
         private Player _player;
 
@@ -58,6 +63,38 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                     return;
 
                 EquipItem(part);
+                return;
+            }
+
+            if (_player.Sensor.FindItem(_player.Camera.CameraTrans, gasStationLayer, pickupDistance, out Collider stationCollider))
+            {
+                GasStationController station = stationCollider.GetComponent<GasStationController>();
+
+                if (station == null)
+                    station = stationCollider.GetComponentInParent<GasStationController>();
+
+                if (station == null)
+                    return;
+
+                FuelNozzle nozzle = station.TryDetachNozzle();
+
+                if (nozzle == null)
+                    return;
+
+                EquipItem(nozzle);
+                return;
+            }
+
+            if (fuelInjector != null
+              && _player.Sensor.FindItem(_player.Camera.CameraTrans, fuelInjector.FuelDoorLayerMask,
+                                                              pickupDistance, out Collider fuelDoorCollider))
+            {
+                FuelDoor fuelDoor = fuelDoorCollider.GetComponent<FuelDoor>();
+
+                if (fuelDoor == null)
+                    return;
+
+                fuelInjector.TryStartFueling(fuelDoor);
                 return;
             }
 
@@ -132,7 +169,35 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
         public bool AttachCurrentItem()
         {
-            if (CurrentItem == null || partDetacher == null)
+            if (CurrentItem == null)
+                return false;
+
+            if (CurrentItem is FuelNozzle nozzle)
+            {
+                if (nozzle.Station == null)
+                    return false;
+
+                if (!_player.Sensor.FindItem(_player.Camera.CameraTrans, gasStationLayer,
+                        pickupDistance, out Collider stationCollider))
+                    return false;
+
+                GasStationController station = stationCollider.GetComponent<GasStationController>();
+                if (station == null)
+                    station = stationCollider.GetComponentInParent<GasStationController>();
+
+                if (station == null || station != nozzle.Station)
+                    return false;
+
+                if (!station.TryAttachNozzle(nozzle))
+                    return false;
+
+                CurrentItem = null;
+                CurrentGrabObject = null;
+
+                return true;
+            }
+
+            if (partDetacher == null)
                 return false;
 
             if (!partDetacher.TryAttachWheel(CurrentItem, _player.Camera.CameraTrans))
@@ -172,6 +237,22 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                                                 : null;
 
             partDetacher.TickDetach(Time.deltaTime, wrench);
+        }
+
+        public void UpdateFuelHold()
+        {
+            if (fuelInjector == null || !fuelInjector.IsFueling)
+                return;
+
+            bool holding = _player.PlayerInput != null && _player.PlayerInput.IsInteractHeld;
+
+            if (!holding)
+            {
+                fuelInjector.CancelFueling();
+                return;
+            }
+
+            fuelInjector.TickFueling(Time.deltaTime);
         }
     }
 }

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2800116296563679786}
   - component: {fileID: 1430146756119896115}
   - component: {fileID: 271766282271763797}
+  - component: {fileID: 884009152431403780}
   m_Layer: 0
   m_Name: PlayerGrabModule
   m_TagString: Untagged
@@ -48,9 +49,13 @@ MonoBehaviour:
   itemLayer:
     serializedVersion: 2
     m_Bits: 32768
+  gasStationLayer:
+    serializedVersion: 2
+    m_Bits: 131072
   weaponHoldPoint: {fileID: 0}
   pickupDistance: 4
   partDetacher: {fileID: 271766282271763797}
+  fuelInjector: {fileID: 884009152431403780}
 --- !u!114 &271766282271763797
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -79,3 +84,20 @@ MonoBehaviour:
   pickupDistance: 4
   durationChannel: {fileID: 11400000, guid: c6dff33bcde9eda42a4d11c78f80c7ab, type: 2}
   handDetachTime: 8
+--- !u!114 &884009152431403780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640332462097447401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68e83bc3255f7b346978eaf099d5625b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Grabs.FuelInjector
+  fuelDoorLayerMask:
+    serializedVersion: 2
+    m_Bits: 262144
+  fuelDuration: 5
+  durationChannel: {fileID: 11400000, guid: c6dff33bcde9eda42a4d11c78f80c7ab, type: 2}
