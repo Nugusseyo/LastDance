@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3609551563487789227}
   - component: {fileID: 183863904057553019}
   m_Layer: 0
-  m_Name: Remake2
+  m_Name: LowCar2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -50,8 +50,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15a66550fd3f2144ba07301922417cb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Car.CarSeller
-  carBasePrice: 500
+  carBasePrice: 10000
   wheelDefaultPrice: 50
+  RefuelingPrice: 4000
   wheelLayerMask:
     serializedVersion: 2
     m_Bits: 0
