@@ -108,8 +108,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.561813, y: 2.0628772, z: 0.93690825}
-  m_Center: {x: -0.000025570393, y: 1.0290515, z: 0.009899318}
+  m_Size: {x: 0.3698348, y: 1.7477796, z: 0.65151477}
+  m_Center: {x: -0.0016284436, y: 0.8876786, z: 0.0014289618}
 --- !u!1 &8058258921890188493
 GameObject:
   m_ObjectHideFlags: 0
@@ -168,7 +168,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -2315378818891012869, guid: 1f273cad24519b24ebcfa09ec662854d, type: 3}
+  - {fileID: -5893457009136419862, guid: c48cc038dca18174ea58e5a9cbd45032, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -202,7 +202,7 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.06154251
+        value: 0.029788971
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -214,8 +214,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.3207547, g: 0.3207547, b: 0.3207547, a: 1}
-      key1: {r: 0.3660378, g: 0.3660378, b: 0.3660378, a: 1}
+      key0: {r: 0.038454924, g: 0.04150939, b: 0.039982155, a: 1}
+      key1: {r: 0.039215688, g: 0.043137256, b: 0.043137256, a: 1}
       key2: {r: 0.3660378, g: 0.3660378, b: 0.3660378, a: 0}
       key3: {r: 0.3660378, g: 0.3660378, b: 0.3660378, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}

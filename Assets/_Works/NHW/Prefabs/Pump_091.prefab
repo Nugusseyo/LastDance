@@ -9,11 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1356115581280498545}
+  - component: {fileID: 1211777803918373796}
   - component: {fileID: 1411339962405534515}
   - component: {fileID: 4732709025677039031}
   - component: {fileID: 2923504705969124472}
   - component: {fileID: 944182286592428708}
-  - component: {fileID: 1211777803918373796}
   m_Layer: 15
   m_Name: Pump_091
   m_TagString: Untagged
@@ -36,6 +36,28 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1211777803918373796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7141308026864298094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00a7ecba4d9c41d479fff5d5c6afcfd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Items.FuelNozzle
+  <CurrentItemData>k__BackingField: {fileID: 11400000, guid: 5e076fe4514381348b2a435512ee244a, type: 2}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  holdPositionOffset: {x: 0.054, y: 0.195, z: -0.598}
+  holdRotationOffset: {x: 83.27661, y: 0.53003055, z: 0.5403006}
+  holdScale: {x: 300, y: 300, z: 300}
+  UseEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!33 &1411339962405534515
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -141,19 +163,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1211777803918373796
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7141308026864298094}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00a7ecba4d9c41d479fff5d5c6afcfd6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Items.FuelNozzle
-  <CurrentItemData>k__BackingField: {fileID: 11400000, guid: 5e076fe4514381348b2a435512ee244a, type: 2}
-  UseEvent:
-    m_PersistentCalls:
-      m_Calls: []
