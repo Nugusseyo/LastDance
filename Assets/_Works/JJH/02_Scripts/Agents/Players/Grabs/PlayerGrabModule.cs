@@ -23,6 +23,9 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
         [Header("Car")]
         [SerializeField] private PartDetacher partDetacher;
 
+        [Header("Fuel")]
+        [SerializeField] private FuelInjector fuelInjector;
+
         private Player _player;
 
         public override void Initialize(ModuleOwner owner)
@@ -79,6 +82,19 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                     return;
 
                 EquipItem(nozzle);
+                return;
+            }
+
+            if (fuelInjector != null
+              && _player.Sensor.FindItem(_player.Camera.CameraTrans, fuelInjector.FuelDoorLayerMask,
+                                                              pickupDistance, out Collider fuelDoorCollider))
+            {
+                FuelDoor fuelDoor = fuelDoorCollider.GetComponent<FuelDoor>();
+
+                if (fuelDoor == null)
+                    return;
+
+                fuelInjector.TryStartFueling(fuelDoor);
                 return;
             }
 
@@ -221,6 +237,22 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                                                 : null;
 
             partDetacher.TickDetach(Time.deltaTime, wrench);
+        }
+
+        public void UpdateFuelHold()
+        {
+            if (fuelInjector == null || !fuelInjector.IsFueling)
+                return;
+
+            bool holding = _player.PlayerInput != null && _player.PlayerInput.IsInteractHeld;
+
+            if (!holding)
+            {
+                fuelInjector.CancelFueling();
+                return;
+            }
+
+            fuelInjector.TickFueling(Time.deltaTime);
         }
     }
 }
