@@ -211,7 +211,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             currentItemTransform.SetPositionAndRotation(itemPosition, itemRotation);
 
             CurrentItem.RestoreOriginalScale();
-            CurrentItem.SetPhysicsState();
+            CurrentItem.ReleaseIgnoring(GetPlayerColliders());
 
             EquipItem(item);
         }
@@ -223,7 +223,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
             CurrentItem.transform.SetParent(null);
             CurrentItem.RestoreOriginalScale();
-            CurrentItem.SetPhysicsState();
+            CurrentItem.ReleaseIgnoring(GetPlayerColliders());
 
             CurrentItem = null;
             CurrentGrabObject = null;
@@ -236,7 +236,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             if (CurrentItem != null)
             {
                 CurrentItem.RestoreOriginalScale();
-                CurrentItem.SetPhysicsState();
+                CurrentItem.ReleaseIgnoring(GetPlayerColliders());
             }
 
             CurrentItem = null;
@@ -370,6 +370,11 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             _player.Mover.RunSpeed /= _currentWeaponSpeedMultiplier;
 
             _currentWeaponSpeedMultiplier = 1f;
+        }
+
+        private Collider[] GetPlayerColliders()
+        {
+            return _player != null ? _player.GetComponentsInChildren<Collider>() : null;
         }
     }
 }
