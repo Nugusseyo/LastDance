@@ -13645,7 +13645,7 @@ MonoBehaviour:
   autoDepartSeconds: 60
   passingTraffic: 1
   passingInterval: {x: 1, y: 2}
-  enterChance: 0.805
+  enterChance: 0.92
   passingLanes: 2
   passingLaneSpacing: 4
   maxPassingCars: 20
