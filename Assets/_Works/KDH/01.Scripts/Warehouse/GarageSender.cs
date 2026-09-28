@@ -1,7 +1,9 @@
+using CustomerCar = _Works.CJW.Scripts.Cars.Car;
 using _Works.JYG._Scripts.Events;
 using _Works.KDH._01.Scripts.Car;
 using _Works.Shared.Cars;
 using DevLib.EventChannelSystem;
+using Resources.DataBase.Human_Data;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -18,7 +20,6 @@ namespace _Works.KDH._01.Scripts.Warehouse
         [SerializeField] private float playerSize = 0.6f;
         [SerializeField] private EventChannelSO moneyChannel;
         [SerializeField] private int garageCarPrice = 300;
-        [SerializeField] private BadCustomerCars badCustomerCars;
         [SerializeField, Range(0, 100)] private int quickScrapFeePercent = 30;
         [SerializeField] private float tiltPerWheel = 4f;
         [SerializeField] private float sinkPerWheel = 0.06f;
@@ -90,7 +91,8 @@ namespace _Works.KDH._01.Scripts.Warehouse
 
         private bool IsBadCar(IRemovableCar car)
         {
-            if (badCustomerCars != null && badCustomerCars.IsBadCar(car.GameObject)) return true;
+            CustomerCar customerCar = car.GameObject.GetComponent<CustomerCar>();
+            if (customerCar != null && customerCar.HumanType == HumanType.Bad) return true;
 
             Debug.Log($"[GarageSender] {car.GameObject.name}는 정상 손님 차라서 폐차 못 해요.");
             return false;

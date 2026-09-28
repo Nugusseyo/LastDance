@@ -7645,7 +7645,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1039004557}
   - component: {fileID: 1039004556}
-  - component: {fileID: 1039004558}
   m_Layer: 0
   m_Name: Garage Sender
   m_TagString: Untagged
@@ -7673,7 +7672,6 @@ MonoBehaviour:
   playerSize: 0.6
   moneyChannel: {fileID: 0}
   garageCarPrice: 300
-  badCustomerCars: {fileID: 1039004558}
   quickScrapFeePercent: 30
   tiltPerWheel: 4
   sinkPerWheel: 0.06
@@ -7694,19 +7692,6 @@ Transform:
   - {fileID: 431175861}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1039004558
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1039004555}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f92aea0bc7752f49a84380b1df79099, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Warehouse.BadCustomerCars
-  visitDirector: {fileID: 1960849068}
 --- !u!1001 &1046245115
 PrefabInstance:
   m_ObjectHideFlags: 0
