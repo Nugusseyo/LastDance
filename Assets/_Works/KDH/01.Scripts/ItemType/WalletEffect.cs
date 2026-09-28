@@ -12,6 +12,7 @@ namespace _Works.KDH._01.Scripts.ItemType
         public void Apply()
         {
             eventChannelSO.RaiseEvent(UIEvents.BuffEvent.Init(BuffType.Wallet, duration));
+            eventChannelSO.RaiseEvent(UIEvents.WalletEvent.Init(duration));
 
 #if UNITY_EDITOR
             Debug.Log("Wallet Effect Apply");

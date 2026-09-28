@@ -17,8 +17,13 @@ namespace _Works.JYG._Scripts.GasStation
         {
             if(upgradeEventChannel != null)
                 upgradeEventChannel.AddListener<UpgradeItem>(HandleUpgradeItem);
+            
+            
+            if(gasStations != null && gasStations.Count > 0)
+                foreach (GasStationController gasStation in gasStations)
+                    gasStation.gameObject.SetActive(false);
         }
-
+        
         private void OnDestroy()
         {
             if(upgradeEventChannel != null)

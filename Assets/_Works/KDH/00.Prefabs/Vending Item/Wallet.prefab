@@ -154,7 +154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83a900ce7dc65d34fb926e8182f5fde9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.ItemType.WalletEffect
-  eventChannelSO: {fileID: 11400000, guid: 5ca454320a311264a830e271fd884517, type: 2}
+  eventChannelSO: {fileID: 11400000, guid: 01ba2cac045ca0441ac68c1592a25d57, type: 2}
   duration: 30
 --- !u!114 &7020518861364392201
 MonoBehaviour:
@@ -179,8 +179,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4466210938857730512}
-        m_TargetAssemblyTypeName: _Works.KDH._01.Scripts.ItemType.WalletEffect,
-          Assembly-CSharp
+        m_TargetAssemblyTypeName: _Works.KDH._01.Scripts.ItemType.WalletEffect, Assembly-CSharp
         m_MethodName: Apply
         m_Mode: 1
         m_Arguments:
