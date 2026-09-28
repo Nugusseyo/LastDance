@@ -27,10 +27,6 @@ namespace _Works.CJW.Scripts.Cars
 
         private ICarMoveModule _moveModule;
 
-        /// <summary>URP Lit의 색 프로퍼티. 커스텀 셰이더를 쓰면 이 이름을 맞춰야 한다.</summary>
-        private static readonly int BodyColorId = Shader.PropertyToID("_BaseColor");
-
-        private MaterialPropertyBlock _mpb;
 
         /// <summary>seats에서 빈 칸을 걷어낸 실제 좌석. 좌석 수의 유일한 근거다.</summary>
         private Transform[] _usableSeats;
@@ -196,6 +192,45 @@ namespace _Works.CJW.Scripts.Cars
             Stop();
             ClearBodyColor();
             GetModule<ICarWheelModule>()?.ResetPose();
+
+            // 지나가던 차가 다음에 방문 차로 나올 수 있다. 에이전트·구멍을 꺼 둔 채 두면 길을 찾지 못한다.
+            SetGliding(false);
+        }
+
+        private UnityEngine.AI.NavMeshAgent _agent;
+        private UnityEngine.AI.NavMeshObstacle _footprint;
+
+        /// <summary>도로를 지나가기만 하는 차처럼 밖에서 직접 옮길지(<see cref="Glide"/>). 켜면 경로 찾기와 조향을 멈추고,
+        /// 에이전트와 NavMesh 구멍(장애물)을 끈다 — 달리는 차가 구멍을 내면 도로 NavMesh가 매 프레임 다시 깎여 다른 차의 길이 흔들린다.
+        /// 교통 센서는 그대로 둬서 방문 차가 이 차를 보고 양보한다.</summary>
+        public void SetGliding(bool gliding)
+        {
+            if (gliding)
+            {
+                Stop();
+            }
+
+            _agent ??= GetComponentInChildren<UnityEngine.AI.NavMeshAgent>(true);
+            _footprint ??= GetComponentInChildren<UnityEngine.AI.NavMeshObstacle>(true);
+
+            if (_agent != null)
+            {
+                _agent.enabled = !gliding;
+            }
+
+            if (_footprint != null)
+            {
+                _footprint.enabled = !gliding;
+            }
+        }
+
+        /// <summary><see cref="SetGliding"/>을 켠 차를 이 자리로 옮긴다. 바닥 높이는 이동 모듈이 맞춘다.</summary>
+        public void Glide(Vector3 position, Quaternion rotation, float speed)
+        {
+            if (_moveModule == null || !_moveModule.Glide(position, rotation, speed))
+            {
+                transform.SetPositionAndRotation(position, rotation);
+            }
         }
 
         private void EnsureSeatCache()

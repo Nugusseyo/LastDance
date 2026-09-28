@@ -549,7 +549,7 @@ MonoBehaviour:
   RefuelingPrice: 6000
   wheelLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
 --- !u!114 &3067220772619212488
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -844,10 +844,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
-  <CurrentItemData>k__BackingField: {fileID: 0}
+  <CurrentItemData>k__BackingField: {fileID: 11400000, guid: 411951e96e274bf9a9f02216a1275d4b, type: 2}
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   holdPositionOffset: {x: 0, y: 0, z: 0}
   holdRotationOffset: {x: 0, y: 0, z: 0}
   holdScale: {x: 1, y: 1, z: 1}
@@ -937,10 +937,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
-  <CurrentItemData>k__BackingField: {fileID: 0}
+  <CurrentItemData>k__BackingField: {fileID: 11400000, guid: 411951e96e274bf9a9f02216a1275d4b, type: 2}
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   holdPositionOffset: {x: 0, y: 0, z: 0}
   holdRotationOffset: {x: 0, y: 0, z: 0}
   holdScale: {x: 1, y: 1, z: 1}
@@ -1030,10 +1030,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
-  <CurrentItemData>k__BackingField: {fileID: 0}
+  <CurrentItemData>k__BackingField: {fileID: 11400000, guid: 411951e96e274bf9a9f02216a1275d4b, type: 2}
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   holdPositionOffset: {x: 0, y: 0, z: 0}
   holdRotationOffset: {x: 0, y: 0, z: 0}
   holdScale: {x: 1, y: 1, z: 1}
@@ -1123,10 +1123,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bac3388715dae614788026fb6b421de5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.GrabItem
-  <CurrentItemData>k__BackingField: {fileID: 0}
+  <CurrentItemData>k__BackingField: {fileID: 11400000, guid: 411951e96e274bf9a9f02216a1275d4b, type: 2}
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   holdPositionOffset: {x: 0, y: 0, z: 0}
   holdRotationOffset: {x: 0, y: 0, z: 0}
   holdScale: {x: 1, y: 1, z: 1}

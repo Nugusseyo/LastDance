@@ -148,6 +148,10 @@ namespace _Works.CJW.Scripts.Cars
         /// <summary>이번 물러서기를 포기하기까지의 시간(초). 교착을 풀 때는 짧게, 밖에서 거리를 정해 물러설 때는 그 거리만큼 넉넉히.</summary>
         private float _backoffLimit = BackoffTimeout;
 
+        /// <summary>밖에서 거리를 정해 건 물러서기(<see cref="BackOff"/>)인지. 이때는 핸들을 풀고 곧게, 정한 거리만큼 물러선다.
+        /// 경로를 향해 꺾으며 후진하면 뒤꽁무니가 반대쪽(대개 주유기 섬)으로 돌아가 NavMesh 끝에 닿고, 몇십 cm 만에 후진이 끊긴다.</summary>
+        private bool _straightBackoff;
+
         /// <summary>제자리 회전(N자 회전) 중인지와 그 상태. 앞뒤로 한 번 오갈 때마다 핸들을 반대로 꺾어 같은 쪽으로 돈다.</summary>
         private bool _turning;
         private Vector3 _turnGoal;
@@ -585,6 +589,7 @@ namespace _Works.CJW.Scripts.Cars
             _backoffTimer = 0f;
             _backoffLimit = distance / _reverseSpeed + 2f;
             _blockedTime = 0f;
+            _straightBackoff = true;
         }
 
         public void Stop()
@@ -733,6 +738,12 @@ namespace _Works.CJW.Scripts.Cars
 
                 if (IsReverseBlocked() || _backoffTimer > _backoffLimit)
                 {
+                    if (_straightBackoff && _backoffRemaining > 0.5f)
+                    {
+                        Debug.Log($"[CarSteering] {name}이(가) 물러서기를 {_backoffRemaining:F1}m 남기고 멈춥니다 " +
+                                  $"({(_backoffTimer > _backoffLimit ? "시간 초과" : "뒤가 막힘")}).", this);
+                    }
+
                     _backoffRemaining = 0f;
                 }
 
@@ -870,8 +881,9 @@ namespace _Works.CJW.Scripts.Cars
 
             // 후진 중에는 가고 싶은 방향의 반대로 꾫는다.
             // 속도가 음수라 yawRate = v·κ 의 부호가 뒤집히므로, 이래야 차머리가 목표 쪽으로 돌아온다.
+            // 밖에서 정한 물러서기는 곧게 물러선다. 계획(LeavingState)이 곧은 후진 거리로 뒤가 비었는지 쟀다.
             float curvatureTarget = _reversing
-                ? -CarSteeringSolver.DesiredCurvature(local, maxCurvature)
+                ? (_straightBackoff && _backoffRemaining > 0f ? 0f : -CarSteeringSolver.DesiredCurvature(local, maxCurvature))
                 : CarSteeringSolver.TargetCurvature(local, maxCurvature, MinTurnRadius);
 
             float steerTarget = CarSteeringSolver.CurvatureToSteer(curvatureTarget, _wheelBase);
@@ -893,7 +905,10 @@ namespace _Works.CJW.Scripts.Cars
             else if (_reversing)
             {
                 // 허용된 후진 거리 안에 멈춰야 하므로 남은 거리로 상한을 걸어둔다.
-                float room = Mathf.Max(_maxReverseDistance - _reverseTravelled, 0f);
+                // 밖에서 정한 물러서기는 그 거리가 상한이다. 각을 벌려고 하는 후진 한도(_maxReverseDistance)보다 길 수 있다.
+                float room = _straightBackoff && _backoffRemaining > 0f
+                    ? _backoffRemaining
+                    : Mathf.Max(_maxReverseDistance - _reverseTravelled, 0f);
                 vTarget = -Mathf.Min(_reverseSpeed, CarSteeringSolver.StopSpeedLimit(room, _brakeAccel));
             }
             else
@@ -1017,6 +1032,7 @@ namespace _Works.CJW.Scripts.Cars
             _backoffRemaining = _backoffDistance;
             _backoffTimer = 0f;
             _backoffLimit = BackoffTimeout;
+            _straightBackoff = false;
         }
 
         /// <summary>회전은 속도에 비례해서만(θ̇ = v·κ), 이동은 항상 정면으로만.</summary>
@@ -1042,6 +1058,18 @@ namespace _Works.CJW.Scripts.Cars
                                    _groundMask, QueryTriggerInteraction.Ignore)
                 ? hit.point.y
                 : fallback;
+        }
+
+        /// <summary>목적지 없이 멈춰 있는 동안(<see cref="Stop"/> 뒤) 밖에서 차를 옮긴다. 이 모듈의 틱은 목적지가 없으면 아무것도 안 하므로 서로 부딪치지 않는다.</summary>
+        public bool Glide(Vector3 position, Quaternion rotation, float speed)
+        {
+            position.y = GroundHeight(position, position.y - _rideHeight) + _rideHeight;
+            transform.SetPositionAndRotation(position, rotation);
+
+            // 바퀴 모듈이 이 값으로 바퀴를 굴린다.
+            _speed = speed;
+            _steer = 0f;
+            return true;
         }
 
         /// <summary>지금 자리의 바닥 높이에 맞춰 차를 올리거나 내린다. 스폰하거나 서 있다 출발할 때 한 번 맞춘다.</summary>

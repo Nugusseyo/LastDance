@@ -11,9 +11,9 @@ NavMeshProjectSettings:
     cost: 1
   - name: Jump
     cost: 2
-  - name: 
-    cost: 1
-  - name: 
+  - name: Offroad
+    cost: 10
+  - name: Road
     cost: 1
   - name: 
     cost: 1
@@ -109,7 +109,7 @@ NavMeshProjectSettings:
       m_Flags: 0
   - serializedVersion: 3
     agentTypeID: -334000983
-    agentRadius: 1.1
+    agentRadius: 1.2
     agentHeight: 1.6
     agentSlope: 30
     agentClimb: 0.3

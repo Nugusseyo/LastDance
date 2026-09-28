@@ -20,6 +20,10 @@ namespace _Works.JJH._02_Scripts.Objects
         [SerializeField] private int hoseSegments = 12;
         [SerializeField] private float hoseSlack = 0.4f;
 
+        [Header("Hose Snap")]
+        [SerializeField] private float maxHoseLength = 10f;
+        [SerializeField, Range(0.5f, 1f)] private float tensionStartRatio = 0.7f;
+
         public bool IsDetached { get; private set; }
 
         private FuelNozzle _activeNozzle;
@@ -32,10 +36,24 @@ namespace _Works.JJH._02_Scripts.Objects
 
         private void LateUpdate()
         {
-            if (!IsDetached || hoseLine == null || _activeNozzle == null)
+            if (!IsDetached)
                 return;
 
-            UpdateHose();
+            if (_activeNozzle == null)
+            {
+                ResetStation();
+                return;
+            }
+
+            if (GetHoseStart().Equals(default) == false &&
+                Vector3.Distance(GetHoseStart(), _activeNozzle.transform.position) > maxHoseLength)
+            {
+                SnapHose();
+                return;
+            }
+
+            if (hoseLine != null)
+                UpdateHose();
         }
 
         public FuelNozzle TryDetachNozzle()
@@ -61,14 +79,31 @@ namespace _Works.JJH._02_Scripts.Objects
                 return false;
 
             Destroy(targetNozzle.gameObject);
+            ResetStation();
 
+            return true;
+        }
+
+        private void SnapHose()
+        {
+            if (_activeNozzle != null)
+                Destroy(_activeNozzle.gameObject);
+
+            ResetStation();
+        }
+
+        private void ResetStation()
+        {
             _activeNozzle = null;
             IsDetached = false;
 
             SetVisual(true);
             SetHoseActive(false);
+        }
 
-            return true;
+        private Vector3 GetHoseStart()
+        {
+            return hoseStartPoint != null ? hoseStartPoint.position : transform.position;
         }
 
         private void SetVisual(bool attached)
@@ -87,14 +122,18 @@ namespace _Works.JJH._02_Scripts.Objects
 
             hoseLine.enabled = active;
 
-            if (active)
+            if (active && _activeNozzle != null)
                 UpdateHose();
         }
 
         private void UpdateHose()
         {
-            Vector3 start = hoseStartPoint != null ? hoseStartPoint.position : transform.position;
+            Vector3 start = GetHoseStart();
             Vector3 end = _activeNozzle.transform.position;
+
+            float ratio = Vector3.Distance(start, end) / maxHoseLength;
+            float tension = Mathf.InverseLerp(tensionStartRatio, 1f, ratio);
+            float slack = Mathf.Lerp(hoseSlack, 0f, tension);
 
             if (hoseLine.positionCount != hoseSegments)
                 hoseLine.positionCount = hoseSegments;
@@ -104,8 +143,7 @@ namespace _Works.JJH._02_Scripts.Objects
                 float t = i / (float)(hoseSegments - 1);
                 Vector3 point = Vector3.Lerp(start, end, t);
 
-                float sag = Mathf.Sin(t * Mathf.PI) * hoseSlack;
-                point.y -= sag;
+                point.y -= Mathf.Sin(t * Mathf.PI) * slack;
 
                 hoseLine.SetPosition(i, point);
             }

@@ -96,9 +96,13 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("말풍선 프리팹의 풀 아이템.")]
         [SerializeField] private PoolItemSO speechBubble;
 
-        [Tooltip("때릴 대상(차·자판기)을 찾아 다가가기 시작할 때 할 대사(HumanDB index) 후보. 비우면 말하지 않는다.\n" +
+        [Tooltip("때릴 대상(차·자판기)을 찾아 다가가기 시작할 때(speakOnArrival면 대상 앞에 도착했을 때) 할 대사(HumanDB index) 후보. 비우면 말하지 않는다.\n" +
                  "'아저씨 창문 내려봐요'처럼 대상에게 거는 말은 여기에 둔다 — 내리자마자 말하면 차가 없어도 허공에 대고 말한다.")]
         [SerializeField] private int[] targetLines;
+
+        [Tooltip("켜면 대상 앞에 도착한 뒤에 말한다. 끄면(기본) 대상을 찾아 걸어가기 시작할 때 말한다.\n" +
+                 "자판기 손님처럼 대상 앞에서 하는 말이면 켠다. 기본값을 false로 둔 건 이 필드가 없던 프리팹이 기존처럼 말하게 하기 위해서다.")]
+        [SerializeField] private bool speakOnArrival;
 
         [Tooltip("손님 기준으로 말풍선을 띄울 위치(m). 0이면 머리 위 기본 위치를 쓴다.")]
         [SerializeField] private Vector3 speechOffset;
@@ -158,7 +162,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                     // 대상이 생겼다. 이제부터는 진상이다. 대상에게 거는 말도 이때 한다.
                     _engaged = true;
                     Ctx.Harmless = false;
-                    SayTo(target, ct);
+                    if (!speakOnArrival)
+                    {
+                        SayTo(target, ct);
+                    }
 
                     if (!await Approach(target, ct))
                     {
@@ -176,6 +183,11 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                         }
 
                         return VisitOutcome.Blocked;
+                    }
+
+                    if (speakOnArrival)
+                    {
+                        SayTo(target, ct);
                     }
 
                     StrikeResult result = await Strike(target, hitCount == 0 ? int.MaxValue : hitCount - hits, ct);
@@ -446,7 +458,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             _spokenTo = null;
         }
 
-        /// <summary>새 대상에게 다가가기 시작할 때 한마디 한다. 말풍선은 걸어가며 머리 위를 따라다니다 대사가 끝나거나 이 행동이 끊기면 접힌다.</summary>
+        /// <summary>새 대상에게 다가가기 시작할 때(speakOnArrival면 도착했을 때) 한마디 한다. 말풍선은 걸어가며 머리 위를 따라다니다 대사가 끝나거나 이 행동이 끊기면 접힌다.</summary>
         private void SayTo(Transform target, CancellationToken ct)
         {
             if (target == _spokenTo)
