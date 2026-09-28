@@ -13,6 +13,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         public event Action OnThrowAttackKeyPressed;
         public event Action OnInteractKeyPressed;
         public event Action OnUseKeyPressed;
+        public event Action OnEscapePressed;
 
         public Vector2 MoveDirection { get; private set; }
         public Vector2 LookDirection { get; private set; }
@@ -100,6 +101,12 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         {
             if (context.performed)
                 OnUseKeyPressed?.Invoke();
+        }
+
+        public void OnExit(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+                OnEscapePressed?.Invoke();
         }
     }
 }
