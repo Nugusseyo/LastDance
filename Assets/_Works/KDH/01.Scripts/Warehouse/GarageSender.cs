@@ -20,7 +20,7 @@ namespace _Works.KDH._01.Scripts.Warehouse
         [SerializeField] private float playerSize = 0.6f;
         [SerializeField] private EventChannelSO moneyChannel;
         [SerializeField] private int garageCarPrice = 300;
-        [SerializeField, Range(0, 100)] private int quickScrapFeePercent = 30;
+        [SerializeField] private int wheelPrice = 50;
         [SerializeField] private float tiltPerWheel = 4f;
         [SerializeField] private float sinkPerWheel = 0.06f;
         [SerializeField] private float tiltSpeed = 2f;
@@ -32,6 +32,7 @@ namespace _Works.KDH._01.Scripts.Warehouse
         private float pitch;
         private float roll;
         private float sink;
+        private int removedWheelCount;
         private Vector3 carStartPosition;
 
         public GameObject GarageCar => garageCar;
@@ -60,10 +61,10 @@ namespace _Works.KDH._01.Scripts.Warehouse
 
             if (moneyChannel != null)
             {
-                moneyChannel.RaiseEvent(UIEvents.ScrapEvent.Init(garageCarPrice, 0, 0));
+                moneyChannel.RaiseEvent(UIEvents.ScrapEvent.Init(garageCarPrice, removedWheelCount, wheelPrice));
             }
 
-            Debug.Log($"[GarageSender] {garageCar.name}를 팔았어요.");
+            Debug.Log($"[GarageSender] {garageCar.name}를 팔았어요. 뺀 바퀴 {removedWheelCount}개");
             Destroy(garageCar);
             garageCar = null;
 
@@ -78,14 +79,12 @@ namespace _Works.KDH._01.Scripts.Warehouse
             string carName = car.GameObject.name;
             if (!car.Remove()) return false;
 
-            int price = garageCarPrice * (100 - quickScrapFeePercent) / 100;
-
             if (moneyChannel != null)
             {
-                moneyChannel.RaiseEvent(UIEvents.ScrapEvent.Init(price, 0, 0));
+                moneyChannel.RaiseEvent(UIEvents.ScrapEvent.Init(garageCarPrice, 0, wheelPrice));
             }
 
-            Debug.Log($"[GarageSender] {carName}를 빠른 폐차했어요. 수수료 {quickScrapFeePercent}% 떼고 {price}원");
+            Debug.Log($"[GarageSender] {carName}를 빠른 폐차했어요.");
             return true;
         }
 
@@ -133,6 +132,7 @@ namespace _Works.KDH._01.Scripts.Warehouse
             pitch = 0f;
             roll = 0f;
             sink = 0f;
+            removedWheelCount = 0;
 
             returnPosition = player.position;
             returnRotation = player.rotation;
@@ -194,6 +194,7 @@ namespace _Works.KDH._01.Scripts.Warehouse
             roll -= Mathf.Sign(wheelPosition.x) * tiltPerWheel;
             pitch += Mathf.Sign(wheelPosition.z) * tiltPerWheel;
             sink += sinkPerWheel;
+            removedWheelCount++;
         }
 
         private void TiltGarageCar()
