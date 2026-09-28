@@ -28051,6 +28051,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 81bbf941ed5945eaa67bb68af41bdc90, type: 2}
   - {fileID: 11400000, guid: d5899e3904b346758ff2a27a96fc7bee, type: 2}
   - {fileID: 11400000, guid: 056deb7bed5349e487362aee51feb08f, type: 2}
+  - {fileID: 11400000, guid: ba441ef0c06943c3b4ff8a98073baec7, type: 2}
   vendingPoint: {fileID: 1895226917}
   systemEvent: {fileID: 11400000, guid: d31e526d71d1b444f89007a57798b10f, type: 2}
 --- !u!4 &5514653542796558776
@@ -30245,6 +30246,52 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -9207399424902789746, guid: a4edc61ffd621714c88167493b0c8983, type: 3}
+--- !u!1 &812345601
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 812345602}
+  - component: {fileID: 812345603}
+  m_Layer: 0
+  m_Name: Money Doubler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &812345602
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812345601}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &812345603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812345601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f1bf4c16a6445982ca5d669c8ea651, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.ItemType.MoneyDoubler
+  buffChannel: {fileID: 11400000, guid: 5ca454320a311264a830e271fd884517, type: 2}
+  money: {fileID: 11400000, guid: e2d9677edeb7e28419dd3296b34645f6, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -30262,3 +30309,4 @@ SceneRoots:
   - {fileID: 177381920036566396}
   - {fileID: 1855426730}
   - {fileID: 644526372}
+  - {fileID: 812345602}
