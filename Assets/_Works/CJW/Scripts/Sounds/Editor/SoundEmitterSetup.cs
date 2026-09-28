@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Text;
 using _Works.CJW.Scripts.Cars;
+using _Works.CJW.Scripts.Customers;
+using _Works.CJW.Scripts.Customers.Editor;
 using DevLib.EventChannelSystem;
 using DevLib.ModuleSystem;
 using UnityEditor;
@@ -53,7 +55,10 @@ namespace _Works.CJW.Scripts.Sounds.Editor
 
                     if (root.GetComponentInChildren<SoundEmitterModule>(true) == null)
                     {
-                        SoundEmitterModule module = root.AddComponent<SoundEmitterModule>();
+                        // 손님은 모듈을 자식 오브젝트에 하나씩 둔다. 차는 루트에 그대로 붙인다.
+                        SoundEmitterModule module = root.GetComponent<AbstractCustomer>() != null
+                            ? CustomerModuleSlots.Add<SoundEmitterModule>(root)
+                            : root.AddComponent<SoundEmitterModule>();
                         var so = new SerializedObject(module);
                         so.FindProperty("soundChannel").objectReferenceValue = channel;
                         so.ApplyModifiedPropertiesWithoutUndo();

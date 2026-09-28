@@ -25,6 +25,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs.Attacks
             }
         }
 
+        public bool CanAttack => _currentAttack != null && _currentAttack.CanAttack;
+
         public void Attack()
         {
             _currentAttack?.Attack();

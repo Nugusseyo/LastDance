@@ -23,6 +23,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs.Attacks
 
         public bool IsOnCooldown => _cooldownTimer > 0f;
 
+        public override bool CanAttack => !IsOnCooldown;
+
         private void Update()
         {
             if (_cooldownTimer > 0f)

@@ -159,10 +159,17 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
                     }
 
                     // 조건은 매 실행 직전에 본다. 방문 중에 맵이 달라져도 따라간다.
+                    // 조건이 안 맞으면 그 행동이 정한 대신할 행동을 돌리고, 없으면 건너뛴다.
                     if (!state.CanRun())
                     {
-                        index++;
-                        continue;
+                        CustomerState fallback = state.WhenConditionFails;
+                        if (fallback == null)
+                        {
+                            index++;
+                            continue;
+                        }
+
+                        state = fallback;
                     }
 
                     RunResult result = await RunOne(state, outer);

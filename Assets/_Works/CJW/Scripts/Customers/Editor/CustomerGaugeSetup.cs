@@ -52,19 +52,12 @@ namespace _Works.CJW.Scripts.Customers.Editor
 
                     float headTop = HeadTop(root);
 
-                    if (root.GetComponentInChildren<CustomerPatienceModule>(true) == null)
-                    {
-                        root.AddComponent<CustomerPatienceModule>();
-                    }
+                    CustomerModuleSlots.GetOrAdd<CustomerPatienceModule>(root);
 
                     WorldGauge health = EnsureGauge(root, healthPrefab, new Vector3(0f, headTop + HealthAboveHead, 0f), 1f);
                     WorldGauge patience = EnsureGauge(root, patiencePrefab, new Vector3(0f, headTop + PatienceAboveHead, 0f), PatienceScale);
 
-                    CustomerGaugeModule view = root.GetComponentInChildren<CustomerGaugeModule>(true);
-                    if (view == null)
-                    {
-                        view = root.AddComponent<CustomerGaugeModule>();
-                    }
+                    CustomerGaugeModule view = CustomerModuleSlots.GetOrAdd<CustomerGaugeModule>(root);
 
                     var so = new SerializedObject(view);
                     so.FindProperty("healthGauge").objectReferenceValue = health;

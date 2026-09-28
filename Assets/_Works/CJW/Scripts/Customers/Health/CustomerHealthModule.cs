@@ -22,8 +22,15 @@ namespace _Works.CJW.Scripts.Customers.Health
         [SerializeField, Min(0f)] private float invincibleTime = 0.2f;
 
         [Header("죽음")]
-        [Tooltip("죽을 때 때린 세기와 상관없이 더하는 위쪽 속도(m/s).")]
+        [Tooltip("죽을 때 때린 세기와 상관없이 더하는 위쪽 세기(m/s). 아래 충격량 배율이 곱해진다.")]
         [SerializeField, Min(0f)] private float deathLaunchUp = 1.5f;
+
+        [Tooltip("죽을 때 맞은 자리에서 가장 가까운 뼈에 주는 충격량 = (때린 방향 × 세기 + 위쪽) × 이 값(N·s per m/s). " +
+                 "맞은 부위가 먼저 튕기고 나머지 몸은 관절에 끌려간다.")]
+        [SerializeField, Min(0f)] private float deathImpulse = 20f;
+
+        [Tooltip("맞은 자리의 높이(m). 공격이 어디에 맞았는지 알려 주지 않아서 이 높이의 몸 앞면을 맞은 자리로 본다.")]
+        [SerializeField, Min(0f)] private float hitHeight = 1.3f;
 
         [Tooltip("쓰러진 뒤 이 시간(초)이 지나면 사라진다.")]
         [SerializeField, Min(0f)] private float despawnDelay = 3f;
@@ -93,6 +100,9 @@ namespace _Works.CJW.Scripts.Customers.Health
 
             Damaged?.Invoke(hit);
 
+            // 연출을 먼저 튼다. 래그돌이 켜지기 전이어야 가슴 뼈 자리에서 피가 튀고, 몸이 물든 채로 쓰러진다.
+            _customer?.HitFeedback?.Play(hit, CurrentHealth <= 0f);
+
             if (CurrentHealth <= 0f)
             {
                 _customer?.Sound?.Play(deathSound);
@@ -123,8 +133,12 @@ namespace _Works.CJW.Scripts.Customers.Health
                 if (ragdoll != null)
                 {
                     Vector3 planar = new(hit.Direction.x, 0f, hit.Direction.z);
-                    Vector3 push = planar.sqrMagnitude > 0.0001f ? planar.normalized * hit.Force : Vector3.zero;
-                    ragdoll.Activate(push + Vector3.up * deathLaunchUp, stayDown: true);
+                    planar = planar.sqrMagnitude > 0.0001f ? planar.normalized : Vector3.zero;
+
+                    // 때린 쪽 몸 앞면을 맞은 자리로 본다. 그 자리에서 가장 가까운 뼈(대개 가슴)가 먼저 튕겨 나간다.
+                    Vector3 hitPoint = _customer.transform.position + Vector3.up * hitHeight - planar * 0.3f;
+                    Vector3 impulse = (planar * hit.Force + Vector3.up * deathLaunchUp) * deathImpulse;
+                    ragdoll.ActivateAt(hitPoint, impulse, stayDown: true);
                 }
                 else
                 {

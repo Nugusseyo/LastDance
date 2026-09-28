@@ -40,8 +40,8 @@ namespace _Works.CJW.Scripts.Customers.Editor
             }
 
             GameObject source = AssetDatabase.LoadAssetAtPath<GameObject>(SourcePrefab);
-            var sourceHealth = source != null ? source.GetComponent<CustomerHealthModule>() : null;
-            var sourceRagdoll = source != null ? source.GetComponent<RagdollModule>() : null;
+            var sourceHealth = CustomerModuleSlots.Find<CustomerHealthModule>(source);
+            var sourceRagdoll = CustomerModuleSlots.Find<RagdollModule>(source);
             if (sourceHealth == null || sourceRagdoll == null)
             {
                 Debug.LogError($"[CustomerHitSetup] 기준 프리팹 {SourcePrefab}에 체력·래그돌 모듈이 없습니다.");
@@ -54,7 +54,7 @@ namespace _Works.CJW.Scripts.Customers.Editor
                 .ToArray();
 
             GameObject actionSource = AssetDatabase.LoadAssetAtPath<GameObject>(ActionSourcePrefab);
-            var sourceAction = actionSource != null ? actionSource.GetComponent<ActionAnimatorModule>() : null;
+            var sourceAction = CustomerModuleSlots.Find<ActionAnimatorModule>(actionSource);
             if (sourceAction == null)
             {
                 Debug.LogError($"[CustomerHitSetup] {ActionSourcePrefab}에 연출 모듈이 없습니다.");
@@ -80,15 +80,15 @@ namespace _Works.CJW.Scripts.Customers.Editor
                     // 플레이어 공격은 Customer 레이어의 몸통(루트 콜라이더)만 찾는다. 래그돌 뼈 콜라이더는 쓰러졌을 때만 켜지므로 루트만 옮긴다.
                     root.layer = layer;
 
-                    if (root.GetComponent<RagdollModule>() == null)
+                    if (CustomerModuleSlots.Find<RagdollModule>(root) == null)
                     {
-                        EditorUtility.CopySerialized(sourceRagdoll, root.AddComponent<RagdollModule>());
+                        EditorUtility.CopySerialized(sourceRagdoll, CustomerModuleSlots.Add<RagdollModule>(root));
                     }
 
-                    CustomerHealthModule health = root.GetComponent<CustomerHealthModule>();
+                    CustomerHealthModule health = CustomerModuleSlots.Find<CustomerHealthModule>(root);
                     if (health == null)
                     {
-                        health = root.AddComponent<CustomerHealthModule>();
+                        health = CustomerModuleSlots.Add<CustomerHealthModule>(root);
                         EditorUtility.CopySerialized(sourceHealth, health);
                     }
 
@@ -98,9 +98,9 @@ namespace _Works.CJW.Scripts.Customers.Editor
 
                     // 피격 클립은 연출 모듈이 튼다. 없으면 맞아도 움찔하지 않는다.
                     // 다른 프리팹의 기반이 되는 프리팹에는 붙이지 않는다 — 이미 자기 연출 모듈을 가진 변형에 두 개가 겹친다.
-                    if (root.GetComponent<ActionAnimatorModule>() == null && !basePaths.Contains(path))
+                    if (CustomerModuleSlots.Find<ActionAnimatorModule>(root) == null && !basePaths.Contains(path))
                     {
-                        EditorUtility.CopySerialized(sourceAction, root.AddComponent<ActionAnimatorModule>());
+                        EditorUtility.CopySerialized(sourceAction, CustomerModuleSlots.Add<ActionAnimatorModule>(root));
                     }
 
                     PrefabUtility.SaveAsPrefabAsset(root, path);

@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 96793984887665266}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.4544582, y: 0, z: -0.22187543}
+  m_LocalPosition: {x: -2.5245857, y: 0, z: -0.22821474}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -58,8 +58,8 @@ Transform:
   m_GameObject: {fileID: 464136773919951070}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.1989903, y: 0.23793225, z: -1.8841109}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -1.2332473, y: 0.24473032, z: -1.9379427}
+  m_LocalScale: {x: 1.0285715, y: 1.0285715, z: 1.0285715}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1911718656584901117}
@@ -97,6 +97,60 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6dc32976058e7ad47a582e2060fd4454, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Objects.FuelDoor
+--- !u!1 &1107871945766519175
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2713377968882662626}
+  - component: {fileID: 625229558187540115}
+  m_Layer: 20
+  m_Name: Body 0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2713377968882662626
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1107871945766519175}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.058686156, y: 0.09997157, z: -0.51561236}
+  m_LocalScale: {x: 0.8399999, y: 0.8399999, z: 0.8399999}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1741120015974716698}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &625229558187540115
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1107871945766519175}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300024, guid: 3c83bf83fac09a648b2190d795ed1f43, type: 3}
 --- !u!1 &2145713592514969050
 GameObject:
   m_ObjectHideFlags: 0
@@ -143,6 +197,7 @@ Transform:
   - {fileID: 5710073132407415048}
   - {fileID: 8076870386851663097}
   - {fileID: 8767919060689151195}
+  - {fileID: 1741120015974716698}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7566554683054725042
@@ -163,8 +218,7 @@ MonoBehaviour:
   - {fileID: 5045294249316259818}
   dropOffPoint: {fileID: 8076870386851663097}
   parkingTurnSpeed: 180
-  bodyRenderers:
-  - {fileID: 6867710469039206289}
+  bodyRenderers: []
 --- !u!114 &4460671736979473927
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,10 +236,10 @@ MonoBehaviour:
   _arrivalRadius: 1
   _maxApproachRetries: 2
   _avoidancePriority: 0
-  _wheelBase: 1.6808743
+  _wheelBase: 1.7288995
   _maxSteerAngle: 40
   _steerRate: 140
-  _accel: 6
+  _accel: 10
   _brakeAccel: 7
   _maxLateralAccel: 5
   _lookaheadGain: 1
@@ -218,7 +272,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 2145713592514969050}
   m_Enabled: 1
   m_AgentTypeID: -334000983
-  m_Radius: 1.1894683
+  m_Radius: 1.2234532
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -227,7 +281,7 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 1.2645105
+  m_Height: 1.3006395
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
@@ -244,7 +298,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Cars.CarTrafficSensorModule
   footprint: {fileID: 0}
-  fallbackHalfSize: {x: 0.9440224, y: 2.2091491}
+  fallbackHalfSize: {x: 0.97099453, y: 2.2722678}
   laneMargin: 0.3
   enableBypass: 1
   bypassSideMargin: 0.5
@@ -326,7 +380,6 @@ MonoBehaviour:
   wheelLayerMask:
     serializedVersion: 2
     m_Bits: 0
-  walletEffect: {fileID: 0}
 --- !u!114 &1746627378147965625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,7 +468,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_LocalScale: {x: 0.72, y: 0.72, z: 0.72}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1911718656584901117}
@@ -461,7 +514,7 @@ Transform:
   m_GameObject: {fileID: 6268349461055723266}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.518657, y: 0, z: -0.3227279}
+  m_LocalPosition: {x: 0.5334759, y: 0, z: -0.3319487}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -492,12 +545,72 @@ Transform:
   m_GameObject: {fileID: 8054839624130459284}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.4757873, y: 0, z: -0.2689399}
+  m_LocalPosition: {x: -0.48938125, y: 0, z: -0.27662393}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1911718656584901117}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8301433014097882396
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1741120015974716698}
+  - component: {fileID: 1773538992063721565}
+  m_Layer: 20
+  m_Name: PlayerBlocker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1741120015974716698
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8301433014097882396}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.857143, y: 0.857143, z: 0.857143}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2713377968882662626}
+  m_Father: {fileID: 1911718656584901117}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &1773538992063721565
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8301433014097882396}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &6867710469041502193
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -528,19 +641,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 21eccd1df4cce0b42b03ae31b91a2882, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.7
+      value: 0.72
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 21eccd1df4cce0b42b03ae31b91a2882, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.7
+      value: 0.72
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 21eccd1df4cce0b42b03ae31b91a2882, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.7
+      value: 0.72
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 21eccd1df4cce0b42b03ae31b91a2882, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.048905134
+      value: 0.050302427
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 21eccd1df4cce0b42b03ae31b91a2882, type: 3}
       propertyPath: m_LocalPosition.y
@@ -548,7 +661,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 21eccd1df4cce0b42b03ae31b91a2882, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.429677
+      value: -0.4419535
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 21eccd1df4cce0b42b03ae31b91a2882, type: 3}
       propertyPath: m_LocalRotation.w
@@ -619,11 +732,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 6387257977330459085}
   m_SourcePrefab: {fileID: 100100000, guid: 21eccd1df4cce0b42b03ae31b91a2882, type: 3}
---- !u!23 &6867710469039206289 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 2300000, guid: 21eccd1df4cce0b42b03ae31b91a2882, type: 3}
-  m_PrefabInstance: {fileID: 6867710469041502193}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6867710469041467733 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100004, guid: 21eccd1df4cce0b42b03ae31b91a2882, type: 3}
@@ -711,6 +819,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
+  holdPositionOffset: {x: 0, y: 0, z: 0}
+  holdRotationOffset: {x: 0, y: 0, z: 0}
+  holdScale: {x: 1, y: 1, z: 1}
   UseEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -801,6 +912,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
+  holdPositionOffset: {x: 0, y: 0, z: 0}
+  holdRotationOffset: {x: 0, y: 0, z: 0}
+  holdScale: {x: 1, y: 1, z: 1}
   UseEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -891,6 +1005,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
+  holdPositionOffset: {x: 0, y: 0, z: 0}
+  holdRotationOffset: {x: 0, y: 0, z: 0}
+  holdScale: {x: 1, y: 1, z: 1}
   UseEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -981,6 +1098,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
+  holdPositionOffset: {x: 0, y: 0, z: 0}
+  holdRotationOffset: {x: 0, y: 0, z: 0}
+  holdScale: {x: 1, y: 1, z: 1}
   UseEvent:
     m_PersistentCalls:
       m_Calls: []
