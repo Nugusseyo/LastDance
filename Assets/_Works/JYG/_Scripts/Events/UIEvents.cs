@@ -9,9 +9,15 @@ namespace _Works.JYG._Scripts.Events
         public static readonly DurationEvent DurationEvent = new DurationEvent();
         
         public static readonly ReviewEvent ReviewEvent = new ReviewEvent();
+        public static readonly ReviewBlockEvent ReviewBlockEvent = new ReviewBlockEvent();
+        public static readonly ReviewBuffEvent  ReviewBuffEvent = new ReviewBuffEvent();
         
         public static readonly RefuelingEvent RefuelingEvent = new RefuelingEvent();
         public static readonly ScrapEvent ScrapEvent = new ScrapEvent();
+        
+        public static readonly MessageEvent MessageEvent = new MessageEvent();
+        
+        public static readonly BuffEvent BuffEvent = new BuffEvent();
     }
 
     #region GaugeEvents
@@ -54,6 +60,28 @@ namespace _Works.JYG._Scripts.Events
             return this;
         }
     }
+
+    public class ReviewBlockEvent : GameEvent //리뷰가 깎이지 않는 기간
+    {
+        public float BlockDuration { get; set; }
+
+        public ReviewBlockEvent Init(float blockDuration)
+        {
+            BlockDuration = blockDuration;
+            return this;
+        }
+    }
+
+    public class ReviewBuffEvent : GameEvent
+    {
+        public float Duration { get; set; }
+
+        public ReviewBuffEvent Init(float duration)
+        {
+            Duration = duration;
+            return this;
+        }
+    }
     
     #endregion
     
@@ -83,6 +111,46 @@ namespace _Works.JYG._Scripts.Events
             WheelPrice = wheelPrice;
             return this;
         }
+    }
+    
+    #endregion
+    
+    #region Message
+
+    public class MessageEvent : GameEvent
+    {
+        public string Message { get; set; }
+        public MessageEvent Init(string message)
+        {
+            Message = message;
+            return this;
+        }
+    }
+    
+    #endregion
+    
+    #region BuffEvent
+
+    public class BuffEvent : GameEvent
+    {
+        public BuffType BuffType { get; set; }
+        public float Duration { get; set; }
+
+        public BuffEvent Init(BuffType type, float duration)
+        {
+            BuffType = type;
+            Duration = duration;
+            return this;
+        }
+    }
+
+    public enum BuffType
+    {
+        None,
+        Energy,
+        Coke,
+        Cider,
+        Wallet
     }
     
     #endregion

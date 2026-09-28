@@ -32,6 +32,12 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 return VisitOutcome.Failed;
             }
 
+            // 차에서 내리는 사이에 플레이어가 이미 주유를 끝냈다. 주유기로 걸어갈 이유가 없다.
+            if (IsCarFueled)
+            {
+                return Fueled();
+            }
+
             Vector3 originPos = customer.transform.position;
             MapPosition mapPos;
 
@@ -50,7 +56,23 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
             try
             {
-                VisitOutcome outcome = await MoveAndWait(mapPos.Position, timeout, ct);
+                // 걸어가는 도중에 주유가 끝날 수 있다. 그러면 그 자리에서 멈추고 주유를 받은 것으로 친다.
+                VisitOutcome outcome;
+                using (CancellationTokenSource moveCts = CancellationTokenSource.CreateLinkedTokenSource(ct))
+                {
+                    (bool arrivedFirst, VisitOutcome moved) = await UniTask.WhenAny(
+                        MoveAndWait(mapPos.Position, timeout, moveCts.Token),
+                        UniTask.WaitUntil(() => IsCarFueled, cancellationToken: moveCts.Token));
+                    moveCts.Cancel();
+
+                    if (!arrivedFirst)
+                    {
+                        customer.Mover?.Stop();
+                        return Fueled();
+                    }
+
+                    outcome = moved;
+                }
 
                 // 주유기에 닿지 못했으면 주유를 기다릴 이유가 없다. 이동 결과를 그대로 넘긴다.
                 if (outcome != VisitOutcome.Done)
@@ -77,6 +99,17 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             }
         }
 
+        /// <summary>방문이 이 차의 주유 완료를 기록했는지. 세션이 방문 내내 주유구를 듣고 있어, 손님이 언제 기다리기 시작하든 놓치지 않는다.</summary>
+        private bool IsCarFueled => Ctx.Visit != null && Ctx.Visit.CarFueled;
+
+        /// <summary>주유를 받았다. 주유를 요구하던 말풍선도 이제 할 말이 없으니 접는다.</summary>
+        private VisitOutcome Fueled()
+        {
+            Ctx.EndSpeech();
+            Ctx.Visit?.ReportFueled(Ctx.Customer);
+            return VisitOutcome.Done;
+        }
+
         /// <summary>플레이어가 이 차의 주유를 마칠 때까지 기다린다. <see cref="FuelDoor.OnFuelingCompleted"/>가 유일한 끝 신호다 — 중간에 손을 떼면 계속 기다린다.
         private async UniTask<VisitOutcome> WaitForFuelingEnded(FuelDoor fuelDoor, CancellationToken ct)
         {
@@ -90,7 +123,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 float start = Time.time;
                 bool lateReported = false;
 
-                while (!ended)
+                // 세션이 먼저 들은 완료도 본다. 방문 컨텍스트가 없는 테스트에서는 주유구 신호만으로 끝난다.
+                while (!ended && !IsCarFueled)
                 {
                     float waited = Time.time - start;
 
@@ -114,8 +148,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                     await UniTask.Yield(PlayerLoopTiming.Update, ct);
                 }
 
-                Ctx.Visit?.ReportFueled(Ctx.Customer);
-                return VisitOutcome.Done;
+                return Fueled();
             }
             finally
             {

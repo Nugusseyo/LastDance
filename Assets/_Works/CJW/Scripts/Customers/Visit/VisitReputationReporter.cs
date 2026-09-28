@@ -37,17 +37,22 @@ namespace _Works.CJW.Scripts.Customers.Visit
         [Tooltip("ReviewManager가 듣는 이벤트 채널.")]
         [SerializeField] private EventChannelSO reviewChannel;
 
-        [Header("평판 변화량")]
-        [Tooltip("주유를 해 줬을 때.")]
-        [SerializeField] private int fueled = 2;
-        [Tooltip("주유가 너무 늦어졌을 때.")]
-        [SerializeField] private int fuelLate = -1;
-        [Tooltip("진상(HumanType.Bad)을 퇴치했을 때.")]
-        [SerializeField] private int badDefeated = 5;
-        [Tooltip("진상을 퇴치하지 못하고 방문이 끝났을 때.")]
-        [SerializeField] private int badMissed = -3;
-        [Tooltip("일반인(HumanType.Good)을 때렸을 때. 한 대마다.")]
-        [SerializeField] private int goodHit = -3;
+        // 평판이 얼마나 오르내리는지는 ReviewManager가 리뷰 종류(Good/Bad/Late)로 정한다. 여기서는 무엇을 알릴지만 고른다.
+        // 이벤트의 숫자는 변화량이 아니라 ReviewDB의 리뷰 글 index다 — 없는 index(음수 등)를 보내면 리뷰 UI가 예외를 던진다.
+        [Header("알릴 일")]
+        [Tooltip("주유를 해 줬을 때 (좋은 리뷰).")]
+        [SerializeField] private bool reportFueled = true;
+        [Tooltip("주유가 너무 늦어졌을 때 (늦음 리뷰).")]
+        [SerializeField] private bool reportFuelLate = true;
+        [Tooltip("진상(HumanType.Bad)을 퇴치했을 때 (좋은 리뷰).")]
+        [SerializeField] private bool reportBadDefeated = true;
+        [Tooltip("진상을 퇴치하지 못하고 방문이 끝났을 때 (나쁜 리뷰).")]
+        [SerializeField] private bool reportBadMissed = true;
+        [Tooltip("일반인(HumanType.Good)을 때렸을 때, 한 대마다 (나쁜 리뷰).")]
+        [SerializeField] private bool reportGoodHit = true;
+
+        [Tooltip("손님이 아무 대사도 하지 않았을 때 쓸 리뷰 글 index(ReviewDB).")]
+        [SerializeField, Min(1)] private int fallbackReviewIndex = 1;
 
         private readonly Dictionary<VisitSession, SessionHooks> _sessions = new();
 
@@ -80,8 +85,8 @@ namespace _Works.CJW.Scripts.Customers.Visit
         private void OnVisitStarted(VisitSession session)
         {
             var hooks = new SessionHooks();
-            hooks.OnFueled = _ => Raise(fueled, ReviewType.Good);
-            hooks.OnFuelLate = _ => Raise(fuelLate, ReviewType.Late);
+            hooks.OnFueled = customer => Raise(reportFueled, ReviewType.Good, customer);
+            hooks.OnFuelLate = customer => Raise(reportFuelLate, ReviewType.Late, customer);
             hooks.OnCompleted = OnVisitCompleted;
 
             session.Fueled += hooks.OnFueled;
@@ -118,7 +123,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             // 다른 손님이 때린 건(싸움꾼 등) 플레이어 탓이 아니다.
             if (tracked.Customer.HumanType == HumanType.Good && !IsFromCustomer(hit))
             {
-                Raise(goodHit, ReviewType.Bad);
+                Raise(reportGoodHit, ReviewType.Bad, tracked.Customer);
             }
         }
 
@@ -126,7 +131,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
         {
             if (tracked.Customer.HumanType == HumanType.Bad)
             {
-                Raise(badDefeated, ReviewType.Good);
+                Raise(reportBadDefeated, ReviewType.Good, tracked.Customer);
             }
 
             // 죽은 손님은 방문에서 빠져 잠시 뒤 풀로 돌아간다. 다른 방문에 다시 나오기 전에 구독을 푼다.
@@ -146,7 +151,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 Tracked tracked = hooks.Customers[i];
                 if (!tracked.Defeated && tracked.Customer != null && tracked.Customer.HumanType == HumanType.Bad)
                 {
-                    Raise(badMissed, ReviewType.Bad);
+                    Raise(reportBadMissed, ReviewType.Bad, tracked.Customer);
                 }
             }
 
@@ -183,14 +188,21 @@ namespace _Works.CJW.Scripts.Customers.Visit
             return hit.Attacker != null && hit.Attacker.GetComponentInParent<AbstractCustomer>() != null;
         }
 
-        private void Raise(int amount, ReviewType type)
+        private void Raise(bool report, ReviewType type, AbstractCustomer customer)
         {
-            if (amount == 0 || reviewChannel == null)
+            if (!report || reviewChannel == null)
             {
                 return;
             }
 
-            reviewChannel.RaiseEvent(UIEvents.ReviewEvent.Review(amount, type));
+            reviewChannel.RaiseEvent(UIEvents.ReviewEvent.Review(ReviewIndexOf(customer), type));
+        }
+
+        /// <summary>리뷰 글은 손님이 한 대사와 같은 index를 쓴다(HumanDB와 ReviewDB가 번호를 맞춰 둠). 말하지 않은 손님은 기본 글.</summary>
+        private int ReviewIndexOf(AbstractCustomer customer)
+        {
+            int line = customer != null && customer.Fsm != null && customer.Fsm.Context != null ? customer.Fsm.Context.LineIndex : 0;
+            return line > 0 ? line : fallbackReviewIndex;
         }
     }
 }

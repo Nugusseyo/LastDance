@@ -57,6 +57,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>Leaving 전용. 앞차에 막힌 채 마지막 경적 뒤로 기다린 시간(초).</summary>
         public float LeaveHonkElapsed;
 
+        /// <summary>Leaving 전용. 서 있는 앞차에 막혀 제자리인 채 마지막 탈출 계획 뒤로 흐른 시간(초).</summary>
+        public float LeaveEscapeElapsed;
+
         /// <summary>손님이 다른 차를 훔치러 나섰는지. 이때부터 방문은 출발·퇴치 요청을 받지 않고 손님이 떠나기를 기다린다.</summary>
         public bool Abandoning;
 
@@ -72,9 +75,34 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>손님이 주유를 너무 오래 기다렸다. 한 번 기다림에 한 번만 온다.</summary>
         public event Action<AbstractCustomer> FuelLate;
 
-        public void ReportFueled(AbstractCustomer customer) => Fueled?.Invoke(customer);
+        /// <summary>이 방문의 차가 주유를 다 받았는지. 손님이 주유기에 닿기 전에 주유가 끝나도 놓치지 않도록 신호 대신 이 값을 본다.</summary>
+        public bool CarFueled;
 
-        public void ReportFuelLate(AbstractCustomer customer) => FuelLate?.Invoke(customer);
+        public void ReportFueled(AbstractCustomer customer) => Raise(Fueled, customer);
+
+        public void ReportFuelLate(AbstractCustomer customer) => Raise(FuelLate, customer);
+
+        /// <summary>듣는 쪽(평판·UI)이 예외를 던져도 알린 손님의 행동까지 끊기지 않게 여기서 받아 남긴다.
+        /// 그대로 흘리면 주유를 기다리던 상태가 예외로 끝나, 그 뒤 주유를 해 줘도 아무도 듣지 않는다.</summary>
+        private static void Raise(Action<AbstractCustomer> handlers, AbstractCustomer customer)
+        {
+            if (handlers == null)
+            {
+                return;
+            }
+
+            foreach (Delegate handler in handlers.GetInvocationList())
+            {
+                try
+                {
+                    ((Action<AbstractCustomer>)handler).Invoke(customer);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
+            }
+        }
 
         /// <summary>단계가 바뀔 때마다 진행 상태만 되돌린다. 방문 전체 값(차·지점)은 건드리지 않는다.</summary>
         public void ResetPhaseProgress()
@@ -90,6 +118,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             LeaveStallElapsed = 0f;
             LeaveRestarts = 0;
             LeaveHonkElapsed = 0f;
+            LeaveEscapeElapsed = 0f;
         }
 
         public void Clear()
@@ -99,6 +128,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             Abandoning = false;
             AbandonDone = false;
             StolenCar = null;
+            CarFueled = false;
             ResetPhaseProgress();
         }
     }

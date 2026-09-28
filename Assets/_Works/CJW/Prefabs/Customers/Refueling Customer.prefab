@@ -19,7 +19,8 @@ GameObject:
   - component: {fileID: 5903309322208164130}
   - component: {fileID: 8176693654625810345}
   - component: {fileID: 1744576071038305074}
-  m_Layer: 0
+  - component: {fileID: 3564926923994221906}
+  m_Layer: 19
   m_Name: Refueling Customer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -248,6 +249,8 @@ MonoBehaviour:
   deathLaunchUp: 1.5
   despawnDelay: 3
   poolManager: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
+  hitClip: {fileID: 11400000, guid: c819ca92aeda640408631732998c6201, type: 2}
+  hitDuration: 0.6
   fightBack: 1
   damagedSound: {fileID: 11400000, guid: a4e1202c4a7640d4baa4db68977c3335, type: 2}
   deathSound: {fileID: 0}
@@ -277,6 +280,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Appearance.CustomerAppearanceModule
   lookSet: {fileID: 11400000, guid: b141f1b7c7aac4c45a959e747d19de1f, type: 2}
+--- !u!114 &3564926923994221906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1374554424783394349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f0442a68545331448e4cf10fe62183f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.Animation.ActionAnimatorModule
+  crossFade: 0.1
+  exitClip: {fileID: 11400000, guid: 4aa00dabdbbb49f284c98aa9587ac5ff, type: 2}
 --- !u!1 &4592436310506188908
 GameObject:
   m_ObjectHideFlags: 0

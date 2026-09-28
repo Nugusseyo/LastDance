@@ -213,6 +213,14 @@ namespace _Works.CJW.Scripts.Customers.Movement
             _movedSinceCheck = 0f;
             _stuckTime = 0f;
 
+            // 연출(맞는 동작 등)이 화면을 잡고 있으면 서기 클립으로 덮지 않는다. 같은 프레임에 둘을 걸면 연출이 씹힌다.
+            // 연출이 끝나면 매 프레임 갱신이 알아서 서기를 다시 튼다.
+            if (_action != null && _action.IsPlaying)
+            {
+                _playingClip = 0;
+                return;
+            }
+
             PlayClip(idleClip);
         }
 

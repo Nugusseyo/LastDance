@@ -51,12 +51,14 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
                     humanDBs.Add(data.type, new List<(int, HumanData)>());              //List가 존재하지 않아 새로 만든다.
                     humanDBs[data.type].Add((data.index, data));                        //데이터를 안에 넣어준다.
                 }
-                Debug.Log($"Added Data : {data.type}, {data.index}, {data.contents1}");
+                //Debug.Log($"Added Data : {data.type}, {data.index}, {data.contents1}");
             }
         }
 
         public void InitializeBubble(HumanType humanType, int index)   //버블을 소환하고싶으면 해당 함수를 호출해라.
         {
+            _ended = false;
+
             if (tmp == null)
             {
                 Debug.LogError("말풍선의 tmp가 지정되지 않아 Initialize가 불가능합니다. 취소 됨.");
@@ -125,11 +127,18 @@ namespace _Works.JYG._Scripts.UI.SpeechBubble
         }
 
         //대사를 띄우지 못했을 때도 기다리는 쪽이 멈추지 않도록 끝났다고 알리고 풀로 돌아간다.
-        private void EndSpeech()
+        //말하던 손님의 요구가 풀리거나 손님이 사라지면 밖에서도 불러 대사를 바로 접는다. 이미 접혔으면 아무것도 하지 않는다.
+        public void EndSpeech()
         {
+            if (_ended)
+                return;
+
+            _ended = true;
             OnSpeechEnd?.Invoke();
             poolManager.Push(this);
         }
+
+        private bool _ended;
 
         private void OnDisable()
         {

@@ -2,7 +2,9 @@
 using _Works.JJH._02_Scripts.Objects;
 using _Works.KDH._01.Scripts.Car;
 using _Works.KDH._01.Scripts.Wrench;
+using DevLib.EventChannelSystem;
 using DevLib.ModuleSystem;
+using DevLib.SoundSystem;
 using UnityEngine;
 
 namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
@@ -25,6 +27,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
         [Header("Fuel")]
         [SerializeField] private FuelInjector fuelInjector;
+
+        [Header("Sound")]
+        [SerializeField] private EventChannelSO soundChannel;
+        [SerializeField] private SoundClipSo drinkSfx;
 
         private Player _player;
 
@@ -52,6 +58,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                 return;
 
             CurrentItem.UseItem();
+
+            soundChannel.RaiseEvent(SoundEvents.PlaySoundEvent.Init(transform.position, drinkSfx, 0, null));
         }
 
         public void PickupItem()
@@ -176,7 +184,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             item.SetGrabState();
 
             CurrentGrabObject.transform.SetParent(weaponHoldPoint, true);
-            CurrentGrabObject.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            CurrentGrabObject.transform.SetLocalPositionAndRotation(item.HoldPositionOffset, item.HoldRotationOffset);
+            CurrentGrabObject.transform.localScale = item.HoldScale;
 
             ApplyWeaponSpeedModifier(item);
         }
@@ -199,6 +208,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             currentItemTransform.SetParent(null);
             currentItemTransform.SetPositionAndRotation(itemPosition, itemRotation);
 
+            CurrentItem.RestoreOriginalScale();
             CurrentItem.SetPhysicsState();
 
             EquipItem(item);
@@ -210,6 +220,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                 return;
 
             CurrentItem.transform.SetParent(null);
+            CurrentItem.RestoreOriginalScale();
             CurrentItem.SetPhysicsState();
 
             CurrentItem = null;
@@ -221,7 +232,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
         public void ClearCurrentItem()
         {
             if (CurrentItem != null)
+            {
+                CurrentItem.RestoreOriginalScale();
                 CurrentItem.SetPhysicsState();
+            }
 
             CurrentItem = null;
             CurrentGrabObject = null;
@@ -253,6 +267,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                 if (!station.TryAttachNozzle(nozzle))
                     return false;
 
+                CurrentItem.RestoreOriginalScale();
                 CurrentItem = null;
                 CurrentGrabObject = null;
                 ResetWeaponSpeedModifier();
@@ -266,6 +281,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             if (!partDetacher.TryAttachWheel(CurrentItem, _player.Camera.CameraTrans))
                 return false;
 
+            CurrentItem.RestoreOriginalScale();
             CurrentItem = null;
             CurrentGrabObject = null;
             ResetWeaponSpeedModifier();
