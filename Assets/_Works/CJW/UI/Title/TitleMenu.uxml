@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/_Works/CJW/UI/Title/TitleMenu.uss" />
+    <ui:VisualElement name="root" class="title-root">
+        <ui:Label name="game-title" text="주유소!" class="game-title" />
+        <ui:VisualElement name="menu" class="menu">
+            <ui:Button name="start-button" text="Start" class="menu-button" />
+            <ui:Button name="setting-button" text="Setting" class="menu-button" />
+            <ui:Button name="exit-button" text="Exit" class="menu-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

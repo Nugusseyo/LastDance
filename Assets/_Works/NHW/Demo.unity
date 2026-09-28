@@ -2030,7 +2030,7 @@ Transform:
   m_GameObject: {fileID: 317757387}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.28, y: 0, z: 11.46}
+  m_LocalPosition: {x: -2.21, y: 0, z: 7.63}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11700,7 +11700,7 @@ Transform:
   m_GameObject: {fileID: 1599816411}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.43, y: 0, z: -24.65}
+  m_LocalPosition: {x: -0.1, y: 0, z: -23.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13640,6 +13640,7 @@ MonoBehaviour:
   approachDistance: 9
   approachClearRadius: 1.2
   occupiedSlotRadius: 2
+  slotLeaveDistance: 5.5
   approachCorridorExtra: 9
   allowBackIn: 0
   spawnInterval: 8
@@ -13648,7 +13649,7 @@ MonoBehaviour:
   autoDepartSeconds: 60
   passingTraffic: 1
   passingInterval: {x: 1, y: 2}
-  enterChance: 0.6
+  enterChance: 0.805
   passingLanes: 2
   passingLaneSpacing: 4
   maxPassingCars: 20

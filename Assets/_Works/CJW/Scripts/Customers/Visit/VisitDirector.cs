@@ -18,6 +18,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
         private sealed class ActiveVisit
         {
             public VisitSession Session;
+            /// <summary>빌린 주차 자리. 떠나는 차가 자리를 벗어나 먼저 돌려줬으면 null이다.</summary>
             public RentableMapPosition Slot;
             public float WaitTimer;
         }
@@ -62,6 +63,10 @@ namespace _Works.CJW.Scripts.Customers.Visit
         [Tooltip("이미 다른 방문이 빌린 자리가 진입 직선에서 이 거리(m) 안에 있으면 막힌 자리로 본다. " +
                  "그 차가 아직 도착 전이어도 곧 그 자리에 선다. 차 반길이 정도로 둔다.")]
         [SerializeField, Min(0f)] private float occupiedSlotRadius = 2f;
+
+        [Tooltip("떠나는 차가 자리 중심에서 이만큼(m) 멀어지면 자리를 돌려준다. 퇴장길에서 막혀 있어도 빈자리에는 다음 차가 들어온다.\n" +
+                 "자리 반길이(2.3m)와 차 반길이(약 2.5m)를 더한 것보다 커야 차 몸체가 자리를 벗어난 뒤에 돌려준다. 0이면 퇴장이 끝날 때 돌려준다.")]
+        [SerializeField, Min(0f)] private float slotLeaveDistance = 5.5f;
 
         [Tooltip("진입점까지 오는 길도 같은 줄 앞쪽 자리를 지난다. 진입점에서 이만큼(m) 더 바깥까지 빌린 자리가 있는지 본다.")]
         [SerializeField, Min(0f)] private float approachCorridorExtra = 9f;
@@ -256,6 +261,39 @@ namespace _Works.CJW.Scripts.Customers.Visit
         {
             TickSpawn(dt);
             TickAutoDeparture(dt);
+            TickSlotRelease();
+        }
+
+        /// <summary>떠나는 차가 자리를 벗어나면 방문이 끝나기 전에 자리를 돌려준다. 퇴장 지점에 닿아야 돌려주면
+        /// 퇴장길에서 앞차에 막힌 동안(최대 수 분) 빈자리를 붙들고 있어 다음 차가 못 들어온다.</summary>
+        private void TickSlotRelease()
+        {
+            if (slotLeaveDistance <= 0f)
+            {
+                return;
+            }
+
+            for (int i = 0; i < _activeVisits.Count; i++)
+            {
+                ActiveVisit visit = _activeVisits[i];
+                Car car = visit.Session.Car;
+
+                // 버려진 차는 자리에 남아 계속 차지하니 퇴장하는 차만 본다.
+                if (visit.Slot == null || visit.Session.Phase != VisitPhase.Leaving || car == null)
+                {
+                    continue;
+                }
+
+                Vector3 delta = car.transform.position - visit.Slot.Position;
+                delta.y = 0f;
+                if (delta.sqrMagnitude < slotLeaveDistance * slotLeaveDistance)
+                {
+                    continue;
+                }
+
+                mapData.ReleaseParkingSlot(visit.Slot);
+                visit.Slot = null;
+            }
         }
 
         /// <summary>틱마다 스폰할 수 있는지 확인한다.</summary>
@@ -1178,9 +1216,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
                     car.SetRemover(ClearAbandonedCar);
                     AbandonedCarCountChanged?.Invoke(_abandonedCars.Count);
                 }
-                else
+                else if (_activeVisits[i].Slot != null)
                 {
-                    // 빌린 자리는 반드시 짝을 맞춰 돌려준다.
+                    // 빌린 자리는 반드시 짝을 맞춰 돌려준다. 떠나며 자리를 벗어났을 때 이미 돌려줬으면 null이다.
                     mapData.ReleaseParkingSlot(_activeVisits[i].Slot);
                 }
 
@@ -1209,7 +1247,10 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 }
 
                 car.SetRemover(null);
-                mapData.ReleaseParkingSlot(_abandonedCars[i].Slot);
+                if (_abandonedCars[i].Slot != null)
+                {
+                    mapData.ReleaseParkingSlot(_abandonedCars[i].Slot);
+                }
                 poolManager.Push(car);
                 _abandonedCars.RemoveAt(i);
                 AbandonedCarCountChanged?.Invoke(_abandonedCars.Count);
