@@ -41,6 +41,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
         /// <summary>이 행동이 주유를 원하는지. 한 차에 주유 손님을 하나만 태우려고 차를 채울 때 프리팹의 행동을 훑어 판단한다.</summary>
         public virtual bool WantsFuel => false;
 
+        /// <summary>이 행동이 진상 짓을 시작하는 순간을 스스로 알리는지(<see cref="VisitContext.ReportMisconduct"/>).
+        /// 그런 손님은 그 순간에만 평판이 깎이고, 방문이 끝날 때 '진상을 놓침'으로 다시 깎이지 않는다.</summary>
+        public virtual bool ReportsMisconduct => false;
+
         /// <summary>방문 시작 시 호출. 인스턴스가 재사용되므로 진행값을 들고 있다면 여기서 되돌린다.</summary>
         public virtual void Reset() { }
 
