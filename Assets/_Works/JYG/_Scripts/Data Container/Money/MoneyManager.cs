@@ -89,10 +89,10 @@ namespace _Works.JYG._Scripts.Data_Container.Money
                                    + evt.DisassembledWheel
                                    * (evt.WheelPrice * _scrapItem.value.Value);
 
-                int AssembledWheel = 4 - evt.DisassembledWheel;
-                if (AssembledWheel > 0)
+                int assembledWheel = 4 - evt.DisassembledWheel;
+                if (assembledWheel > 0)
                 {
-                    finalValue += evt.WheelPrice * (1 - _quickScrapItem.value.Value) * AssembledWheel;
+                    finalValue += evt.WheelPrice * (1 - _quickScrapItem.value.Value) * assembledWheel;
                 }
                 
                 moneyContainer.Value += Mathf.RoundToInt(finalValue * multiplier);

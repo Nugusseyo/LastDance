@@ -16,3 +16,4 @@ MonoBehaviour:
   vendingItemSprite: {fileID: 21300000, guid: c7ad659b120f3f24d914f3a26c1b87e6, type: 3}
   price: 100000
   itemSO: {fileID: 11400000, guid: e405049591786824f921ca80e564d24f, type: 2}
+  tooltipData: {fileID: 11400000, guid: 3d0a47412f694df46acc59944c8ac6b3, type: 2}

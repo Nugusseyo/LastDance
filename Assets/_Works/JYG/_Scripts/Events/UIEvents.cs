@@ -1,5 +1,6 @@
 using DevLib.EventChannelSystem;
 using Resources.DataBase.Review_Data;
+using UnityEngine;
 
 namespace _Works.JYG._Scripts.Events
 {
@@ -19,6 +20,9 @@ namespace _Works.JYG._Scripts.Events
         public static readonly MessageEvent MessageEvent = new MessageEvent();
         
         public static readonly BuffEvent BuffEvent = new BuffEvent();
+
+        public static readonly TooltipEvent TooltipEvent = new TooltipEvent();
+        public static readonly TipMoveEvent TipMoveEvent = new TipMoveEvent();
     }
 
     #region GaugeEvents
@@ -163,6 +167,37 @@ namespace _Works.JYG._Scripts.Events
         Coke,
         Cider,
         Wallet
+    }
+    
+    #endregion
+    
+    #region TooltipEvent
+
+    public class TooltipEvent : GameEvent
+    {
+        public string ItemName { get; set; }
+        public string Content { get; set; }
+        public bool Active { get; set; }
+
+        public TooltipEvent Init(string itemName, string content, bool active)
+        {
+            ItemName = itemName;
+            Content = content;
+            Active = active;
+
+            return this;
+        }
+    }
+
+    public class TipMoveEvent : GameEvent
+    {
+        public Vector2 Position;
+
+        public TipMoveEvent Init(Vector2 pos)
+        {
+            Position = pos;
+            return this;
+        }
     }
     
     #endregion
