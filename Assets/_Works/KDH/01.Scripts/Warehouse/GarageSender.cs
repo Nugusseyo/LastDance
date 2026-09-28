@@ -1,3 +1,4 @@
+using _Works.KDH._01.Scripts.Car;
 using _Works.Shared.Cars;
 using UnityEngine;
 using UnityEngine.AI;
@@ -10,8 +11,8 @@ namespace _Works.KDH._01.Scripts.Warehouse
         [SerializeField] private Transform player;
         [SerializeField] private Transform teleportPoint;
         [SerializeField] private Transform carPoint;
-        [SerializeField] private float lookDistance = 6f;
-        [SerializeField, Range(0f, 1f)] private float aimDotThreshold = 0.6f;
+        [SerializeField] private float lookDistance = 4f;
+        [SerializeField] private float carPadding = 0.5f;
 
         private Camera playerCamera;
 
@@ -88,19 +89,15 @@ namespace _Works.KDH._01.Scripts.Warehouse
 
             PutOnFloor(copy);
 
+            BoxCollider wall = copy.AddComponent<BoxCollider>();
+            CarWallMaker.AddBoxLikeCar(wall, copy.transform, 0.2f);
+
             return copy;
         }
 
         private void PutOnFloor(GameObject car)
         {
-            Renderer[] renderers = car.GetComponentsInChildren<Renderer>();
-            if (renderers.Length == 0) return;
-
-            Bounds bounds = renderers[0].bounds;
-            foreach (Renderer carRenderer in renderers)
-            {
-                bounds.Encapsulate(carRenderer.bounds);
-            }
+            Bounds bounds = GetCarBounds(car);
 
             Vector3 rayStart = carPoint.position + Vector3.up * 1.5f;
             if (!Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, 10f, ~0, QueryTriggerInteraction.Ignore)) return;
@@ -117,29 +114,40 @@ namespace _Works.KDH._01.Scripts.Warehouse
                 if (playerCamera == null) return null;
             }
 
-            Vector3 eyePosition = playerCamera.transform.position;
-            Vector3 lookDirection = playerCamera.transform.forward;
+            Ray lookRay = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
 
-            IRemovableCar bestCar = null;
-            float bestDot = aimDotThreshold;
+            IRemovableCar closestCar = null;
+            float closestDistance = lookDistance;
 
             foreach (MonoBehaviour script in FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None))
             {
                 if (script is not IRemovableCar car) continue;
 
-                Vector3 toCar = car.GameObject.transform.position - eyePosition;
-                if (toCar.sqrMagnitude > lookDistance * lookDistance) continue;
+                Bounds carBounds = GetCarBounds(car.GameObject);
+                carBounds.Expand(carPadding);
 
-                float dot = Vector3.Dot(lookDirection, toCar.normalized);
-
-                if (dot > bestDot)
+                if (carBounds.IntersectRay(lookRay, out float distance) && distance <= closestDistance)
                 {
-                    bestDot = dot;
-                    bestCar = car;
+                    closestDistance = distance;
+                    closestCar = car;
                 }
             }
 
-            return bestCar;
+            return closestCar;
+        }
+
+        private Bounds GetCarBounds(GameObject car)
+        {
+            Renderer[] renderers = car.GetComponentsInChildren<Renderer>();
+            if (renderers.Length == 0) return new Bounds(car.transform.position, Vector3.one * 2f);
+
+            Bounds bounds = renderers[0].bounds;
+            foreach (Renderer carRenderer in renderers)
+            {
+                bounds.Encapsulate(carRenderer.bounds);
+            }
+
+            return bounds;
         }
 
         private void TeleportPlayer()
