@@ -283,6 +283,16 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
             }
             else if (TryFindPassLane(context.Car, blocker, context.ExitPoint, out Vector3 passFrom, out Vector3 passTo))
             {
+                // 나란한 직선은 앞차 옆으로 몇 m 비킨 곳에서 시작한다. 시작점이 코앞이면 그 옆 거리를 틀 앞쪽 거리가 모자라
+                // 차가 앞차·주유기 쪽으로 휘어 들어가 선다. 시작점까지 달릴 거리가 PassRunUp이 되도록 더 물러선다.
+                Vector3 carForward = context.Car.transform.forward;
+                carForward.y = 0f;
+                float runUp = Vector3.Dot(passFrom - context.Car.transform.position, carForward.normalized);
+                if (room > 0f && PassRunUp - runUp > backOff)
+                {
+                    backOff = Mathf.Min(PassRunUp - runUp, room);
+                }
+
                 // 앞차 옆 틈으로 곧장 퇴장 지점을 겨누면 NavMesh 경로가 앞차 모서리에 바짝 붙어 꺾이고, 조향이 그 모서리를
                 // 더 깎아 교통 센서가 앞차를 막는 차로 잡고 선다. 앞차 옆을 나란히 지나는 직선을 따라가게 한다.
                 context.DepartPoint = passTo;
@@ -376,8 +386,11 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
         /// <summary>앞차 중심까지 이만큼(m)은 떨어져야 앞차 옆으로 돌아 나갈 각이 나온다. 8m 간격 줄에서 1m만 물러서면 앞차 옆구리에 다시 걸렸다.</summary>
         private const float PassGap = 11f;
 
-        /// <summary>물러설 때 뒤에 비어 있어야 하는 최대 거리(m).</summary>
-        private const float MaxBackOff = 6f;
+        /// <summary>물러설 때 뒤에 비어 있어야 하는 최대 거리(m). 앞차와 6m 간격으로 붙은 줄(Demo)에서 나란히 지나기 달릴 거리까지 벌리려면 10m는 필요하다.</summary>
+        private const float MaxBackOff = 10f;
+
+        /// <summary>앞차 옆을 나란히 지나는 직선의 시작점까지 앞으로 달릴 거리(m). 옆으로 3m쯤 비키려면 이만큼은 있어야 앞차·주유기를 긁지 않고 틀 수 있다.</summary>
+        private const float PassRunUp = 8f;
 
         /// <summary>뒤로 얼마나 물러설 수 있는지. 뒤 범퍼 뒤로 차가 있으면 그 앞까지만.</summary>
         private static bool CanReverse(Car car, out float room)
