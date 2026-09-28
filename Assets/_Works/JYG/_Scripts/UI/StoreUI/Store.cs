@@ -44,6 +44,11 @@ namespace _Works.JYG._Scripts.UI.StoreUI
              
              LoadListInitialize();  // 저장된 LoadList 값을 불러온다.
              InitializeBlock();
+             //ApplyBlockData();
+         }
+
+         private void Start()
+         {
              ApplyBlockData();
          }
 

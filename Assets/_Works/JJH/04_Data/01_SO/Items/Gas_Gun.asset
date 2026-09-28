@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21db5cb4169cb0c4fb0bc8e8086b8afc, type: 3}
   m_Name: Gas_Gun
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.WeaponItemSO
-  <Damage>k__BackingField: 15
+  <Damage>k__BackingField: 1
   <AttackCooltime>k__BackingField: 1.2
   <MoveSpeedMultiplier>k__BackingField: 0
