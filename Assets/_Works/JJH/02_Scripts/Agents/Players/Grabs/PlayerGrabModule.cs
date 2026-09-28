@@ -42,11 +42,13 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
             _player = (Player)owner;
         }
 
-        // F키를 누르고 있는 동안 부품 분리·주유 게이지를 진행시킨다. 부르는 곳이 없으면 시작만 되고 게이지가 멈춰 있다.
         private void Update()
         {
             if (_player == null)
                 return;
+
+            if (!ReferenceEquals(CurrentItem, null) && CurrentItem == null)
+                ClearCurrentItem();
 
             UpdateDetachHold();
             UpdateFuelHold();
@@ -332,7 +334,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
             bool holding = _player.PlayerInput != null && _player.PlayerInput.IsInteractHeld;
 
-            if (!holding)
+            if (!holding || !(CurrentItem is FuelNozzle))
             {
                 fuelInjector.CancelFueling();
                 return;
