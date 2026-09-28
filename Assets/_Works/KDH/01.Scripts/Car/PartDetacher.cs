@@ -20,7 +20,8 @@ namespace _Works.KDH._01.Scripts.Car
         [SerializeField] private float popForce = 5f;
         [SerializeField] private float upForce = 3f;
         [SerializeField] private float collapseTiltAngle = 5f;
-        [SerializeField] private float collapseDuration = 0.15f;
+        [SerializeField] private float collapseDropDistance = 0.1f;
+        [SerializeField] private float collapseDuration = 0.3f;
         [SerializeField] private float pickupDistance = 4f;
 
         [Header("Detach Time / UI")]
@@ -139,31 +140,35 @@ namespace _Works.KDH._01.Scripts.Car
             Vector3 startPos = car.position;
             Quaternion startRot = car.rotation;
 
-            float groundY = startPos.y;
-
-            Vector3 groundProbe = new Vector3(wheelDropPoint.x, startPos.y + 3f, wheelDropPoint.z);
-
-            if (Physics.Raycast(groundProbe, Vector3.down, out RaycastHit groundHit, 10f, groundLayerMask))
-                groundY = groundHit.point.y;
-
-            Vector3 endPos = new Vector3(startPos.x, Mathf.Min(startPos.y, groundY), startPos.z);
+            Vector3 endPos = startPos + Vector3.down * collapseDropDistance;
             Quaternion endRot = startRot * Quaternion.AngleAxis(collapseTiltAngle, tiltAxis);
+
+            Rigidbody carRigidbody = car.GetComponent<Rigidbody>();
+            if (carRigidbody != null)
+            {
+                carRigidbody.linearVelocity = Vector3.zero;
+                carRigidbody.angularVelocity = Vector3.zero;
+                carRigidbody.isKinematic = true;
+            }
 
             float time = 0f;
 
             while (time < collapseDuration)
             {
                 time += Time.deltaTime;
-                float progress = time / collapseDuration;
+                float progress = Mathf.Clamp01(time / collapseDuration);
+                float eased = 1f - (1f - progress) * (1f - progress); // ease-out
 
-                car.position = Vector3.Lerp(startPos, endPos, progress);
-                car.rotation = Quaternion.Slerp(startRot, endRot, progress);
+                car.position = Vector3.Lerp(startPos, endPos, eased);
+                car.rotation = Quaternion.Slerp(startRot, endRot, eased);
 
                 yield return null;
             }
 
             car.position = endPos;
             car.rotation = endRot;
+
+            _collapseCoroutine = null;
         }
 
         private IEnumerator RestoreCarRoutine(Transform car, float targetHeight)
@@ -185,7 +190,7 @@ namespace _Works.KDH._01.Scripts.Car
             while (time < collapseDuration)
             {
                 time += Time.deltaTime;
-                float progress = time / collapseDuration;
+                float progress = Mathf.Clamp01(time / collapseDuration);
 
                 car.position = Vector3.Lerp(startPosition, targetPosition, progress);
                 car.rotation = Quaternion.Slerp(startRotation, targetRotation, progress);
@@ -246,30 +251,9 @@ namespace _Works.KDH._01.Scripts.Car
             bool isWheel = IsWheel(partObject);
             Vector3 wheelDropPoint = partObject.transform.position;
 
-            if (isWheel && !_wheelSockets.ContainsKey(partObject))
-            {
-                _wheelSockets[partObject] = new WheelSocket
-                {
-                    parent = car,
-                    localPosition = partObject.transform.localPosition,
-                    localRotation = partObject.transform.localRotation,
-                    carHeight = car.position.y
-                };
-            }
+            Destroy(partObject);
 
-            partObject.transform.SetParent(null);
-
-            part.SetPhysicsState();
-
-            Vector3 outward = partObject.transform.position - car.position;
-            outward.y = 0f;
-
-            if (outward.sqrMagnitude > 0.001f)
-                outward.Normalize();
-
-            part.AddForce(outward * popForce + Vector3.up * upForce, ForceMode.VelocityChange);
-
-            if (isWheel)
+            if (isWheel && car != null)
                 CollapseCar(car, wheelDropPoint);
         }
 
