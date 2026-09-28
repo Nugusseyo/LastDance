@@ -1,5 +1,4 @@
 using UnityEngine;
-using _Works.KDH._01.Scripts.ItemType;
 
 namespace _Works.KDH._01.Scripts.Car
 {
@@ -7,7 +6,6 @@ namespace _Works.KDH._01.Scripts.Car
     {
 
         [SerializeField] private int defaultPrice = 50;
-        [SerializeField] private WalletEffect walletEffect;
 
 
         public int SellPart(GameObject part)
@@ -18,11 +16,6 @@ namespace _Works.KDH._01.Scripts.Car
             }
 
             int price = GetPartPrice(part);
-
-            if (walletEffect != null && walletEffect.IsMoneyDoubled)
-            {
-                price *= 2;
-            }
 
             Destroy(part);
 
