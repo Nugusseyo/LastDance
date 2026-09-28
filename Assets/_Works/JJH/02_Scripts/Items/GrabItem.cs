@@ -1,5 +1,6 @@
 ﻿using _Works.JJH._02_Scripts.Agents.Modules;
 using _Works.Shared.Combat;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -18,6 +19,11 @@ namespace _Works.JJH._02_Scripts.Items
         [SerializeField] private Vector3 holdRotationOffset;
         [SerializeField] private Vector3 holdScale = Vector3.one;
 
+        [Header("Release")]
+        [SerializeField] private float minIgnoreTime = 0.2f;   // 최소 충돌 무시 시간
+        [SerializeField] private float maxIgnoreTime = 2f;     // 겹침이 안 풀려도 이 시간 뒤엔 복구
+        [SerializeField] private float maxDepenetrationVelocity = 1f;
+
         public UnityEvent UseEvent;
 
         public Vector3 HoldPositionOffset => holdPositionOffset;
@@ -28,7 +34,7 @@ namespace _Works.JJH._02_Scripts.Items
         private int _throwDamage;
 
         private Rigidbody _rigidbody;
-        private Collider _collider;
+        private Collider[] _colliders;
 
         private Vector3 _originalLocalScale;
         private bool _hasStoredScale;
@@ -36,9 +42,20 @@ namespace _Works.JJH._02_Scripts.Items
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
-            _collider = GetComponent<Collider>();
+            _colliders = GetComponentsInChildren<Collider>(true);
+
+            _rigidbody.maxDepenetrationVelocity = maxDepenetrationVelocity;
 
             SetKinematicState();
+        }
+
+        private void SetTrigger(bool isTrigger)
+        {
+            foreach (Collider col in _colliders)
+            {
+                if (col != null)
+                    col.isTrigger = isTrigger;
+            }
         }
 
         public void UseItem()
@@ -59,7 +76,7 @@ namespace _Works.JJH._02_Scripts.Items
 
             _rigidbody.isKinematic = true;
             _rigidbody.useGravity = false;
-            _collider.isTrigger = true;
+            SetTrigger(true);
 
             IsThrown = false;
         }
@@ -68,7 +85,7 @@ namespace _Works.JJH._02_Scripts.Items
         {
             _rigidbody.isKinematic = false;
             _rigidbody.useGravity = true;
-            _collider.isTrigger = false;
+            SetTrigger(false);
         }
 
         public void SetKinematicState()
@@ -78,9 +95,69 @@ namespace _Works.JJH._02_Scripts.Items
 
             _rigidbody.isKinematic = true;
             _rigidbody.useGravity = false;
-            _collider.isTrigger = false;
+            SetTrigger(false);
 
             IsThrown = false;
+        }
+
+        // 겹친 콜라이더들과 충돌을 무시한 채 물리를 켠다. 겹침이 풀리면 충돌을 복구한다.
+        public void ReleaseIgnoring(Collider[] ignoreColliders)
+        {
+            SetPhysicsState();
+
+            if (ignoreColliders == null || ignoreColliders.Length == 0)
+                return;
+
+            StartCoroutine(IgnoreCollisionRoutine(ignoreColliders));
+        }
+
+        private IEnumerator IgnoreCollisionRoutine(Collider[] others)
+        {
+            SetIgnore(others, true);
+
+            float elapsed = 0f;
+            while (elapsed < maxIgnoreTime)
+            {
+                elapsed += Time.deltaTime;
+
+                if (elapsed >= minIgnoreTime && !IsOverlapping(others))
+                    break;
+
+                yield return null;
+            }
+
+            SetIgnore(others, false);
+        }
+
+        private bool IsOverlapping(Collider[] others)
+        {
+            foreach (Collider mine in _colliders)
+            {
+                if (mine == null) continue;
+
+                foreach (Collider other in others)
+                {
+                    if (other == null) continue;
+                    if (mine.bounds.Intersects(other.bounds))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void SetIgnore(Collider[] others, bool ignore)
+        {
+            foreach (Collider mine in _colliders)
+            {
+                if (mine == null) continue;
+
+                foreach (Collider other in others)
+                {
+                    if (other == null) continue;
+                    Physics.IgnoreCollision(mine, other, ignore);
+                }
+            }
         }
 
         public void StopPhysics()

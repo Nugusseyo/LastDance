@@ -1,7 +1,9 @@
+using CustomerCar = _Works.CJW.Scripts.Cars.Car;
 using _Works.JYG._Scripts.Events;
 using _Works.KDH._01.Scripts.Car;
 using _Works.Shared.Cars;
 using DevLib.EventChannelSystem;
+using Resources.DataBase.Human_Data;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -18,6 +20,7 @@ namespace _Works.KDH._01.Scripts.Warehouse
         [SerializeField] private float playerSize = 0.6f;
         [SerializeField] private EventChannelSO moneyChannel;
         [SerializeField] private int garageCarPrice = 300;
+        [SerializeField, Range(0, 100)] private int quickScrapFeePercent = 30;
         [SerializeField] private float tiltPerWheel = 4f;
         [SerializeField] private float sinkPerWheel = 0.06f;
         [SerializeField] private float tiltSpeed = 2f;
@@ -29,6 +32,7 @@ namespace _Works.KDH._01.Scripts.Warehouse
         private float pitch;
         private float roll;
         private float sink;
+        private Vector3 carStartPosition;
 
         public GameObject GarageCar => garageCar;
 
@@ -43,9 +47,10 @@ namespace _Works.KDH._01.Scripts.Warehouse
                 SendToGarage(FindLookingCar());
             }
 
-            if (Keyboard.current.eKey.wasPressedThisFrame && IsLookingAt(garageCar))
+            if (Keyboard.current.eKey.wasPressedThisFrame)
             {
-                SellGarageCar();
+                if (IsLookingAt(garageCar)) SellGarageCar();
+                else QuickScrap(FindLookingCar());
             }
         }
 
@@ -65,6 +70,34 @@ namespace _Works.KDH._01.Scripts.Warehouse
             MovePlayer(returnPosition, returnRotation);
         }
 
+        public bool QuickScrap(IRemovableCar car)
+        {
+            if (car == null || !car.CanRemove) return false;
+            if (!IsBadCar(car)) return false;
+
+            string carName = car.GameObject.name;
+            if (!car.Remove()) return false;
+
+            int price = garageCarPrice * (100 - quickScrapFeePercent) / 100;
+
+            if (moneyChannel != null)
+            {
+                moneyChannel.RaiseEvent(UIEvents.ScrapEvent.Init(price, 0, 0));
+            }
+
+            Debug.Log($"[GarageSender] {carName}를 빠른 폐차했어요. 수수료 {quickScrapFeePercent}% 떼고 {price}원");
+            return true;
+        }
+
+        private bool IsBadCar(IRemovableCar car)
+        {
+            CustomerCar customerCar = car.GameObject.GetComponent<CustomerCar>();
+            if (customerCar != null && customerCar.HumanType == HumanType.Bad) return true;
+
+            Debug.Log($"[GarageSender] {car.GameObject.name}는 정상 손님 차라서 폐차 못 해요.");
+            return false;
+        }
+
         public bool SendToGarage(IRemovableCar car)
         {
             if (car == null)
@@ -78,6 +111,8 @@ namespace _Works.KDH._01.Scripts.Warehouse
                 Debug.Log($"[GarageSender] {car.GameObject.name}는 아직 버려진 차가 아니라서 못 보내요.");
                 return false;
             }
+
+            if (!IsBadCar(car)) return false;
 
             if (garageCar != null)
             {
@@ -94,6 +129,7 @@ namespace _Works.KDH._01.Scripts.Warehouse
             }
 
             garageCar = newCar;
+            carStartPosition = newCar.transform.position;
             pitch = 0f;
             roll = 0f;
             sink = 0f;
@@ -165,7 +201,7 @@ namespace _Works.KDH._01.Scripts.Warehouse
             if (garageCar == null) return;
 
             Quaternion targetRotation = carPoint.rotation * Quaternion.Euler(pitch, 0f, roll);
-            Vector3 targetPosition = carPoint.position + Vector3.down * sink;
+            Vector3 targetPosition = carStartPosition + Vector3.down * sink;
 
             float step = tiltSpeed * Time.deltaTime;
             garageCar.transform.rotation = Quaternion.Slerp(garageCar.transform.rotation, targetRotation, step);
