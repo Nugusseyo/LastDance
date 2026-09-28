@@ -426,8 +426,6 @@ MonoBehaviour:
   - {fileID: 1774772620037930216}
   dropOffPoint: {fileID: 4856318237269258848}
   parkingTurnSpeed: 180
-  bodyRenderers:
-  - {fileID: 2171761606320563786}
 --- !u!114 &471449907095769015
 MonoBehaviour:
   m_ObjectHideFlags: 0

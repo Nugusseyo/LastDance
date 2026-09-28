@@ -100,7 +100,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
                 return;
             }
 
-            // 주유구는 뒷바퀴 바로 위라 바퀴(부품)와 겹친다. 두 레이어를 한 번에 쏴서 실제로 조준한 쪽을 고른다.
             LayerMask fuelDoorMask = fuelInjector != null ? fuelInjector.FuelDoorLayerMask : (LayerMask)0;
             if (fuelInjector != null && partDetacher != null
               && _player.Sensor.FindItem(_player.Camera.CameraTrans, partDetacher.PartLayerMask | fuelDoorMask,
@@ -141,6 +140,12 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
 
                 if (station == null)
                     return;
+
+                if (station.IsDetached)
+                {
+                    station.ForceResetNozzle();
+                    return;
+                }
 
                 FuelNozzle nozzle = station.TryDetachNozzle();
 

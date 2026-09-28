@@ -480,7 +480,8 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return null;
             }
 
-            PoolItemSO visual = PickVisual(carData);
+            CarDataSO visualData = PickVisual(carData);
+            PoolItemSO visual = visualData.PoolItem;
             Car car = poolManager.Pop<Car>(visual);
             if (car == null)
             {
@@ -499,6 +500,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 mapData.ReleaseParkingSlot(slot);
                 return null;
             }
+
+            // 손님 체력은 눈에 보이는 차의 등급을 따른다. randomVisual 차는 행동 등급(Low)이 아니라 빌려 온 겉모습의 등급.
+            ApplyGradeHealth(visualData.Grade);
 
             // 한 차에는 한쪽 손님만 탄다. 차만 보고도 정상/진상 차를 알 수 있게 넘겨 둔다.
             car.SetHumanType(_carHumanType);
@@ -569,17 +573,31 @@ namespace _Works.CJW.Scripts.Customers.Visit
         private readonly List<CarDataSO> _visualGradeBuffer = new();
         private Func<CarGrade, bool> _hasVisualCandidate;
 
-        /// <summary>이 방문에 쓸 차 겉모습(풀 항목). randomVisual인 차는 등급 있는 차들의 겉모습 중에서
+        /// <summary>이번 차에 태운 손님들의 최대 체력을 등급 표에서 정한다. 표가 없거나 등급이 없으면 프리팹 체력 그대로.</summary>
+        private void ApplyGradeHealth(CarGrade grade)
+        {
+            if (carGradeTable == null || !carGradeTable.TryGetCustomerHealth(grade, out float health))
+            {
+                return;
+            }
+
+            for (int i = 0; i < _spawnBuffer.Count; i++)
+            {
+                _spawnBuffer[i].Health?.SetMaxHealth(health);
+            }
+        }
+
+        /// <summary>이 방문에 쓸 차 겉모습을 가진 차 데이터. randomVisual인 차는 등급 있는 차들의 겉모습 중에서
         /// 평판으로 등급을 뽑고 그 안에서 spawnWeight로 고른다. 동시 대수 제한은 행동(CarDataSO) 기준이라 여기서는 보지 않는다.</summary>
-        private PoolItemSO PickVisual(CarDataSO carData)
+        private CarDataSO PickVisual(CarDataSO carData)
         {
             if (!carData.RandomVisual)
             {
-                return carData.PoolItem;
+                return carData;
             }
 
             CarDataSO picked = PickGradedCar();
-            return picked != null ? picked.PoolItem : carData.PoolItem;
+            return picked != null && picked.PoolItem != null ? picked : carData;
         }
 
         /// <summary>등급 있는 차 중에서 평판으로 등급을 뽑고 그 안에서 spawnWeight로 하나 고른다.

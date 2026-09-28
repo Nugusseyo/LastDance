@@ -171,7 +171,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -326,7 +326,6 @@ MonoBehaviour:
   - {fileID: 6640510013437676620}
   dropOffPoint: {fileID: 4338414241114106963}
   parkingTurnSpeed: 180
-  bodyRenderers: []
 --- !u!114 &2989793685568333686
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -433,22 +432,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Cars.CarWheelModule
   wheels:
-  - transform: {fileID: 0}
-    spinAxis: {x: 1, y: 0, z: 0}
-    steerAxis: {x: 0, y: 1, z: 0}
-    steer: 1
-    radius: 0
-  - transform: {fileID: 0}
-    spinAxis: {x: 1, y: 0, z: 0}
-    steerAxis: {x: 0, y: 1, z: 0}
-    steer: 1
-    radius: 0
-  - transform: {fileID: 0}
+  - transform: {fileID: 2518208902002992262}
     spinAxis: {x: 1, y: 0, z: 0}
     steerAxis: {x: 0, y: 1, z: 0}
     steer: 0
     radius: 0
-  - transform: {fileID: 0}
+  - transform: {fileID: 8907125884283708589}
+    spinAxis: {x: 1, y: 0, z: 0}
+    steerAxis: {x: 0, y: 1, z: 0}
+    steer: 1
+    radius: 0
+  - transform: {fileID: 2332004772987236509}
+    spinAxis: {x: 1, y: 0, z: 0}
+    steerAxis: {x: 0, y: 1, z: 0}
+    steer: 1
+    radius: 0
+  - transform: {fileID: 4429034660119043894}
     spinAxis: {x: 1, y: 0, z: 0}
     steerAxis: {x: 0, y: 1, z: 0}
     steer: 0
@@ -726,7 +725,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -963,7 +962,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -1231,7 +1230,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0

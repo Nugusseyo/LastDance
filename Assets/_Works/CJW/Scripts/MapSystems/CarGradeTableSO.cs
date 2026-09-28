@@ -16,17 +16,35 @@ namespace _Works.CJW.Scripts.MapSystems
             [Tooltip("평판이 이 값 이상이면 해금된다.")]
             public int unlockReputation;
             [Min(0f)] public float weight;
+            [Tooltip("이 등급 차에서 내린 손님의 최대 체력.")]
+            [Min(1f)] public float customerHealth = 1f;
         }
 
         [SerializeField] private Entry[] entries =
         {
-            new Entry { grade = CarGrade.Low, unlockReputation = 0, weight = 11f },
-            new Entry { grade = CarGrade.Mid, unlockReputation = 35, weight = 7f },
-            new Entry { grade = CarGrade.High, unlockReputation = 75, weight = 6f },
-            new Entry { grade = CarGrade.Super, unlockReputation = 120, weight = 5f },
+            new Entry { grade = CarGrade.Low, unlockReputation = 0, weight = 11f, customerHealth = 3f },
+            new Entry { grade = CarGrade.Mid, unlockReputation = 35, weight = 7f, customerHealth = 5f },
+            new Entry { grade = CarGrade.High, unlockReputation = 75, weight = 6f, customerHealth = 10f },
+            new Entry { grade = CarGrade.Super, unlockReputation = 120, weight = 5f, customerHealth = 30f },
         };
 
         private readonly List<Entry> _pickBuffer = new();
+
+        /// <summary>그 등급 차에서 내린 손님의 최대 체력. 표에 없는 등급이면 false.</summary>
+        public bool TryGetCustomerHealth(CarGrade grade, out float health)
+        {
+            for (int i = 0; i < entries.Length; i++)
+            {
+                if (entries[i] != null && entries[i].grade == grade)
+                {
+                    health = entries[i].customerHealth;
+                    return true;
+                }
+            }
+
+            health = 0f;
+            return false;
+        }
 
         /// <summary>해금됐고 뽑을 차가 있는 등급 중에서 가중치로 하나 고른다. 고를 등급이 없으면 false.</summary>
         public bool TryPickGrade(int reputation, Func<CarGrade, bool> hasCandidate, out CarGrade grade)
