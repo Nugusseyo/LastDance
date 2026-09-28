@@ -123,34 +123,36 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
         }
 
         /// <summary>시퀀스 어딘가에서 주유를 원하는지. 초기화 전에도 직렬화된 값만 보므로 프리팹 에셋에 바로 물어볼 수 있다.</summary>
-        public bool WantsFuel
+        public bool WantsFuel => AnyState(state => state.WantsFuel);
+
+        /// <summary>시퀀스 어딘가의 행동이 진상 짓을 시작하는 순간을 스스로 알리는지. 평판은 그 순간에 깎고 방문 끝에 다시 깎지 않는다.</summary>
+        public bool ReportsMisconduct => AnyState(state => state.ReportsMisconduct);
+
+        private bool AnyState(Predicate<CustomerState> match)
         {
-            get
+            if (sequences == null)
             {
-                if (sequences == null)
-                {
-                    return false;
-                }
-
-                for (int i = 0; i < sequences.Length; i++)
-                {
-                    CustomerState[] states = sequences[i]?.States;
-                    if (states == null)
-                    {
-                        continue;
-                    }
-
-                    for (int j = 0; j < states.Length; j++)
-                    {
-                        if (states[j] != null && states[j].WantsFuel)
-                        {
-                            return true;
-                        }
-                    }
-                }
-
                 return false;
             }
+
+            for (int i = 0; i < sequences.Length; i++)
+            {
+                CustomerState[] states = sequences[i]?.States;
+                if (states == null)
+                {
+                    continue;
+                }
+
+                for (int j = 0; j < states.Length; j++)
+                {
+                    if (states[j] != null && match(states[j]))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         /// <summary>방문 시작. VisitSession.Begin이 손님마다 호출한다.</summary>

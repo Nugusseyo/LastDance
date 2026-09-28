@@ -1454,7 +1454,7 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: adb24c813d9376e49975f5762bc13bf4, type: 2}
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: managedReferences[4377106815191875678].standoff
-      value: 1.2
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: managedReferences[4377106815191875679].duration

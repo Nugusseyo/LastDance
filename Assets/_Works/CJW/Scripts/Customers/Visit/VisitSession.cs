@@ -78,6 +78,13 @@ namespace _Works.CJW.Scripts.Customers.Visit
             remove => _context.FuelLate -= value;
         }
 
+        /// <summary>이 방문의 손님이 진상 짓을 시작했다.</summary>
+        public event Action<AbstractCustomer> Misconduct
+        {
+            add => _context.Misconduct += value;
+            remove => _context.Misconduct -= value;
+        }
+
         public VisitSession()
         {
             // None과 Completed는 틱이 없는 경계 단계라 상태 객체를 두지 않는다.
@@ -89,7 +96,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
             // 컨텍스트는 세션과 수명이 같아 한 번만 구독한다.
             _context.Fueled += HandleFuelDone;
-            _context.FuelGaveUp += HandleFuelDone;
+            _context.FuelGaveUp += HandleFuelGaveUp;
         }
 
         /// <param name="arrivalPoint">차량이 정차할 위치.</param>
@@ -503,6 +510,20 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
 
             _departAfterFuelTimer = 0f;
+        }
+
+        /// <summary>손님이 주유를 기다리다 인내심이 바닥나 포기했다. 화가 난 손님은 대사를 마치거나 일행의 주유를 기다리지 않고 곧장 차를 타고 떠난다.
+        /// 포기를 알린 상태가 아직 도는 중이라 여기서 바로 출발시키지 않고 다음 틱으로 미룬다.</summary>
+        private void HandleFuelGaveUp(AbstractCustomer customer)
+        {
+            if (customer == null)
+            {
+                return;
+            }
+
+            _fuelDone.Add(customer);
+            _departAfterFuelTimer = -1f;
+            _departWhenWaiting = true;
         }
 
         /// <summary>주유 손님이 죽어 걸어 둔 출발을 낸다. 아직 내리는 중(Unloading)이면 Waiting에 들어설 때까지 들고 있다.</summary>

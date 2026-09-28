@@ -77,6 +77,28 @@ namespace _Works.CJW.Scripts.Customers.Visit
         [Tooltip("0보다 크면 그 시간 뒤에 자동으로 출발시킨다. 청소 시스템 연결 전 확인용.")]
         [SerializeField] private float autoDepartSeconds;
 
+        [Header("지나가는 차")]
+        [Tooltip("켜면 스폰 지점에서 차가 일정 간격으로 계속 나와 도로를 지나 퇴장 지점으로 간다. 그중 enterChance 확률로, 들어올 자리가 있을 때만 주유소에 들어와 방문이 된다.\n" +
+                 "끄면 예전처럼 spawnInterval마다 방문 차만 나온다.")]
+        [SerializeField] private bool passingTraffic;
+
+        [Tooltip("차가 나오는 간격(초) 범위. 매번 이 안에서 무작위로 고른다.")]
+        [SerializeField] private Vector2 passingInterval = new(3f, 6f);
+
+        [Tooltip("나온 차가 주유소에 들어올 확률. 빈 주차 자리가 없거나 동시 방문이 꽉 차면 확률과 상관없이 지나간다.")]
+        [SerializeField, Range(0f, 1f)] private float enterChance = 0.3f;
+
+        [Tooltip("동시에 도로를 지나가는 차의 최대 수. 꽉 차면 지나갈 차는 나오지 않고 들어올 차만 나온다.")]
+        [SerializeField, Min(0)] private int maxPassingCars = 6;
+
+        [Tooltip("지나가는 차가 퇴장 지점에서 이 거리(m) 안에 들면 사라진다.")]
+        [SerializeField, Min(0f)] private float passingExitRadius = 6f;
+
+        [Tooltip("지나가는 차가 이 시간(초) 안에 퇴장 지점에 닿지 못하면 막힌 것으로 보고 치운다.")]
+        [SerializeField, Min(1f)] private float passingMaxLifetime = 90f;
+
+        private PassingTraffic _passing;
+
         private sealed class AbandonedCar
         {
             public Car Car;
@@ -135,12 +157,14 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
 
             _spawnTimer = 0f;
+            _passing ??= new PassingTraffic(ReleasePassingCar);
             RegisterAgent(this);
         }
 
         private void OnDisable()
         {
             UnRegisterAgent(this);
+            _passing?.Clear();
         }
 
         /// <summary>지점들은 OnEnable에서 등록되므로, 모두 모인 Start에서 차가 다닐 길을 계산해 맵에 알린다.</summary>
@@ -189,6 +213,12 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 Add(entrance.Position, exitPoint.position);
             }
 
+            // 지나가는 차가 달리는 도로. 넣지 않으면 손님이 그 위에 머물 자리를 잡는다.
+            if (passingTraffic)
+            {
+                Add(spawnPoint.position, exitPoint.position);
+            }
+
             return routes;
         }
 
@@ -219,6 +249,12 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>틱마다 스폰할 수 있는지 확인한다.</summary>
         private void TickSpawn(float dt)
         {
+            if (passingTraffic)
+            {
+                TickPassingTraffic(dt);
+                return;
+            }
+
             // 최대를 넘으면 return
             if (_activeVisits.Count >= maxConcurrentVisits)
                 return;
@@ -242,6 +278,69 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
             _spawnTimer = spawnInterval;
             BeginVisit();
+        }
+
+        /// <summary>도로에 차를 계속 흘려보내고, 그중 몇 대만 주유소에 들인다. 들어올 차는 방문으로, 나머지는 지나가는 차로 나온다.
+        /// 앞 차에 탄 싸움꾼의 짝은 확률과 상관없이 들어온다 — 안 들이면 먼저 온 싸움꾼이 혼자 기다린다.</summary>
+        private void TickPassingTraffic(float dt)
+        {
+            _passing.Tick(dt, exitPoint.position, passingExitRadius, passingMaxLifetime);
+
+            _spawnTimer -= dt;
+            if (_spawnTimer > 0f)
+                return;
+
+            // 스폰 지점이 막혀 있으면 타이머를 남겨둔다. 빠지는 순간 바로 나온다.
+            if (!CarTraffic.IsAreaClear(spawnPoint.position, spawnClearRadius))
+                return;
+
+            // BeginVisit이 짝을 곧바로 보내려고 타이머를 0으로 되돌릴 수 있으므로 먼저 건다.
+            _spawnTimer = Random.Range(passingInterval.x, Mathf.Max(passingInterval.x, passingInterval.y));
+
+            bool enters = CanEnterStation() && (_pendingPartner != null || Random.value < enterChance);
+            if (enters && BeginVisit() != null)
+            {
+                return;
+            }
+
+            if (_passing.Count < maxPassingCars)
+            {
+                SpawnPassingCar();
+            }
+        }
+
+        /// <summary>지금 차 한 대를 주유소에 들일 수 있는지. 동시 방문이 남고, 가는 길이 막히지 않은 빈 자리가 있어야 한다.</summary>
+        private bool CanEnterStation()
+        {
+            return _activeVisits.Count < maxConcurrentVisits && mapData.HasFreeParkingSlot && HasGoodFreeSlot();
+        }
+
+        /// <summary>손님 없이 도로만 지나갈 차를 스폰 지점에 꺼내 퇴장 지점으로 보낸다. 겉모습은 평판으로 등급을 뽑아 고른다.</summary>
+        private void SpawnPassingCar()
+        {
+            CarDataSO data = PickGradedCar();
+            if (data == null || data.PoolItem == null)
+            {
+                return;
+            }
+
+            Car car = poolManager.Pop<Car>(data.PoolItem);
+            if (car == null)
+            {
+                Debug.LogError($"[VisitDirector] 지나가는 차를 꺼내지 못했습니다. PoolManager에 {data.PoolItem.name} 항목이 등록되어 있는지 확인하세요.", this);
+                return;
+            }
+
+            car.Setup(data);
+            car.transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
+            RegisterAgent(car);
+            _passing.Add(car, exitPoint.position);
+        }
+
+        private void ReleasePassingCar(Car car)
+        {
+            UnRegisterAgent(car);
+            poolManager.Push(car);
         }
 
         private void TickAutoDeparture(float dt)
@@ -398,6 +497,14 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return carData.PoolItem;
             }
 
+            CarDataSO picked = PickGradedCar();
+            return picked != null ? picked.PoolItem : carData.PoolItem;
+        }
+
+        /// <summary>등급 있는 차 중에서 평판으로 등급을 뽑고 그 안에서 spawnWeight로 하나 고른다.
+        /// 겉모습만 빌려 쓰는 차(randomVisual)와 도로를 지나가는 차가 쓴다. 고를 차가 없으면 null.</summary>
+        private CarDataSO PickGradedCar()
+        {
             _visualBuffer.Clear();
             for (int i = 0; i < carDataList.Length; i++)
             {
@@ -432,7 +539,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 picked = WeightedPicker.Pick(_visualBuffer, data => data.SpawnWeight);
             }
 
-            return picked != null ? picked.PoolItem : carData.PoolItem;
+            return picked;
         }
 
         private static bool HasGrade(List<CarDataSO> candidates, CarGrade grade)

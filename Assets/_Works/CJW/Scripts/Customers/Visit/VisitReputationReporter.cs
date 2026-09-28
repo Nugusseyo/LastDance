@@ -31,6 +31,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             public readonly List<Tracked> Customers = new();
             public Action<AbstractCustomer> OnFueled;
             public Action<AbstractCustomer> OnFuelLate;
+            public Action<AbstractCustomer> OnMisconduct;
             public Action<VisitSession> OnCompleted;
         }
 
@@ -48,8 +49,10 @@ namespace _Works.CJW.Scripts.Customers.Visit
         [SerializeField] private bool reportFuelLate = true;
         [Tooltip("진상(HumanDB type Bad)을 퇴치했을 때 (좋은 리뷰).")]
         [SerializeField] private bool reportBadDefeated = true;
-        [Tooltip("진상을 퇴치하지 못하고 방문이 끝났을 때 (나쁜 리뷰).")]
+        [Tooltip("진상을 퇴치하지 못하고 방문이 끝났을 때 (나쁜 리뷰). 진상 짓을 시작할 때 스스로 알리는 손님(싸움꾼)은 제외한다.")]
         [SerializeField] private bool reportBadMissed = true;
+        [Tooltip("진상 짓이 시작됐을 때 (나쁜 리뷰). 지금은 싸움꾼 둘이 마주 서서 싸우기 시작할 때 온다.")]
+        [SerializeField] private bool reportMisconduct = true;
         [Tooltip("일반인(HumanDB type Good)을 때렸을 때, 한 대마다 (나쁜 리뷰).")]
         [SerializeField] private bool reportGoodHit = true;
 
@@ -89,10 +92,12 @@ namespace _Works.CJW.Scripts.Customers.Visit
             var hooks = new SessionHooks();
             hooks.OnFueled = customer => Raise(reportFueled, ReviewType.Good, customer, "주유 받음");
             hooks.OnFuelLate = customer => Raise(reportFuelLate, ReviewType.Late, customer, "주유 늦음");
+            hooks.OnMisconduct = customer => Raise(reportMisconduct, ReviewType.Bad, customer, "진상 짓 시작(싸움)");
             hooks.OnCompleted = OnVisitCompleted;
 
             session.Fueled += hooks.OnFueled;
             session.FuelLate += hooks.OnFuelLate;
+            session.Misconduct += hooks.OnMisconduct;
             session.Completed += hooks.OnCompleted;
 
             IReadOnlyList<AbstractCustomer> customers = session.Customers;
@@ -123,15 +128,17 @@ namespace _Works.CJW.Scripts.Customers.Visit
         private void OnDamaged(Tracked tracked, HitInfo hit)
         {
             // 다른 손님이 때린 건(싸움꾼 등) 플레이어 탓이 아니다.
-            if ((EvaluatedType(tracked.Customer) == HumanType.Good || IsHarmless(tracked.Customer)) && !IsFromCustomer(hit))
+            // 진상은 아직 진상 짓을 못 하고 돌아다니는 중이라도 때려서 깎지 않는다 — 플레이어 눈에는 똑같은 진상이다.
+            if (EvaluatedType(tracked.Customer) == HumanType.Good && !IsFromCustomer(hit))
             {
-                Raise(reportGoodHit, ReviewType.Bad, tracked.Customer, IsHarmless(tracked.Customer) ? "돌아다니던 진상(일반인 취급)을 때림" : "일반인을 때림");
+                Raise(reportGoodHit, ReviewType.Bad, tracked.Customer, "일반인을 때림");
             }
         }
 
         private void OnDied(Tracked tracked)
         {
-            if (ActsBad(tracked.Customer))
+            // 돌아다니던 진상도 죽이면 퇴치로 친다. 놓쳤을 때만 일반인 취급(ActsBad)으로 봐준다.
+            if (EvaluatedType(tracked.Customer) == HumanType.Bad)
             {
                 Raise(reportBadDefeated, ReviewType.Good, tracked.Customer, "진상 퇴치");
             }
@@ -165,6 +172,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
         {
             session.Fueled -= hooks.OnFueled;
             session.FuelLate -= hooks.OnFuelLate;
+            session.Misconduct -= hooks.OnMisconduct;
             session.Completed -= hooks.OnCompleted;
 
             for (int i = 0; i < hooks.Customers.Count; i++)
@@ -185,10 +193,17 @@ namespace _Works.CJW.Scripts.Customers.Visit
             tracked.Health = null;
         }
 
-        /// <summary>평판에서 진상으로 셈할지. 진상(HumanDB type Bad)이라도 조건이 안 맞아 진상 짓을 못 하고 돌아다니는 손님
-        /// (<see cref="CustomerFSM.CustomerContext.Harmless"/>)은 일반인으로 본다 — 때리면 깎이고, 퇴치해도 오르지 않고, 그냥 떠나도 깎이지 않는다.</summary>
+        /// <summary>놓쳤을 때 진상으로 셈할지. 진상(HumanDB type Bad)이라도 조건이 안 맞아 진상 짓을 못 하고 돌아다니는 손님
+        /// (<see cref="CustomerFSM.CustomerContext.Harmless"/>)은 그냥 떠나도 깎지 않는다. 때리거나 죽였을 때는 늘 진상으로 본다.
+        /// 진상 짓을 시작하는 순간을 스스로 알리는 손님(<see cref="CustomerFSM.CustomerFSMModule.ReportsMisconduct"/>)은 그 알림으로만 깎는다.</summary>
         private bool ActsBad(AbstractCustomer customer)
         {
+            // 진상 짓을 시작할 때 스스로 알리는 손님은 그때 이미 깎았다. 시작하지 못했으면 깎을 일도 없다.
+            if (customer.Fsm != null && customer.Fsm.ReportsMisconduct)
+            {
+                return false;
+            }
+
             return EvaluatedType(customer) == HumanType.Bad && !IsHarmless(customer);
         }
 

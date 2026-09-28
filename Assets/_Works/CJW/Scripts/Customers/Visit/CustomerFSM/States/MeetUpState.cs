@@ -21,6 +21,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
     {
         public int[] SpokenLines => faceOffLines != null && faceOffLines.Length > 0 ? faceOffLines : fightLines;
 
+        /// <summary>싸움꾼의 진상 짓은 짝과 마주 서서 싸움을 시작하는 순간이다. 짝을 못 만나 싸우지 않고 떠나면 평판을 깎지 않는다.</summary>
+        public override bool ReportsMisconduct => true;
+
         [Tooltip("짝을 맺어 줄 등록소. 같은 에셋을 쓰는 손님끼리만 만난다.")]
         [SerializeField] private CustomerRendezvousSO rendezvous;
 
@@ -172,6 +175,13 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                     speaking.Forget();
                 }
 
+                // 맞고 나서 이 행동이 처음부터 다시 돌아 또 싸움을 시작해도 한 번만 알린다.
+                if (!_misconductReported)
+                {
+                    _misconductReported = true;
+                    Ctx.Visit?.ReportMisconduct(Ctx.Customer);
+                }
+
                 VisitOutcome fought = await Perform(ct);
 
                 // 싸움이 끝났다(짝이 죽어 차로 돌아가는 경우 포함). 마주 섰을 때의 대사를 달고 걸어가지 않게 접는다.
@@ -274,6 +284,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [NonSerialized] private bool _partnerDefeated;
 
         [NonSerialized] private BoardState _returnToCar;
+
+        /// <summary>이번 방문에서 싸움을 시작했다고 이미 알렸는지.</summary>
+        [NonSerialized] private bool _misconductReported;
 
         /// <summary>상대가 만날 지점 근처에 올 때까지 기다린다. 상대가 사라지거나 이동 한계 시간을 넘기면 false.</summary>
         private async UniTask<bool> WaitForPartnerArrival(CancellationToken ct)
@@ -500,6 +513,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         {
             RestoreAvoidance();
             _partnerDefeated = false;
+            _misconductReported = false;
 
             if (rendezvous != null && Ctx != null)
             {
