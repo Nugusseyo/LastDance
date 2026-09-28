@@ -107,6 +107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.TestCustomer
   <HumanType>k__BackingField: 1
+  <ReviewIndices>k__BackingField: 01000000
   <Agent>k__BackingField: {fileID: 102127318752237865}
   <PoolItem>k__BackingField: {fileID: 11400000, guid: ab006801092c78a4193644fd5692d72f, type: 2}
 --- !u!114 &2876735463361945510
@@ -166,7 +167,7 @@ MonoBehaviour:
       data:
         condition:
           rid: -2
-        fuelTimeout: 0
+        fuelTimeout: 30
         lateSeconds: 30
 --- !u!114 &7400742253367986626
 MonoBehaviour:

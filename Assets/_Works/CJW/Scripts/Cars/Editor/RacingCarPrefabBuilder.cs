@@ -22,8 +22,8 @@ namespace _Works.CJW.Scripts.Cars.Editor
         private const string PoolItemFolder = "Assets/DevLib/ObjectPool/Items";
         private const string PoolManagerPath = "Assets/DevLib/ObjectPool/PoolManager.asset";
         private const string CarDataFolder = "Assets/_Works/CJW/Data/Cars";
-        /// <summary>팩 모델에 곱할 크기. 0.7에서 1.2배 키웠다(2026-09-28). 바꾼 뒤 Resize Racing Car Prefabs를 돌리면 만든 프리팹에 반영된다.</summary>
-        private const float VisualScale = 0.84f;
+        /// <summary>팩 모델에 곱할 크기. 0.7 → 0.84 → 0.72(2026-09-28). 바꾼 뒤 Resize Racing Car Prefabs를 돌리면 만든 프리팹에 반영된다.</summary>
+        private const float VisualScale = 0.72f;
 
         [MenuItem("Tools/JW/Cars/Build Racing Car Prefabs")]
         public static void Build()
@@ -219,9 +219,22 @@ namespace _Works.CJW.Scripts.Cars.Editor
                 return false;
             }
 
+            // 모델 배율만 보고 비율을 정하면, 누가 인스펙터에서 모델만 먼저 바꿔 둔 프리팹은 "이미 맞음"으로 건너뛰어
+            // 장애물·좌석·휠베이스가 옛 크기로 남는다. 나머지 부품이 맞춰진 크기는 장애물(HitCollider) 배율로 따로 잰다 —
+            // Build 때부터 장애물 배율이 모델 배율과 같이 움직여 왔다.
+            NavMeshObstacle footprint = root.GetComponentInChildren<NavMeshObstacle>(true);
             float current = visual.localScale.x;
-            float factor = VisualScale / current;
-            if (current <= 0f || Mathf.Abs(factor - 1f) < 1e-3f)
+            float bodyScale = footprint != null && footprint.transform.parent == root.transform
+                ? footprint.transform.localScale.x
+                : current;
+            if (current <= 0f || bodyScale <= 0f)
+            {
+                sb.AppendLine($"  !! {root.name}: 배율이 0이라 건너뜀");
+                return false;
+            }
+
+            float factor = VisualScale / bodyScale;
+            if (Mathf.Abs(factor - 1f) < 1e-3f && Mathf.Abs(VisualScale / current - 1f) < 1e-3f)
             {
                 sb.AppendLine($"  {root.name}: 이미 {current:F2}배, 건너뜀");
                 return false;
@@ -247,7 +260,12 @@ namespace _Works.CJW.Scripts.Cars.Editor
             foreach (Transform child in root.transform)
             {
                 child.localPosition *= factor;
-                if (markers.Contains(child) == false)
+                if (child == visual)
+                {
+                    // 모델은 배율을 곧바로 맞춘다. 이미 바뀌어 있었을 수 있어 곱하지 않는다.
+                    child.localScale = Vector3.one * VisualScale;
+                }
+                else if (markers.Contains(child) == false)
                 {
                     child.localScale *= factor;
                 }

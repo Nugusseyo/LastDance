@@ -107,6 +107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.TestCustomer
   <HumanType>k__BackingField: 2
+  <ReviewIndices>k__BackingField: 090000000a000000
   <Agent>k__BackingField: {fileID: 3456830236770064048}
   <PoolItem>k__BackingField: {fileID: 11400000, guid: 4842f099d15f7dd458eb24f0e9907feb, type: 2}
 --- !u!114 &684480218473189439
@@ -170,7 +171,7 @@ MonoBehaviour:
       type: {class: MeetUpState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
       data:
         condition:
-          rid: -2
+          rid: 4377106798104543313
         rendezvous: {fileID: 11400000, guid: 96819d8b25e4230499c447e4381b735c, type: 2}
         meetKey: fight
         waitTimeout: 30
@@ -187,6 +188,13 @@ MonoBehaviour:
         attackSound: {fileID: 11400000, guid: 7f6240342e8afa9418c6043f4acaabf3, type: 2}
         blockSound: {fileID: 11400000, guid: a4e1202c4a7640d4baa4db68977c3335, type: 2}
         fightLoopSound: {fileID: 11400000, guid: b82e9087a5218ab4ca3680e64e04f317, type: 2}
+        speechPool: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
+        speechBubble: {fileID: 11400000, guid: 2a00163c0ed52214a828e00935dbf2e5, type: 2}
+        faceOffLines: 090000000a000000
+        fightLines: 090000000a000000
+        fightSpeechInterval: 4
+        speechOffset: {x: 0, y: 2.2, z: 0}
+        speechSound: {fileID: 0}
     - rid: 4377106771376341121
       type: {class: StayState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
       data:
@@ -197,7 +205,7 @@ MonoBehaviour:
       type: {class: BoardState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
       data:
         condition:
-          rid: 4377106798104543313
+          rid: -2
         stagger: 0
         jitter: 0.2
         timeout: 40
@@ -206,7 +214,7 @@ MonoBehaviour:
       type: {class: JoinRendezvousState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}
       data:
         condition:
-          rid: -2
+          rid: 4377106798104543313
         rendezvous: {fileID: 11400000, guid: 96819d8b25e4230499c447e4381b735c, type: 2}
         meetKey: fight
     - rid: 4377106798104543313
@@ -222,7 +230,7 @@ MonoBehaviour:
           rid: -2
         poolManager: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
         bubbleItem: {fileID: 11400000, guid: 2a00163c0ed52214a828e00935dbf2e5, type: 2}
-        lineIndices: 090000000a000000
+        lineIndices: []
         offset: {x: 0, y: 2.2, z: 0}
         runAlongside: 1
         speechSound: {fileID: 0}

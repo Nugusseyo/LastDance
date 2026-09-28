@@ -210,7 +210,7 @@ MonoBehaviour:
         condition:
           rid: -2
         timeout: 40
-        fuelTimeout: 0
+        fuelTimeout: 30
         lateSeconds: 30
     - rid: 4377106771376341108
       type: {class: SpeechState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}

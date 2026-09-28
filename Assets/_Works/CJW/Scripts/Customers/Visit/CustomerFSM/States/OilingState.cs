@@ -166,6 +166,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         private VisitOutcome GiveUp(VisitOutcome outcome)
         {
             Ctx.EndSpeech();
+
+            // 방문은 주유 손님이 모두 주유를 받아야 곧 출발한다. 포기도 알리지 않으면 자동 출발 안전망이 돌 때까지 서 있다.
+            Ctx.Visit?.ReportFuelGaveUp(Ctx.Customer);
             return outcome;
         }
 

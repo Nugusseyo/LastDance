@@ -106,6 +106,18 @@ PrefabInstance:
       propertyPath: <HumanType>k__BackingField
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4559870543567499094, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: <ReviewIndices>k__BackingField.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4559870543567499094, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: '<ReviewIndices>k__BackingField.Array.data[0]'
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4559870543567499094, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: '<ReviewIndices>k__BackingField.Array.data[1]'
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 5790812639602798014, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: agent
       value: 
@@ -300,14 +312,26 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: dcc05465e2f25ee40932941aad0ba98e, type: 2}
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: managedReferences[4377106929555079258].lineIndices.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: managedReferences[4377106815191875682].speechPool
+      value: 
+      objectReference: {fileID: 11400000, guid: c5baccba6f7390e45915d59f83b4381e, type: 2}
+    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: managedReferences[4377106815191875682].speechBubble
+      value: 
+      objectReference: {fileID: 11400000, guid: 2a00163c0ed52214a828e00935dbf2e5, type: 2}
+    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: managedReferences[4377106815191875682].targetLines.Array.size
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: 'managedReferences[4377106929555079258].lineIndices.Array.data[0]'
+      propertyPath: 'managedReferences[4377106815191875682].targetLines.Array.data[0]'
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: 'managedReferences[4377106929555079258].lineIndices.Array.data[1]'
+      propertyPath: 'managedReferences[4377106815191875682].targetLines.Array.data[1]'
       value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents:

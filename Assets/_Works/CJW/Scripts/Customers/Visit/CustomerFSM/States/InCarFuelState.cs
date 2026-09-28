@@ -47,8 +47,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                             Ctx.Visit?.ReportFuelLate(Ctx.Customer);
                         }
 
-                        // 주유를 못 받고 그만둔다. 주유를 달라던 말풍선도 접는다.
+                        // 주유를 못 받고 그만둔다. 주유를 달라던 말풍선도 접고, 방문이 곧 출발하도록 알린다.
                         Ctx.EndSpeech();
+                        Ctx.Visit?.ReportFuelGaveUp(Ctx.Customer);
                         return VisitOutcome.Timeout;
                     }
 

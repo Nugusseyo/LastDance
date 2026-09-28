@@ -30,10 +30,14 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 4aa00dabdbbb49f284c98aa9587ac5ff, type: 2}
     - target: {fileID: 2383952036485700464, guid: e0a39a5b340f0aa4db363c84eda15a8d, type: 3}
       propertyPath: managedReferences[4377106929555079258].lineIndices.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2383952036485700464, guid: e0a39a5b340f0aa4db363c84eda15a8d, type: 3}
+      propertyPath: managedReferences[4377106815191875682].targetLines.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2383952036485700464, guid: e0a39a5b340f0aa4db363c84eda15a8d, type: 3}
-      propertyPath: 'managedReferences[4377106929555079258].lineIndices.Array.data[0]'
+      propertyPath: 'managedReferences[4377106815191875682].targetLines.Array.data[0]'
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3770552447671277581, guid: e0a39a5b340f0aa4db363c84eda15a8d, type: 3}
@@ -87,6 +91,14 @@ PrefabInstance:
     - target: {fileID: 7552905961623622214, guid: e0a39a5b340f0aa4db363c84eda15a8d, type: 3}
       propertyPath: <HumanType>k__BackingField
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7552905961623622214, guid: e0a39a5b340f0aa4db363c84eda15a8d, type: 3}
+      propertyPath: <ReviewIndices>k__BackingField.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7552905961623622214, guid: e0a39a5b340f0aa4db363c84eda15a8d, type: 3}
+      propertyPath: '<ReviewIndices>k__BackingField.Array.data[0]'
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
