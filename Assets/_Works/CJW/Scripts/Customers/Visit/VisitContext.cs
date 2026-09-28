@@ -82,6 +82,11 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
         public void ReportFuelLate(AbstractCustomer customer) => Raise(FuelLate, customer);
 
+        /// <summary>손님이 주유를 기다리다 포기했다. 방문은 주유를 받은 것과 똑같이 보고 일행을 태워 떠난다. 평판은 먼저 온 <see cref="FuelLate"/>가 깎는다.</summary>
+        public event Action<AbstractCustomer> FuelGaveUp;
+
+        public void ReportFuelGaveUp(AbstractCustomer customer) => Raise(FuelGaveUp, customer);
+
         /// <summary>듣는 쪽(평판·UI)이 예외를 던져도 알린 손님의 행동까지 끊기지 않게 여기서 받아 남긴다.
         /// 그대로 흘리면 주유를 기다리던 상태가 예외로 끝나, 그 뒤 주유를 해 줘도 아무도 듣지 않는다.</summary>
         private static void Raise(Action<AbstractCustomer> handlers, AbstractCustomer customer)

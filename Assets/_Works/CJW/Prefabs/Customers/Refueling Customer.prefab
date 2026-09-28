@@ -107,6 +107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Customers.TestCustomer
   <HumanType>k__BackingField: 1
+  <ReviewIndices>k__BackingField: 01000000
   <Agent>k__BackingField: {fileID: 898281800623855617}
   <PoolItem>k__BackingField: {fileID: 11400000, guid: c88f4bf24ea92c9428c5186b88525443, type: 2}
 --- !u!114 &3094453847196704398
@@ -171,7 +172,7 @@ MonoBehaviour:
         condition:
           rid: -2
         timeout: 40
-        fuelTimeout: 0
+        fuelTimeout: 30
         lateSeconds: 30
     - rid: 4377106771376341108
       type: {class: SpeechState, ns: _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States, asm: Assembly-CSharp}

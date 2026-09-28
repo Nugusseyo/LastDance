@@ -37,8 +37,8 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>주유 뒤 손님이 할 일(대사 등)을 마치길 기다리는 최대 시간(초). 넘기면 하던 일을 끊고 출발한다.</summary>
         private const float DepartAfterFuelMaxWait = 15f;
 
-        /// <summary>이번 방문에서 주유를 받은 손님.</summary>
-        private readonly HashSet<AbstractCustomer> _fueled = new();
+        /// <summary>이번 방문에서 주유 기다림이 끝난 손님. 주유를 받았거나, 너무 오래 기다려 포기했다. 둘 다 이제 출발만 기다린다.</summary>
+        private readonly HashSet<AbstractCustomer> _fuelDone = new();
 
         /// <summary>주유가 다 끝나고 흐른 시간(초). 음수면 기다리는 중이 아니다.</summary>
         private float _departAfterFuelTimer = -1f;
@@ -88,7 +88,8 @@ namespace _Works.CJW.Scripts.Customers.Visit
             AddDefault(new LeavingState());
 
             // 컨텍스트는 세션과 수명이 같아 한 번만 구독한다.
-            _context.Fueled += HandleFueled;
+            _context.Fueled += HandleFuelDone;
+            _context.FuelGaveUp += HandleFuelDone;
         }
 
         /// <param name="arrivalPoint">차량이 정차할 위치.</param>
@@ -274,8 +275,8 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
 
             // 행동을 끊기 전에 읽는다. 주유를 받기 전에 빠졌는지가 곧장 출발할지를 정한다.
-            bool waitedForFuel = customer.Fsm != null && customer.Fsm.WantsFuel && !_fueled.Contains(customer);
-            _fueled.Remove(customer);
+            bool waitedForFuel = customer.Fsm != null && customer.Fsm.WantsFuel && !_fuelDone.Contains(customer);
+            _fuelDone.Remove(customer);
 
             // 행동을 끊으면 이 손님의 Phase 실행이 곧바로 끝나, 세션이 이 손님을 기다리지 않는다.
             customer.Fsm?.Stop();
@@ -302,7 +303,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             for (int i = 0; i < customers.Count; i++)
             {
                 CustomerFSMModule fsm = customers[i].Fsm;
-                if (fsm != null && fsm.WantsFuel && !_fueled.Contains(customers[i]))
+                if (fsm != null && fsm.WantsFuel && !_fuelDone.Contains(customers[i]))
                 {
                     return true;
                 }
@@ -482,11 +483,11 @@ namespace _Works.CJW.Scripts.Customers.Visit
         }
 
 
-        /// <summary>주유를 원하던 손님이 모두 주유를 받으면 잠시 뒤 출발한다. 안 그러면 주유가 끝나도 손님이 그 자리에 선 채
+        /// <summary>주유를 원하던 손님이 모두 주유를 받거나 기다리다 포기하면 잠시 뒤 출발한다. 안 그러면 손님이 그 자리에 선 채
         /// 자동 출발 타이머나 Waiting 한계 시간이 다 될 때까지 아무 반응 없이 기다린다.</summary>
-        private void HandleFueled(AbstractCustomer customer)
+        private void HandleFuelDone(AbstractCustomer customer)
         {
-            if (customer == null || !_fueled.Add(customer))
+            if (customer == null || !_fuelDone.Add(customer))
             {
                 return;
             }
@@ -495,7 +496,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             for (int i = 0; i < customers.Count; i++)
             {
                 CustomerFSMModule fsm = customers[i].Fsm;
-                if (fsm != null && fsm.WantsFuel && !_fueled.Contains(customers[i]))
+                if (fsm != null && fsm.WantsFuel && !_fuelDone.Contains(customers[i]))
                 {
                     return;
                 }
@@ -557,7 +558,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>주유 받은 손님이 모두 이번 단계에서 할 일을 마치고 출발만 기다리는지.</summary>
         private bool AllFueledCustomersIdle()
         {
-            foreach (AbstractCustomer customer in _fueled)
+            foreach (AbstractCustomer customer in _fuelDone)
             {
                 CustomerState current = customer != null ? customer.Fsm?.Machine?.Current : null;
                 if (current != null && !(current is StayState stay && stay.IsIndefinite))
@@ -580,7 +581,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
         private void ResetFuelDeparture()
         {
-            _fueled.Clear();
+            _fuelDone.Clear();
             _departAfterFuelTimer = -1f;
             _departWhenWaiting = false;
             ListenFuelDoor(null);

@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Gas_Gun
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Attacks.Weapons.WeaponItemSO
   <Damage>k__BackingField: 15
-  <AttackCooltime>k__BackingField: 5
+  <AttackCooltime>k__BackingField: 1.2
+  <MoveSpeedMultiplier>k__BackingField: 0

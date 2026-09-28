@@ -4,6 +4,7 @@ using _Works.CJW.Scripts.Customers.Health;
 using _Works.CJW.Scripts.Sounds;
 using Cysharp.Threading.Tasks;
 using DevLib.AnimatorSystem;
+using DevLib.ObjectPool.Runtime;
 using DevLib.SoundSystem;
 using UnityEngine;
 using UnityEngine.AI;
@@ -16,16 +17,23 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
     /// 상대에게 실제로 피해를 주지는 않는다. 둘 다 손님이라 한쪽만 쓰러지면 방문 하나가 갈 곳을 잃기 때문이다.
     /// 짝이 (플레이어에게 맞아) 죽으면 남은 쪽은 그 자리에 서 있지 않고 자기 차로 돌아가 탄다.</summary>
     [Serializable]
-    public sealed class MeetUpState : CustomerState
+    public sealed class MeetUpState : CustomerState, ISpeakingState
     {
+        public int[] SpokenLines => faceOffLines != null && faceOffLines.Length > 0 ? faceOffLines : fightLines;
+
         [Tooltip("짝을 맺어 줄 등록소. 같은 에셋을 쓰는 손님끼리만 만난다.")]
         [SerializeField] private CustomerRendezvousSO rendezvous;
 
         [Tooltip("약속 이름. 같은 이름끼리 짝이 된다. 싸움·대화처럼 용도가 다르면 이름을 나눈다.")]
         [SerializeField] private string meetKey = "fight";
 
-        [Tooltip("짝이 나타날 때까지 기다릴 시간(초). 넘기면 아무 일 없이 다음 행동으로 넘어간다.")]
+        [Tooltip("짝이 나타날 때까지 기다릴 시간(초). 넘기면 싸움을 접는다.")]
         [SerializeField, Min(0f)] private float waitTimeout = 10f;
+
+        [Tooltip("끄면(기본) 싸울 수 없을 때(조건이 안 맞음, 짝이 안 옴·안 닿음) 일반 손님처럼 돌아다니고, 평판도 일반인으로 셈해 때리면 깎인다.\n" +
+                 "켜면 예전처럼 다음 행동(대개 가만히 서 있기)으로 넘어간다.\n" +
+                 "켜는 쪽을 옵션으로 둔 건 [SerializeReference] 상태의 새 필드가 기존 프리팹에 false로 들어가기 때문이다.")]
+        [SerializeField] private bool standIfNoFight;
 
         [Tooltip("만날 지점까지 걸어갈 때의 한계 시간(초).")]
         [SerializeField, Min(0f)] private float moveTimeout = 40f;
@@ -48,6 +56,30 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
         [Tooltip("상대를 향해 돌아설 때의 각속도(도/초).")]
         [SerializeField, Min(1f)] private float turnSpeed = 540f;
+
+        [Header("말풍선")]
+        [Tooltip("말풍선을 꺼내 올 풀. 비우면 말하지 않는다.")]
+        [SerializeField] private PoolManagerSO speechPool;
+
+        [Tooltip("말풍선 프리팹의 풀 아이템.")]
+        [SerializeField] private PoolItemSO speechBubble;
+
+        [Tooltip("둘이 만날 지점에 와서 서로 마주 섰을 때 할 대사(HumanDB index) 후보. 비우면 말하지 않는다.\n" +
+                 "방문마다 갈래(CustomerContext.PickVariant)로 하나를 고르고, 짝은 그 다음 갈래를 골라 둘이 다른 대사를 한다.")]
+        [SerializeField] private int[] faceOffLines;
+
+        [Tooltip("싸우는 동안 주기적으로 할 대사(HumanDB index) 후보. 말할 때마다 무작위로 하나를 고른다(후보가 둘 이상이면 바로 앞 대사는 피한다). 비우면 싸우는 동안엔 말하지 않는다.")]
+        [SerializeField] private int[] fightLines;
+
+        [Tooltip("싸우는 동안 말하는 간격(초). 둘이 번갈아 말하므로 한 사람은 이 두 배마다 말한다. " +
+                 "첫 말은 싸움 시작 후 이 시간 뒤라 마주 섰을 때의 대사를 바로 덮지 않는다.")]
+        [SerializeField, Min(0.5f)] private float fightSpeechInterval = 4f;
+
+        [Tooltip("손님 기준으로 말풍선을 띄울 위치(m).")]
+        [SerializeField] private Vector3 speechOffset = new(0f, 2.2f, 0f);
+
+        [Tooltip("말풍선이 뜰 때 낼 소리.")]
+        [SerializeField] private SoundClipSo speechSound;
 
         [Header("사운드")]
         [Tooltip("공격 차례가 올 때마다 낼 소리(주먹 휘두르는 소리·기합).")]
@@ -87,8 +119,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                     {
                         if (Time.time > deadline)
                         {
-                            // 아무도 안 왔다. 방문을 망치지 않고 다음 행동으로 넘긴다.
-                            return VisitOutcome.Blocked;
+                            // 아무도 안 왔다. 싸움을 접고 돌아다닌다(끄면 다음 행동으로 넘긴다).
+                            return await GiveUpFight(ct);
                         }
 
                         await UniTask.Yield(PlayerLoopTiming.Update, ct);
@@ -111,7 +143,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
                 if (outcome != VisitOutcome.Done)
                 {
-                    return outcome;
+                    // 만날 지점에 닿지 못했다. 짝 앞에서 싸울 수 없으니 접는다.
+                    return await GiveUpFight(ct);
                 }
 
                 // 걷기를 접지 않으면 이동 모듈이 연출 중에도 방향을 붙들고 있다.
@@ -123,7 +156,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 // 혼자 먼저 싸우다 떠나지 않도록 상대가 올 때까지 기다린다.
                 if (!await WaitForPartnerArrival(ct))
                 {
-                    return IsDefeated(met) ? await ReturnToCar(ct) : VisitOutcome.Blocked;
+                    return IsDefeated(met) ? await ReturnToCar(ct) : await GiveUpFight(ct);
                 }
 
                 CustomerContext partner = Ctx.Partner;
@@ -132,7 +165,18 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                     await FaceTowards(partner.Customer.transform.position, turnSpeed, ct);
                 }
 
+                // 마주 서자마자 한마디 하고 곧바로 주먹을 주고받는다. 말풍선은 싸우는 동안 머리 위를 따라다니다
+                // 대사가 끝나거나 싸움이 끝나면(탑승·맞음·짝의 죽음) 접힌다.
+                if (CustomerSpeech.TrySay(Ctx, speechPool, speechBubble, faceOffLines, speechOffset, speechSound, ct, out UniTask speaking))
+                {
+                    speaking.Forget();
+                }
+
                 VisitOutcome fought = await Perform(ct);
+
+                // 싸움이 끝났다(짝이 죽어 차로 돌아가는 경우 포함). 마주 섰을 때의 대사를 달고 걸어가지 않게 접는다.
+                Ctx.EndSpeech();
+
                 return fought == VisitOutcome.Blocked && IsDefeated(met) ? await ReturnToCar(ct) : fought;
             }
             finally
@@ -196,6 +240,36 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             return outcome;
         }
 
+        /// <summary>싸울 수 없다. 짝과 등록소를 놓고 일반 손님처럼 돌아다닌다(<see cref="WanderState"/>, 평판도 일반인으로).
+        /// 등록소에 남은 채 돌아다니면 나중에 온 싸움꾼이 이 손님을 짝으로 집어 가 혼자 기다리게 된다.</summary>
+        private async UniTask<VisitOutcome> GiveUpFight(CancellationToken ct)
+        {
+            if (standIfNoFight)
+            {
+                return VisitOutcome.Blocked;
+            }
+
+            rendezvous.Leave(meetKey, Ctx);
+            RestoreAvoidance();
+            return await Wander.Run(ct);
+        }
+
+        /// <summary>조건(주유기 수 등)이 안 맞아 싸움을 건너뛸 때도 서 있지 않고 돌아다닌다.</summary>
+        public override CustomerState WhenConditionFails => standIfNoFight ? null : Wander;
+
+        [NonSerialized] private WanderState _wander;
+
+        /// <summary>코드로 만든 돌아다니기. 프리팹에 필드로 두면 기존 손님들에 빈 값으로 들어가므로 코드로 만든다.</summary>
+        private WanderState Wander
+        {
+            get
+            {
+                _wander ??= new WanderState();
+                _wander.Bind(Ctx);
+                return _wander;
+            }
+        }
+
         /// <summary>짝이 죽어 차로 돌아가는 중인지. 다시 돌아도 짝을 새로 찾지 않게 방문 동안 기억한다.</summary>
         [NonSerialized] private bool _partnerDefeated;
 
@@ -256,6 +330,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             // 누가 먼저 공격할지는 둘이 똑같이 계산할 수 있는 값으로 정한다.
             bool attacksFirst = Ctx.Customer.GetInstanceID() < partner.Customer.GetInstanceID();
             int lastTurn = -1;
+            // 맞고 나서 싸움이 다시 시작되면 시작 시각은 처음 것을 쓰므로, 지금 차례부터 세야 돌아오자마자 말하지 않는다.
+            int lastSpeechSlot = Mathf.FloorToInt((Time.time - start) / fightSpeechInterval);
+            int lastFightLine = -1;
 
             if (attacksFirst)
             {
@@ -289,6 +366,17 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                         else
                         {
                             Ctx.Customer.ActionAnimator?.End();
+                        }
+                    }
+
+                    // 둘이 같은 시작 시각으로 말할 차례를 센다. 홀수 차례는 먼저 공격하는 쪽, 짝수 차례는 상대가 말해 말풍선이 겹치지 않는다.
+                    int speechSlot = Mathf.FloorToInt((Time.time - start) / fightSpeechInterval);
+                    if (speechSlot > lastSpeechSlot)
+                    {
+                        lastSpeechSlot = speechSlot;
+                        if ((speechSlot % 2 == 1) == attacksFirst)
+                        {
+                            lastFightLine = SayFightLine(lastFightLine, ct);
                         }
                     }
 
@@ -378,6 +466,30 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             {
                 body.rotation = Quaternion.RotateTowards(body.rotation, Quaternion.LookRotation(look, Vector3.up), turnSpeed * dt);
             }
+        }
+
+        /// <summary>싸움 중 대사 후보에서 하나를 골라 띄운다. 후보가 둘 이상이면 바로 앞에 한 대사는 피한다.
+        /// 말풍선은 싸움이 끊기면(<paramref name="ct"/> 취소) 접히고, 다음 말이 오면 앞 말풍선을 접고 새로 뜬다. 이번에 한 대사를 돌려준다.</summary>
+        private int SayFightLine(int lastLine, CancellationToken ct)
+        {
+            if (fightLines == null || fightLines.Length == 0)
+            {
+                return lastLine;
+            }
+
+            int pick = Random.Range(0, fightLines.Length);
+            if (fightLines.Length > 1 && fightLines[pick] == lastLine)
+            {
+                pick = (pick + 1) % fightLines.Length;
+            }
+
+            int line = fightLines[pick];
+            if (CustomerSpeech.TrySayLine(Ctx, speechPool, speechBubble, line, speechOffset, speechSound, ct, out UniTask speaking))
+            {
+                speaking.Forget();
+            }
+
+            return line;
         }
 
         private HashDataSO PickFightClip()

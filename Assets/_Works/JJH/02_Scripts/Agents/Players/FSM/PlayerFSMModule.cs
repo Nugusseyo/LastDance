@@ -59,6 +59,11 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM
             if (_player.Grab.CurrentItem.CurrentItemData is not WeaponItemSO)
                 return;
 
+            // 쿨타임 중에 들어가면 휘두르는 모션만 나오고 판정은 건너뛰어 "공격이 안 먹히는" 것처럼 보인다.
+            // 무기 쿨타임(1~1.5초)이 공격 상태(0.5초)보다 길다. Player가 먼저 구독해 공격 종류는 이미 골라져 있다.
+            if (!_player.AttackSkill.CanAttack)
+                return;
+
             UpperBody.ChangeState<UpperAttackState>();
         }
 

@@ -98,6 +98,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             end?.Invoke();
         }
 
+        /// <summary>진상 짓을 할 조건이 안 맞아(싸울 짝·때릴 차가 없음) 일반 손님처럼 돌아다니는 중인지. 평판은 이 손님을 일반인으로 셈한다 —
+        /// 때리면 깎이고, 퇴치해도 오르지 않고, 그냥 떠나도 깎이지 않는다. 방문 동안 유지되고 풀 반납 때 풀린다.</summary>
+        public bool Harmless { get; set; }
+
         /// <summary>이번 방문에서 이미 차 반대편으로 옮겨 봤는지. 옮겨도 막히면 계속 오가지 않도록 한 번만 허용한다.</summary>
         public bool RelocatedAroundCar { get; set; }
 
@@ -112,6 +116,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
         public void Reset()
         {
             RelocatedAroundCar = false;
+            Harmless = false;
 
             // 상태가 취소로 끊겨 자기 finally를 못 지났을 수 있다. 마지막 안전망으로 여기서 짝을 맞춘다.
             // 빼먹으면 손님이 반납되어도 그 지점이 점유 상태로 남는다.

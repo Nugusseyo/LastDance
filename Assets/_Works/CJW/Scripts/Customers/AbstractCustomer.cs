@@ -25,6 +25,12 @@ namespace _Works.CJW.Scripts.Customers
     public abstract class AbstractCustomer : ManagingAgent, IPoolable, IHittable
     {
         [field: SerializeField] public HumanType HumanType { get; private set; } = HumanType.Good;
+
+        /// <summary>평판 리뷰 글 번호(ReviewDB index) 후보. HumanDB 대사 번호와 맞춘다(기획서 표).
+        /// 여럿이면 말풍선과 같은 갈래(CustomerContext.PickVariant)로 골라, 한 대사와 리뷰 글이 짝이 맞는다. 비우면 손님이 말하는 대사 번호로 고른다.</summary>
+        [field: SerializeField, Tooltip("평판 리뷰 글 번호(ReviewDB index) 후보. HumanDB 대사 번호와 맞춘다. 여럿이면 말풍선과 같은 갈래로 고른다. 비우면 대사 번호로 고른다.")]
+        public int[] ReviewIndices { get; private set; }
+
         [field: SerializeField] public NavMeshAgent Agent { get; private set; }
         [field: SerializeField] public PoolItemSO PoolItem { get; set; }
         

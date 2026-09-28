@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace _Works.CJW.Scripts.Cars.Editor
 {
-    /// <summary>플레이어가 차를 뚫고 지나가지 못하게 차 프리팹마다 차체 크기의 박스 콜라이더를 단다.
+    /// <summary>플레이어가 차를 뚫고 지나가지 못하게 차 프리팹마다 차체 모양의 볼록 메시 콜라이더를 단다.
     /// 콜라이더는 전용 레이어(<see cref="LayerName"/>)에 두고 그 레이어는 플레이어하고만 부딪히게 한다 —
     /// 손님(탑승·래그돌), 바퀴, 아이템, 바닥과 부딪히면 탑승과 주행이 흔들린다.</summary>
     public static class CarPlayerBlockerSetup
@@ -59,15 +59,6 @@ namespace _Works.CJW.Scripts.Cars.Editor
                 return false;
             }
 
-            // Build가 모델을 첫 번째 자식으로 넣는다. 바퀴는 따로 콜라이더가 있으니 차체만 잰다.
-            Transform visual = root.transform.GetChild(0);
-            Bounds body = BodyBounds(root.transform, visual);
-            if (body.size.sqrMagnitude < 0.01f)
-            {
-                sb.AppendLine($"  !! {root.name}: 차체 크기를 못 잼, 건너뜀");
-                return false;
-            }
-
             Transform blocker = root.transform.Find(BlockerName);
             if (blocker == null)
             {
@@ -80,19 +71,52 @@ namespace _Works.CJW.Scripts.Cars.Editor
             blocker.localRotation = Quaternion.identity;
             blocker.localScale = Vector3.one;
 
-            // 에디터의 GetComponent는 없을 때 가짜 null을 돌려줄 수 있어 ??를 쓰지 않는다.
-            var box = blocker.GetComponent<BoxCollider>();
-            if (box == null)
+            // 예전에 단 박스는 차체 메시 경계라 사이드미러 폭까지 잡혀 차 옆에 투명 벽이 생겼다. 차체 모양 그대로의 볼록 메시로 바꾼다.
+            var oldBox = blocker.GetComponent<BoxCollider>();
+            if (oldBox != null)
             {
-                box = blocker.gameObject.AddComponent<BoxCollider>();
+                Object.DestroyImmediate(oldBox, true);
             }
 
-            box.isTrigger = false;
-            box.center = body.center;
-            box.size = body.size;
+            for (int i = blocker.childCount - 1; i >= 0; i--)
+            {
+                Object.DestroyImmediate(blocker.GetChild(i).gameObject, true);
+            }
+
+            // Build가 모델을 첫 번째 자식으로 넣는다. 바퀴는 따로 콜라이더가 있으니 차체 메시만 쓴다.
+            Transform visual = root.transform.GetChild(0);
+            int count = 0;
+            foreach (MeshFilter mf in visual.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (mf.sharedMesh == null || mf.name.Contains("Wheel"))
+                {
+                    continue;
+                }
+
+                // 모델 안에 콜라이더를 달면 바퀴 분리 등 다른 작업이 모델 계층을 건드릴 때 같이 휩쓸린다. 차체 메시 자리를 본뜬 자식에 단다.
+                var part = new GameObject($"Body {count}").transform;
+                part.SetParent(blocker, false);
+                part.gameObject.layer = layer;
+                part.SetPositionAndRotation(mf.transform.position, mf.transform.rotation);
+                Vector3 meshScale = mf.transform.lossyScale;
+                Vector3 parentScale = blocker.lossyScale;
+                part.localScale = new Vector3(meshScale.x / parentScale.x, meshScale.y / parentScale.y, meshScale.z / parentScale.z);
+
+                var collider = part.gameObject.AddComponent<MeshCollider>();
+                collider.sharedMesh = mf.sharedMesh;
+                collider.convex = true;
+                count++;
+            }
+
+            if (count == 0)
+            {
+                sb.AppendLine($"  !! {root.name}: 차체 메시를 못 찾음, 건너뜀");
+                return false;
+            }
 
             // 차는 트랜스폼으로 움직인다. 리지드바디 없는 콜라이더를 매 프레임 옮기면 정적 콜라이더를 옮기는 셈이라,
-            // 키네마틱으로 두어 플레이어를 자연스럽게 밀어내게 한다. 이 자식에만 달아 다른 콜라이더를 묶지 않는다.
+            // 키네마틱으로 두어 플레이어를 자연스럽게 밀어내게 한다. 이 오브젝트에만 달아 차의 다른 콜라이더를 묶지 않는다.
+            // 에디터의 GetComponent는 없을 때 가짜 null을 돌려줄 수 있어 ??를 쓰지 않는다.
             var rb = blocker.GetComponent<Rigidbody>();
             if (rb == null)
             {
@@ -103,42 +127,8 @@ namespace _Works.CJW.Scripts.Cars.Editor
             rb.useGravity = false;
             rb.interpolation = RigidbodyInterpolation.None;
 
-            sb.AppendLine($"  {root.name}: 박스 중심 {body.center} 크기 {body.size}");
+            sb.AppendLine($"  {root.name}: 차체 메시 콜라이더 {count}개");
             return true;
-        }
-
-        /// <summary>바퀴를 뺀 차체 메시의 경계를 루트 로컬 공간으로 모은다.</summary>
-        private static Bounds BodyBounds(Transform root, Transform visual)
-        {
-            bool has = false;
-            var bounds = new Bounds();
-            foreach (MeshFilter mf in visual.GetComponentsInChildren<MeshFilter>(true))
-            {
-                if (mf.sharedMesh == null || mf.name.Contains("Wheel"))
-                {
-                    continue;
-                }
-
-                // 바퀴가 차체 메시의 자식일 수 있어 자식까지 모으지 않고 이 메시만 잰다.
-                Bounds mb = mf.sharedMesh.bounds;
-                for (int i = 0; i < 8; i++)
-                {
-                    Vector3 corner = mb.center + Vector3.Scale(mb.extents,
-                        new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
-                    Vector3 p = root.InverseTransformPoint(mf.transform.TransformPoint(corner));
-                    if (!has)
-                    {
-                        bounds = new Bounds(p, Vector3.zero);
-                        has = true;
-                    }
-                    else
-                    {
-                        bounds.Encapsulate(p);
-                    }
-                }
-            }
-
-            return bounds;
         }
 
         /// <summary>이름이 <see cref="LayerName"/>인 레이어가 없으면 빈 칸(8번부터)에 만든다.</summary>

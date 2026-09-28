@@ -31,6 +31,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             return condition == null || condition.IsMet(Ctx);
         }
 
+        /// <summary>조건이 안 맞아 이 행동을 건너뛸 때 대신 돌릴 행동. null이면(기본) 그냥 건너뛰고 다음 행동으로 넘어간다.
+        /// 싸움꾼처럼 조건이 안 맞으면 멍하니 서 있게 되는 손님이 대신 돌아다니게 할 때 쓴다. 돌려주는 행동은 이미 Bind돼 있어야 한다.</summary>
+        public virtual CustomerState WhenConditionFails => null;
+
         /// <summary>이 행동을 수행하고 어떻게 끝났는지 반환한다. 모든 대기에 <paramref name="ct"/>를 물려야 반납 후에도 태스크가 계속 도는 일이 없다.</summary>
         public abstract UniTask<VisitOutcome> Run(CancellationToken ct);
 

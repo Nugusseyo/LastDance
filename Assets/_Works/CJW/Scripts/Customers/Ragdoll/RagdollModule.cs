@@ -128,16 +128,48 @@ namespace _Works.CJW.Scripts.Customers.Ragdoll
             }
         }
 
+        /// <summary>쓰러진 채 꺼졌다. 다시 켜질 때 뼈를 기본 자세로 되돌려야 한다.</summary>
+        private bool _rebindOnEnable;
+
+        private void OnEnable()
+        {
+            if (_rebindOnEnable && _animator != null)
+            {
+                _rebindOnEnable = false;
+                _animator.Rebind();
+            }
+        }
+
         // 풀로 돌아가며 꺼질 때 쓰러진 채로 남으면 다음 손님이 누운 채 나온다.
+        // 물리만 끄면 안 된다 — 쓰러질 때 꺼 둔 Animator·몸통 콜라이더·길찾기를 되살리지 않으면, 쓰러짐 표시는 지워져 있어
+        // 꺼낼 때 ResetItem도 일으키지 않고 손님이 쓰러진 자세 그대로 굳어서 나온다. 본체는 다음 스폰이 제자리에 놓으므로 옮기지 않는다.
         private void OnDisable()
         {
             if (IsActive)
             {
                 SetPhysics(false);
                 IsActive = false;
+
+                // 뼈는 물리가 옮겨 둔 쓰러진 자세 그대로다. 꺼진 채로는 Rebind가 안 되니 다시 켜질 때 기본 자세로 되돌린다.
+                if (_animator != null)
+                {
+                    _animator.enabled = true;
+                    _rebindOnEnable = true;
+                }
+
+                if (_rootCollider != null)
+                {
+                    _rootCollider.enabled = true;
+                }
+
+                if (_agent != null)
+                {
+                    _agent.enabled = true;
+                }
             }
 
             _stayDown = false;
+            _fellThrough = false;
         }
 
         public void Activate(Vector3 launchVelocity, bool stayDown = false)
