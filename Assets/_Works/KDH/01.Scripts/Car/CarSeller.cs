@@ -1,5 +1,4 @@
 using UnityEngine;
-using _Works.KDH._01.Scripts.ItemType;
 
 namespace _Works.KDH._01.Scripts.Car
 {
@@ -9,7 +8,6 @@ namespace _Works.KDH._01.Scripts.Car
         [SerializeField] private int wheelDefaultPrice = 50;
         [SerializeField] private int RefuelingPrice = 50;
         [SerializeField] private LayerMask wheelLayerMask;
-        [SerializeField] private WalletEffect walletEffect;
 
         public int SellCar(GameObject car)
         {
@@ -20,11 +18,6 @@ namespace _Works.KDH._01.Scripts.Car
 
             int price = GetCarBasePrice(car);
             price += GetAttachedWheelsPrice(car);
-
-            if (walletEffect != null && walletEffect.IsMoneyDoubled)
-            {
-                price *= 2;
-            }
 
             Destroy(car);
 
