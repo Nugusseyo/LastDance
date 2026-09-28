@@ -19,6 +19,7 @@ namespace _Works.JYG.Data.Vending_Machine
         [SerializeField] private Button buyButton;
         [SerializeField] private EventChannelSO systemEventChannel;
         [SerializeField] private EventChannelSO uiEventChannel;
+        [SerializeField] private VendingTooltip tooltip;
 
         [Header("아이템 활성화, 비활성화 색상")] 
         [SerializeField] private Color greenColor;
@@ -42,6 +43,11 @@ namespace _Works.JYG.Data.Vending_Machine
             
             if(_moneyManager != null)
                 _moneyManager.OnValueChanged += HandleValueChanged;
+
+            if (tooltip != null)
+            {
+                tooltip.TooltipInit(itemData.tooltipData);
+            }
         }
 
         public void HandleBuyButtonPressed()

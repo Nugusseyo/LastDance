@@ -10,5 +10,6 @@ namespace _Works.JYG._Scripts.Vending_Machine
         public Sprite vendingItemSprite;
         public int price;
         public VendingItemSO itemSO;
+        public VendingTooltipData tooltipData;
     }
 }

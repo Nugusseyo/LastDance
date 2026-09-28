@@ -9,8 +9,10 @@ namespace _Works.CJW.Scripts.MapSystems.Events
 
     public class GasStationEvent : GameEvent
     {
-        public GasStationEvent Init()
+        public int Level;
+        public GasStationEvent Init(int level)
         {
+            Level = level;
             return this;
         }
     }

@@ -20,14 +20,17 @@ namespace _Works.CJW.Scripts.MapSystems
         [SerializeField] private MapDataSo mapData;
         [SerializeField] private OilDispenser[] dispensers;
         private bool _installed;
+        private int _level;
+#if UNITY_EDITOR
         
-        #if UNITY_EDITOR
+        private int _debugLevel;
+        
         [ContextMenu("Install")]
         private void Install()
         {
-            systemChannel.RaiseEvent(MapEvents.GasStationEvent.Init());
+            systemChannel.RaiseEvent(MapEvents.GasStationEvent.Init(_debugLevel++));
         }
-        #endif
+#endif
         
         private void Awake()
         {
@@ -37,18 +40,17 @@ namespace _Works.CJW.Scripts.MapSystems
             systemChannel.AddListener<GasStationEvent>(HandleInstallDispenser);
         }
 
-        private void HandleInstallDispenser(GasStationEvent obj)
+        private void HandleInstallDispenser(GasStationEvent evt)
         {
-            if (_installed) return;
+            // 이벤트로 받아온 레벨이 현재 레벨보다 작거나
+            // 타겟 인덱스(_level - 1)이 배열의 길이보다 크면
+            if (evt.Level < _level || _level - 1 > dispensers.Length) return;
+            _level = evt.Level;
             
-            _installed = true;
-            for (int i = 0; i < dispensers.Length; ++i)
-            {
-                var oilDispenser = dispensers[i];
-                oilDispenser.dispenser.SetActive(true);
-                mapData.Register(oilDispenser.dispenserPos);
-                mapData.Register(oilDispenser.parkingPos);
-            }
+            var newDispenser = dispensers[_level-1];
+            newDispenser.dispenser.SetActive(true);
+            mapData.Register(newDispenser.dispenserPos);
+            mapData.Register(newDispenser.parkingPos);
         }
 
         private void OnDestroy()

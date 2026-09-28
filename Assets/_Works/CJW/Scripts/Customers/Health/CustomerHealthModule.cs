@@ -16,6 +16,7 @@ namespace _Works.CJW.Scripts.Customers.Health
     public class CustomerHealthModule : AbstractModule, ICustomerHealth
     {
         [Header("체력")]
+        [Tooltip("기본 최대 체력. 방문으로 나올 땐 차 등급 표(CarGradeTableSO)의 값이 덮어쓴다.")]
         [SerializeField, Min(1f)] private float maxHealth = 30f;
 
         [Tooltip("한 번 맞은 뒤 이 시간(초) 동안은 다시 맞지 않는다. 한 번 휘두른 주먹이 몸의 여러 콜라이더에 겹쳐 여러 번 들어가는 걸 막는다.")]
@@ -55,7 +56,7 @@ namespace _Works.CJW.Scripts.Customers.Health
         [Tooltip("체력이 바닥나 쓰러질 때 낼 소리(마지막 비명).")]
         [SerializeField] private SoundClipSo deathSound;
 
-        public float MaxHealth => maxHealth;
+        public float MaxHealth { get; private set; }
 
         public float CurrentHealth { get; private set; }
 
@@ -84,8 +85,15 @@ namespace _Works.CJW.Scripts.Customers.Health
         {
             _life++;
             IsDead = false;
+            MaxHealth = maxHealth;
             CurrentHealth = maxHealth;
             _invincibleUntil = 0f;
+        }
+
+        public void SetMaxHealth(float value)
+        {
+            MaxHealth = Mathf.Max(1f, value);
+            CurrentHealth = MaxHealth;
         }
 
         public void TakeHit(HitInfo hit)
