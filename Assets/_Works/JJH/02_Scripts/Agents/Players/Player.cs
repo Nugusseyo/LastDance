@@ -15,7 +15,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         public IPlayerCamera Camera { get; private set; }
         public IPlayerAttackSkill AttackSkill { get; private set; }
         public IPlayerGrab Grab { get; private set; }
-        public IPlayerInteract Interact { get; private set; }
 
         protected override void InitializeComponents()
         {
@@ -27,8 +26,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players
             Debug.Assert(AttackSkill != null, $"{gameObject.name}에는 IPlayerAttackSkill 모듈이 필요합니다.");
             Grab = GetModule<IPlayerGrab>();
             Debug.Assert(Grab != null, $"{gameObject.name}에는 IPlayerGrab 모듈이 필요합니다.");
-            Interact = GetModule<IPlayerInteract>();
-            Debug.Assert(Interact != null, $"{gameObject.name}에는 IPlayerInteract 모듈이 필요합니다.");
 
             PlayerInput.OnInteractKeyPressed += HandleInteract;
             PlayerInput.OnAttackKeyPressed += HandleAttackKeyPressed;
@@ -46,7 +43,6 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         private void HandleInteract()
         {
             Grab.PickupItem();
-            Interact.ActiveVendingMachine();
         }
 
         private void HandleAttackKeyPressed()

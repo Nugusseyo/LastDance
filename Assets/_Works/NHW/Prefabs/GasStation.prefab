@@ -90,7 +90,7 @@ MonoBehaviour:
   hoseStartPoint: {fileID: 3406105654612431683}
   hoseSegments: 12
   hoseSlack: 0.4
-  maxHoseLength: 10
+  maxHoseLength: 16
   tensionStartRatio: 0.7
 --- !u!65 &5065267637857315667
 BoxCollider:
