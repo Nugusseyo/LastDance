@@ -20,6 +20,9 @@ namespace _Works.Shared.Cars
         /// <summary>차의 게임 오브젝트. 치우기 전에 위치를 보거나 연출을 붙일 때 쓴다.</summary>
         GameObject GameObject { get; }
 
+        /// <summary>정상 손님 차(Good)인지 진상 손님 차(Bad)인지. 한 차에는 한쪽 손님만 타서 탄 손님으로 정해진다. 손님이 없던 차는 None.</summary>
+        Resources.DataBase.Human_Data.HumanType HumanType { get; }
+
         /// <summary>차를 치운다. 치웠으면 true, <see cref="CanRemove"/>가 false라 아무것도 하지 않았으면 false.</summary>
         bool Remove();
     }

@@ -2806,7 +2806,7 @@ Transform:
   m_GameObject: {fileID: 431175860}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 49.1, y: -6.3, z: 65.2}
+  m_LocalPosition: {x: 50.36, y: -5.491543, z: 65.6066}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7530,6 +7530,7 @@ MonoBehaviour:
   playerSize: 0.6
   moneyChannel: {fileID: 0}
   garageCarPrice: 300
+  quickScrapFeePercent: 30
   tiltPerWheel: 4
   sinkPerWheel: 0.06
   tiltSpeed: 2
@@ -8698,6 +8699,62 @@ Transform:
   - {fileID: 992099817}
   - {fileID: 1518491095}
   m_Father: {fileID: 1873764688}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1176738545
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1176738547}
+  - component: {fileID: 1176738546}
+  m_Layer: 0
+  m_Name: Wheel Detacher
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1176738546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1176738545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d59c97e92ce8e2443af6e6d1a1dded4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.Wrench.WheelDetacher
+  durationChannel: {fileID: 11400000, guid: c6dff33bcde9eda42a4d11c78f80c7ab, type: 2}
+  playerCamera: {fileID: 2016111837}
+  detachDistance: 4
+  aimDotThreshold: 0.9
+  wheelLayerMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  handDetachTime: 6
+  equippedWrench: {fileID: 0}
+  popForce: 1.5
+  playerGrab: {fileID: 1865818728}
+  garageSender: {fileID: 1039004556}
+--- !u!4 &1176738547
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1176738545}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1183414318
 GameObject:
@@ -12513,6 +12570,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8658339796893999606, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+      propertyPath: garageSender
+      value: 
+      objectReference: {fileID: 1039004556}
     - target: {fileID: 9145058354783832482, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
       propertyPath: m_Name
       value: Player
@@ -13179,6 +13240,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4158486984302932535, guid: 902ef7120bd031842b138ccfcbd033dc, type: 3}
   m_PrefabInstance: {fileID: 1830669060}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1865818728 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7509186337148644496, guid: 2fd16a6267dfc2543a0225233cf40b10, type: 3}
+  m_PrefabInstance: {fileID: 1752975459}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14b868c94a91f9e4abf24c7f2dd18e9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.Grabs.PlayerGrabModule
 --- !u!1 &1873764687
 GameObject:
   m_ObjectHideFlags: 0
@@ -16337,3 +16409,4 @@ SceneRoots:
   - {fileID: 1950771817}
   - {fileID: 2092111940}
   - {fileID: 958342315}
+  - {fileID: 1176738547}
