@@ -39,6 +39,9 @@ namespace _Works.CJW.Scripts.Cars
         [Tooltip("조향각이 이 속도(도/초)보다 빠르게 바뀌지 않게 부드럽게 따라간다.")]
         [SerializeField, Min(1f)] private float steerFollowSpeed = 360f;
 
+        /// <summary>설정된 바퀴들. 차 겉모습만 복사해 쓰는 곳(타이틀 등)이 굴릴 바퀴·축을 알아낼 때 읽는다.</summary>
+        public System.Collections.Generic.IReadOnlyList<Wheel> Wheels => wheels;
+
         private ICarMoveModule _move;
         private float _shownSteer;
 

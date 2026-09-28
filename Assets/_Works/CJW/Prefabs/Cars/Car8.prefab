@@ -312,7 +312,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -518,7 +518,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -734,7 +734,6 @@ MonoBehaviour:
   - {fileID: 2004078059854524208}
   dropOffPoint: {fileID: 328341845133225599}
   parkingTurnSpeed: 180
-  bodyRenderers: []
 --- !u!114 &361057774193484591
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -846,17 +845,17 @@ MonoBehaviour:
     steerAxis: {x: 0, y: 1, z: 0}
     steer: 1
     radius: 0
-  - transform: {fileID: 0}
+  - transform: {fileID: 1143842148685702309}
     spinAxis: {x: 1, y: 0, z: 0}
     steerAxis: {x: 0, y: 1, z: 0}
     steer: 1
     radius: 0
-  - transform: {fileID: 0}
+  - transform: {fileID: 6898515021158045546}
     spinAxis: {x: 1, y: 0, z: 0}
     steerAxis: {x: 0, y: 1, z: 0}
     steer: 0
     radius: 0
-  - transform: {fileID: 0}
+  - transform: {fileID: 1318570318037117126}
     spinAxis: {x: 1, y: 0, z: 0}
     steerAxis: {x: 0, y: 1, z: 0}
     steer: 0
@@ -1140,7 +1139,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -1384,7 +1383,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0

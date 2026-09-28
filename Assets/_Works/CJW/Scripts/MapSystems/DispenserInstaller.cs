@@ -23,7 +23,7 @@ namespace _Works.CJW.Scripts.MapSystems
         private int _level;
 #if UNITY_EDITOR
         
-        private int _debugLevel;
+        private int _debugLevel = 1;
         
         [ContextMenu("Install")]
         private void Install()

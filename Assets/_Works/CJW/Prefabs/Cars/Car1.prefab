@@ -116,7 +116,7 @@ Transform:
   m_GameObject: {fileID: 2498246329497408134}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.4322102, y: 0, z: -0.19664977}
+  m_LocalPosition: {x: -1.395, y: 0, z: -0.724}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -287,7 +287,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -524,7 +524,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -784,7 +784,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -939,7 +939,6 @@ MonoBehaviour:
   - {fileID: 4824210634109957977}
   dropOffPoint: {fileID: 3872201235638293172}
   parkingTurnSpeed: 180
-  bodyRenderers: []
 --- !u!114 &4428098873655496679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1051,17 +1050,17 @@ MonoBehaviour:
     steerAxis: {x: 0, y: 1, z: 0}
     steer: 1
     radius: 0
-  - transform: {fileID: 0}
+  - transform: {fileID: 3109632240049604255}
     spinAxis: {x: 1, y: 0, z: 0}
     steerAxis: {x: 0, y: 1, z: 0}
     steer: 1
     radius: 0
-  - transform: {fileID: 0}
+  - transform: {fileID: 1343024615684101755}
     spinAxis: {x: 1, y: 0, z: 0}
     steerAxis: {x: 0, y: 1, z: 0}
     steer: 0
     radius: 0
-  - transform: {fileID: 0}
+  - transform: {fileID: 7112041229712388313}
     spinAxis: {x: 1, y: 0, z: 0}
     steerAxis: {x: 0, y: 1, z: 0}
     steer: 0
@@ -1399,7 +1398,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0

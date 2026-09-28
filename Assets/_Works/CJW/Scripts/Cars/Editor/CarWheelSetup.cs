@@ -13,6 +13,14 @@ namespace _Works.CJW.Scripts.Cars.Editor
         {
             "Assets/_Works/Share/Prefabs/Car.prefab",
             "Assets/_Works/Share/Prefabs/TestSUV.prefab",
+            "Assets/_Works/CJW/Prefabs/Cars/Car1.prefab",
+            "Assets/_Works/CJW/Prefabs/Cars/Car2.prefab",
+            "Assets/_Works/CJW/Prefabs/Cars/Car3.prefab",
+            "Assets/_Works/CJW/Prefabs/Cars/Car4.prefab",
+            "Assets/_Works/CJW/Prefabs/Cars/Car5.prefab",
+            "Assets/_Works/CJW/Prefabs/Cars/Car6.prefab",
+            "Assets/_Works/CJW/Prefabs/Cars/Car7.prefab",
+            "Assets/_Works/CJW/Prefabs/Cars/Car8.prefab",
         };
 
         /// <summary>이름에 이 말이 들어간 오브젝트를 바퀴로 본다. 큐브 차는 원통(Cylinder) 두 개가 앞뒤 차축이다.</summary>
@@ -71,6 +79,13 @@ namespace _Works.CJW.Scripts.Cars.Editor
                         e.FindPropertyRelative("steerAxis").vector3Value = up;
                         e.FindPropertyRelative("steer").boolValue = front;
                         e.FindPropertyRelative("radius").floatValue = 0f;
+                        
+                        // 차에 붙어 있는 동안은 키네마틱. 집거나 던질 때는 GrabItem이 바꾼다.
+                        Rigidbody rb = t.GetComponent<Rigidbody>();
+                        if (rb != null)
+                        {
+                            rb.isKinematic = true;
+                        }
 
                         sb.AppendLine($"  {t.name}: 굴림축 {spin}, 위축 {up}, {(front ? "앞(조향)" : "뒤")}, " +
                                       $"피벗과 모양 중심 거리 {pivotOffset:F3}m{(pivotOffset > 0.05f ? "  ← 피벗이 중심이 아니라 돌리면 흔들립니다" : "")}");

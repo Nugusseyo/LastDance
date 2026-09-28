@@ -42,6 +42,7 @@ GameObject:
   - component: {fileID: 6396943697226378912}
   - component: {fileID: 7863399924236419230}
   - component: {fileID: 5065267637857315667}
+  - component: {fileID: 2317437933560887892}
   m_Layer: 17
   m_Name: GasStation
   m_TagString: Untagged
@@ -89,6 +90,8 @@ MonoBehaviour:
   hoseStartPoint: {fileID: 3406105654612431683}
   hoseSegments: 12
   hoseSlack: 0.4
+  maxHoseLength: 10
+  tensionStartRatio: 0.7
 --- !u!65 &5065267637857315667
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -110,6 +113,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.3698348, y: 1.7477796, z: 0.65151477}
   m_Center: {x: -0.0016284436, y: 0.8876786, z: 0.0014289618}
+--- !u!208 &2317437933560887892
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2312473289182914779}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.25, y: 0.5, z: 0.35}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &8058258921890188493
 GameObject:
   m_ObjectHideFlags: 0

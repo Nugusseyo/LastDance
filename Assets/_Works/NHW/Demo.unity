@@ -336,7 +336,7 @@ GameObject:
   - component: {fileID: 88065211}
   - component: {fileID: 88065212}
   m_Layer: 0
-  m_Name: OilDispenserPoint
+  m_Name: Dispenser Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1054,7 +1054,7 @@ GameObject:
   - component: {fileID: 156905580}
   - component: {fileID: 156905581}
   m_Layer: 0
-  m_Name: Slot (5)
+  m_Name: Parking Slot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1654,7 +1654,7 @@ GameObject:
   - component: {fileID: 253041809}
   - component: {fileID: 253041810}
   m_Layer: 0
-  m_Name: OilDispenserPoint
+  m_Name: Dispenser Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4343,6 +4343,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &658314642 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2312473289182914779, guid: 08a2ccf6a16f3b84183c7520690d32b3, type: 3}
+  m_PrefabInstance: {fileID: 146610463}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &661543593
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4764,7 +4769,7 @@ GameObject:
   - component: {fileID: 732829900}
   - component: {fileID: 732829901}
   m_Layer: 0
-  m_Name: Slot (6)
+  m_Name: Parking Slot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6350,7 +6355,7 @@ GameObject:
   - component: {fileID: 896088203}
   - component: {fileID: 896088204}
   m_Layer: 0
-  m_Name: OilDispenserPoint
+  m_Name: Dispenser Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6638,14 +6643,11 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6396943697226378912, guid: 08a2ccf6a16f3b84183c7520690d32b3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1493010345}
+      addedObject: {fileID: 1401272715}
     - targetCorrespondingSourceObject: {fileID: 6396943697226378912, guid: 08a2ccf6a16f3b84183c7520690d32b3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 896088203}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2312473289182914779, guid: 08a2ccf6a16f3b84183c7520690d32b3, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 923142810}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08a2ccf6a16f3b84183c7520690d32b3, type: 3}
 --- !u!4 &923142806 stripped
 Transform:
@@ -6657,22 +6659,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2312473289182914779, guid: 08a2ccf6a16f3b84183c7520690d32b3, type: 3}
   m_PrefabInstance: {fileID: 923142805}
   m_PrefabAsset: {fileID: 0}
---- !u!208 &923142810
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 923142807}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.25, y: 0.5, z: 0.35}
-  m_MoveThreshold: 0.1
-  m_Carve: 1
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!1001 &924690454
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8485,7 +8471,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6396943697226378912, guid: 08a2ccf6a16f3b84183c7520690d32b3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1401272715}
+      addedObject: {fileID: 1493010345}
     - targetCorrespondingSourceObject: {fileID: 6396943697226378912, guid: 08a2ccf6a16f3b84183c7520690d32b3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 88065211}
@@ -10368,7 +10354,7 @@ GameObject:
   - component: {fileID: 1372492962}
   - component: {fileID: 1372492963}
   m_Layer: 0
-  m_Name: OilDispenserPoint (1)
+  m_Name: Dispenser Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10416,7 +10402,7 @@ GameObject:
   - component: {fileID: 1401272715}
   - component: {fileID: 1401272716}
   m_Layer: 0
-  m_Name: Slot (5)
+  m_Name: Parking Slot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10430,12 +10416,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1401272714}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.7599304, y: 0, z: -5.137056}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2.7599304, y: 0, z: 0.79294395}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1125430590}
+  m_Father: {fileID: 923142806}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1401272716
 MonoBehaviour:
@@ -11074,7 +11060,7 @@ GameObject:
   - component: {fileID: 1493010345}
   - component: {fileID: 1493010346}
   m_Layer: 0
-  m_Name: Slot (5)
+  m_Name: Parking Slot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11088,12 +11074,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1493010344}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.495465, y: 0, z: 6.7170525}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2.495465, y: 0, z: 0.7870527}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 923142806}
+  m_Father: {fileID: 1125430590}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1493010346
 MonoBehaviour:
@@ -14846,6 +14832,9 @@ MonoBehaviour:
   systemChannel: {fileID: 11400000, guid: d31e526d71d1b444f89007a57798b10f, type: 2}
   mapData: {fileID: 11400000, guid: a8ef4851016c0c14ea9c47dfd6375462, type: 2}
   dispensers:
+  - dispenser: {fileID: 658314642}
+    dispenserPos: {fileID: 253041810}
+    parkingPos: {fileID: 156905581}
   - dispenser: {fileID: 923142807}
     dispenserPos: {fileID: 896088204}
     parkingPos: {fileID: 1493010346}
@@ -14861,7 +14850,7 @@ Transform:
   m_GameObject: {fileID: 2092111938}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 29.30522, y: -0, z: 21.67686}
+  m_LocalPosition: {x: 0, y: -0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -123,8 +123,6 @@ MonoBehaviour:
   - {fileID: 1022657891774264322}
   dropOffPoint: {fileID: 3804251931187269582}
   parkingTurnSpeed: 180
-  bodyRenderers:
-  - {fileID: 2814589650673540779}
 --- !u!114 &7923200295318655933
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -505,10 +503,5 @@ Transform:
 --- !u!4 &2814589650671639631 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400004, guid: a446810b4feee0342962f7375c74f6a0, type: 3}
-  m_PrefabInstance: {fileID: 2814589650671240907}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &2814589650673540779 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 2300000, guid: a446810b4feee0342962f7375c74f6a0, type: 3}
   m_PrefabInstance: {fileID: 2814589650671240907}
   m_PrefabAsset: {fileID: 0}
