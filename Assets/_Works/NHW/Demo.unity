@@ -919,7 +919,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2312473289182914779, guid: 08a2ccf6a16f3b84183c7520690d32b3, type: 3}
       propertyPath: m_Name
-      value: GasStation
+      value: GasStation (1)
       objectReference: {fileID: 0}
     - target: {fileID: 6396943697226378912, guid: 08a2ccf6a16f3b84183c7520690d32b3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1069,7 +1069,7 @@ Transform:
   m_GameObject: {fileID: 156905579}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: 2.6276932, y: -0.17694402, z: -1.0360775}
+  m_LocalPosition: {x: 3.22, y: -0.17694402, z: -1.0360775}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1669,7 +1669,7 @@ Transform:
   m_GameObject: {fileID: 253041808}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5976944, y: -0.01694405, z: 0.053922653}
+  m_LocalPosition: {x: 0.99, y: -0.01694405, z: 0.053922653}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4779,7 +4779,7 @@ Transform:
   m_GameObject: {fileID: 732829899}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: 2.6276932, y: -0.17694402, z: -0.97607774}
+  m_LocalPosition: {x: 3.22, y: -0.17694402, z: -0.97607774}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6343,7 +6343,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2312473289182914779, guid: 08a2ccf6a16f3b84183c7520690d32b3, type: 3}
       propertyPath: m_Name
-      value: GasStation (1)
+      value: GasStation
       objectReference: {fileID: 0}
     - target: {fileID: 6396943697226378912, guid: 08a2ccf6a16f3b84183c7520690d32b3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -10543,7 +10543,7 @@ Transform:
   m_GameObject: {fileID: 1372492961}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5976944, y: -0.01694405, z: 0.033922493}
+  m_LocalPosition: {x: 0.98999786, y: -0.01694405, z: 0.033922493}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13808,7 +13808,7 @@ MonoBehaviour:
   autoDepartSeconds: 60
   passingTraffic: 1
   passingInterval: {x: 1, y: 2}
-  enterChance: 0.3
+  enterChance: 0.6
   passingLanes: 2
   passingLaneSpacing: 4
   maxPassingCars: 20
@@ -14304,8 +14304,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 146610464}
   - {fileID: 887940820}
+  - {fileID: 146610464}
   - {fileID: 923142806}
   - {fileID: 1125430590}
   m_Father: {fileID: 1873764688}

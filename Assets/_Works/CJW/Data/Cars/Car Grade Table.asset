@@ -16,12 +16,16 @@ MonoBehaviour:
   - grade: 1
     unlockReputation: 0
     weight: 11
+    customerHealth: 3
   - grade: 2
     unlockReputation: 35
     weight: 7
+    customerHealth: 5
   - grade: 3
     unlockReputation: 75
     weight: 6
+    customerHealth: 10
   - grade: 4
     unlockReputation: 120
     weight: 5
+    customerHealth: 30

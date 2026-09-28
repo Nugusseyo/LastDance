@@ -6,7 +6,9 @@ using _Works.CJW.Scripts.MapSystems;
 using _Works.CJW.Scripts.Sounds;
 using _Works.Shared.Cars;
 using DevLib.ObjectPool.Runtime;
+using Resources.DataBase.Human_Data;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace _Works.CJW.Scripts.Cars
 {
@@ -22,9 +24,6 @@ namespace _Works.CJW.Scripts.Cars
         [Tooltip("정차 자리 방향으로 돌아설 때의 각속도(도/초).")]
         [SerializeField] private float parkingTurnSpeed = 180f;
 
-        [Tooltip("차체 색을 덮어쓸 렌더러. 비워두면 색 변형을 쓰지 않는다.")]
-        [SerializeField] private Renderer[] bodyRenderers;
-
         private ICarMoveModule _moveModule;
 
 
@@ -33,13 +32,10 @@ namespace _Works.CJW.Scripts.Cars
 
         /// <summary>이 차의 수치. 스폰될 때 <see cref="Setup"/>으로 주입된다.</summary>
         public CarDataSO Data { get; private set; }
+        
+        public HumanType HumanType { get; private set; }
 
-        /// <summary>이 차가 정상 손님 차인지 진상 손님 차인지. 한 차에는 한쪽 손님만 타므로 탄 손님으로 정해진다
-        /// (방문 차는 VisitDirector가 손님을 태울 때, 훔친 차는 훔친 손님이 몰고 떠날 때). 손님이 없는 차(지나가는 차 등)는 None.
-        /// 손님이 죽거나 차를 버리고 가도 바뀌지 않는다 — 버려진 진상 차는 여전히 진상 차다.</summary>
-        public Resources.DataBase.Human_Data.HumanType HumanType { get; private set; }
-
-        public void SetHumanType(Resources.DataBase.Human_Data.HumanType type) => HumanType = type;
+        public void SetHumanType(HumanType type) => HumanType = type;
 
         /// <summary>실제로 쓸 수 있는 좌석 수. 배열 길이가 아니라 채워진 칸의 수다.</summary>
         public int SeatCount
@@ -115,23 +111,7 @@ namespace _Works.CJW.Scripts.Cars
 
             _moveModule ??= GetModule<ICarMoveModule>();
             _moveModule?.ApplyStats(data.MoveSpeed, data.ArriveThreshold);
-
-        }
-
-        private void ClearBodyColor()
-        {
-            if (bodyRenderers == null)
-            {
-                return;
-            }
-
-            for (int i = 0; i < bodyRenderers.Length; i++)
-            {
-                if (bodyRenderers[i] != null)
-                {
-                    bodyRenderers[i].SetPropertyBlock(null);
-                }
-            }
+        
         }
 
         /// <summary>인덱스가 좌석 범위 안인지. 태우기 전에 물어보면 경고 없이 확인할 수 있다.</summary>
@@ -198,15 +178,14 @@ namespace _Works.CJW.Scripts.Cars
             HumanType = Resources.DataBase.Human_Data.HumanType.None;
             _remover = null;
             Stop();
-            ClearBodyColor();
             GetModule<ICarWheelModule>()?.ResetPose();
 
             // 지나가던 차가 다음에 방문 차로 나올 수 있다. 에이전트·구멍을 꺼 둔 채 두면 길을 찾지 못한다.
             SetGliding(false);
         }
 
-        private UnityEngine.AI.NavMeshAgent _agent;
-        private UnityEngine.AI.NavMeshObstacle _footprint;
+        private NavMeshAgent _agent;
+        private NavMeshObstacle _footprint;
 
         /// <summary>도로를 지나가기만 하는 차처럼 밖에서 직접 옮길지(<see cref="Glide"/>). 켜면 경로 찾기와 조향을 멈추고,
         /// 에이전트와 NavMesh 구멍(장애물)을 끈다 — 달리는 차가 구멍을 내면 도로 NavMesh가 매 프레임 다시 깎여 다른 차의 길이 흔들린다.
@@ -218,8 +197,8 @@ namespace _Works.CJW.Scripts.Cars
                 Stop();
             }
 
-            _agent ??= GetComponentInChildren<UnityEngine.AI.NavMeshAgent>(true);
-            _footprint ??= GetComponentInChildren<UnityEngine.AI.NavMeshObstacle>(true);
+            _agent ??= GetComponentInChildren<NavMeshAgent>(true);
+            _footprint ??= GetComponentInChildren<NavMeshObstacle>(true);
 
             if (_agent != null)
             {
