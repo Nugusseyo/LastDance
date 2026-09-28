@@ -262,6 +262,13 @@ namespace _Works.CJW.Scripts.Test.Editor
                 return;
             }
 
+            foreach (Vector3 probe in new[] { new Vector3(10f, 0.1f, 90f), new Vector3(30f, 0.1f, 90f), new Vector3(30f, 0.1f, 40f), new Vector3(20f, 0.1f, 60f) })
+            {
+                var f = QueryFilter(carAgent);
+                string area = NavMesh.SamplePosition(probe, out NavMeshHit ah, 1f, f) ? $"mask={ah.mask} (area {Mathf.RoundToInt(Mathf.Log(ah.mask, 2))})" : "none";
+                sb.AppendLine($"  car area at ({probe.x},{probe.z}): {area}");
+            }
+
             ReportTrafficMap(sb, spawn, exit, from, carAgent, byType);
 
             // 도로와 부지 사이(울타리) 1m 지도. '='도로 '#'도로 밖 차 NavMesh '.'없음 'f'=Road fence 콜라이더.
@@ -326,7 +333,7 @@ namespace _Works.CJW.Scripts.Test.Editor
             sb.AppendLine($"  car spawn→exit {PathInfo(from, exit.position, carAgent)}");
             var through = new NavMeshPath();
             if (Sample(exit.position, carAgent, out Vector3 exitOnMesh) &&
-                NavMesh.CalculatePath(from, exitOnMesh, new NavMeshQueryFilter { agentTypeID = carAgent, areaMask = NavMesh.AllAreas }, through))
+                NavMesh.CalculatePath(from, exitOnMesh, QueryFilter(carAgent), through))
             {
                 var corners = new List<string>();
                 foreach (Vector3 c in through.corners)
@@ -382,11 +389,13 @@ namespace _Works.CJW.Scripts.Test.Editor
                 if (r >= 0 && r < h && c >= 0 && c < w) grid[r, c] = ch;
             }
 
-            void Draw(Vector3 a, Vector3 b, char ch)
+            void Draw(Vector3 a, Vector3 b, char ch, bool roadOnly = false)
             {
                 var path = new NavMeshPath();
+                NavMeshQueryFilter f = QueryFilter(carAgent);
+                if (roadOnly) f.areaMask = Cars.CarNavMesh.RoadOnlyMask;
                 if (!Sample(b, carAgent, out Vector3 end, 20f) || !Sample(a, carAgent, out Vector3 start, 20f) ||
-                    !NavMesh.CalculatePath(start, end, new NavMeshQueryFilter { agentTypeID = carAgent, areaMask = NavMesh.AllAreas }, path))
+                    !NavMesh.CalculatePath(start, end, f, path) || path.status != NavMeshPathStatus.PathComplete)
                 {
                     return;
                 }
@@ -401,7 +410,7 @@ namespace _Works.CJW.Scripts.Test.Editor
                 }
             }
 
-            Draw(spawn.position, exit.position, 'o');
+            Draw(spawn.position, exit.position, 'o', true);
             if (byType.TryGetValue(MapPointType.ParkingSlot, out List<MapPosition> slots))
             {
                 foreach (MapPosition s in slots)
@@ -434,7 +443,7 @@ namespace _Works.CJW.Scripts.Test.Editor
         {
             var path = new NavMeshPath();
             if (!Sample(to, agentType, out Vector3 end, 20f) ||
-                !NavMesh.CalculatePath(from, end, new NavMeshQueryFilter { agentTypeID = agentType, areaMask = NavMesh.AllAreas }, path))
+                !NavMesh.CalculatePath(from, end, QueryFilter(agentType), path))
             {
                 return "-";
             }
@@ -446,6 +455,14 @@ namespace _Works.CJW.Scripts.Test.Editor
             }
 
             return string.Join(" ", corners);
+        }
+
+        /// <summary>게임과 같은 구역 비용을 쓰는 필터. 필터 비용은 1로 시작하므로 도로 밖 비용을 넣어야 차 경로가 게임과 같다.</summary>
+        private static NavMeshQueryFilter QueryFilter(int agentType)
+        {
+            var filter = new NavMeshQueryFilter { agentTypeID = agentType, areaMask = NavMesh.AllAreas };
+            filter.SetAreaCost(Cars.CarNavMesh.OffroadArea, Cars.CarNavMesh.OffroadCost);
+            return filter;
         }
 
         private static int FindCustomerAgentType(out string source)
@@ -467,7 +484,7 @@ namespace _Works.CJW.Scripts.Test.Editor
 
         private static bool Sample(Vector3 pos, int agentType, out Vector3 hitPos, float radius = SampleRadius)
         {
-            var filter = new NavMeshQueryFilter { agentTypeID = agentType, areaMask = NavMesh.AllAreas };
+            var filter = QueryFilter(agentType);
             if (NavMesh.SamplePosition(pos, out NavMeshHit hit, radius, filter))
             {
                 hitPos = hit.position;
@@ -485,7 +502,7 @@ namespace _Works.CJW.Scripts.Test.Editor
                 return "target off navmesh";
             }
 
-            var filter = new NavMeshQueryFilter { agentTypeID = agentType, areaMask = NavMesh.AllAreas };
+            var filter = QueryFilter(agentType);
             var path = new NavMeshPath();
             if (!NavMesh.CalculatePath(from, end, filter, path))
             {

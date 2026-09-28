@@ -342,6 +342,15 @@ namespace _Works.CJW.Scripts.Cars.Editor
             }
 
             names.GetArrayElementAtIndex(index).stringValue = CarNavMesh.AgentTypeName;
+
+            // 도로 밖 구역. 이름과 비용을 설정에도 남겨 Navigation 창에서 보이게 한다(실행 중 비용은 CarNavMesh가 다시 맞춘다).
+            SerializedProperty area = so.FindProperty("areas").GetArrayElementAtIndex(CarNavMesh.OffroadArea);
+            area.FindPropertyRelative("name").stringValue = CarNavMesh.OffroadAreaName;
+            area.FindPropertyRelative("cost").floatValue = CarNavMesh.OffroadCost;
+
+            SerializedProperty road = so.FindProperty("areas").GetArrayElementAtIndex(CarNavMesh.RoadArea);
+            road.FindPropertyRelative("name").stringValue = CarNavMesh.RoadAreaName;
+            road.FindPropertyRelative("cost").floatValue = 1f;
             so.ApplyModifiedPropertiesWithoutUndo();
             AssetDatabase.SaveAssets();
 
@@ -471,7 +480,12 @@ namespace _Works.CJW.Scripts.Cars.Editor
                 }
 
                 modifier.overrideArea = true;
-                modifier.area = WalkableArea;
+
+                // 지형은 도로 밖이다. 걸을 수는 있되 비용을 높여, 차가 도로를 따라가다 목적지 가까이에서만 벗어나게 한다.
+                // 도로는 지형과 겹쳐 구워지므로 지형보다 큰 구역 번호를 줘야 도로로 남는다.
+                modifier.area = root.GetComponent<Terrain>() != null ? CarNavMesh.OffroadArea
+                    : path == "Map/Road" ? CarNavMesh.RoadArea
+                    : WalkableArea;
                 modifier.applyToChildren = true;
 
                 var so = new SerializedObject(modifier);

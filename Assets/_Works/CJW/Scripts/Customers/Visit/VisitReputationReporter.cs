@@ -33,6 +33,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
             public Action<AbstractCustomer> OnFuelLate;
             public Action<AbstractCustomer> OnMisconduct;
             public Action<VisitSession> OnCompleted;
+
+            /// <summary>이 방문에서 진상 짓을 알려 이미 깎았는지. 그랬으면 방문 끝에 '진상을 놓침'으로 한 번 더 깎지 않는다.</summary>
+            public bool MisconductReported;
         }
 
         [Header("참조")]
@@ -51,7 +54,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
         [SerializeField] private bool reportBadDefeated = true;
         [Tooltip("진상을 퇴치하지 못하고 방문이 끝났을 때 (나쁜 리뷰). 진상 짓을 시작할 때 스스로 알리는 손님(싸움꾼)은 제외한다.")]
         [SerializeField] private bool reportBadMissed = true;
-        [Tooltip("진상 짓이 시작됐을 때 (나쁜 리뷰). 지금은 싸움꾼 둘이 마주 서서 싸우기 시작할 때 온다.")]
+        [Tooltip("진상 짓이 시작됐을 때 (나쁜 리뷰). 싸움꾼 둘이 마주 서서 싸우기 시작할 때, 길막이 차가 입구를 막고 섰을 때, 뺑뺑이 차가 돌기 시작할 때 온다.")]
         [SerializeField] private bool reportMisconduct = true;
         [Tooltip("일반인(HumanDB type Good)을 때렸을 때, 한 대마다 (나쁜 리뷰).")]
         [SerializeField] private bool reportGoodHit = true;
@@ -92,7 +95,11 @@ namespace _Works.CJW.Scripts.Customers.Visit
             var hooks = new SessionHooks();
             hooks.OnFueled = customer => Raise(reportFueled, ReviewType.Good, customer, "주유 받음");
             hooks.OnFuelLate = customer => Raise(reportFuelLate, ReviewType.Late, customer, "주유 늦음");
-            hooks.OnMisconduct = customer => Raise(reportMisconduct, ReviewType.Bad, customer, "진상 짓 시작(싸움)");
+            hooks.OnMisconduct = customer =>
+            {
+                hooks.MisconductReported = true;
+                Raise(reportMisconduct, ReviewType.Bad, customer, "진상 짓 시작");
+            };
             hooks.OnCompleted = OnVisitCompleted;
 
             session.Fueled += hooks.OnFueled;
@@ -158,7 +165,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             for (int i = 0; i < hooks.Customers.Count; i++)
             {
                 Tracked tracked = hooks.Customers[i];
-                if (!tracked.Defeated && tracked.Customer != null && ActsBad(tracked.Customer))
+                if (!hooks.MisconductReported && !tracked.Defeated && tracked.Customer != null && ActsBad(tracked.Customer))
                 {
                     Raise(reportBadMissed, ReviewType.Bad, tracked.Customer, "진상을 놓침");
                 }

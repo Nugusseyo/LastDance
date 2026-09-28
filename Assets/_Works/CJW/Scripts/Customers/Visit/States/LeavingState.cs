@@ -254,7 +254,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
 
         /// <summary>서 있는 앞차에 막혀 있으면 빠져나갈 계획을 세워 출발시킨다. 막혀 있지 않으면 false.
         /// 앞차와 붙어 있으면 먼저 곧게 물러나 사이를 벌리고, 줄 옆 빈 곳이 있으면 그리로, 없으면 곧장 퇴장 지점으로 간다.</summary>
-        private bool TryEscapeParkedBlocker(VisitContext context)
+        private bool TryEscapeParkedBlocker(VisitContext context, bool forceTurn = false)
         {
             if (!IsBlockedByParkedCar(context.Car, out float frontGap, out ICarTrafficSensor blocker))
             {
@@ -265,13 +265,17 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
             float needed = PassGap - frontGap;
             float backOff = CanReverse(context.Car, out float room) ? Mathf.Clamp(needed, 0f, room) : 0f;
 
-            // 뒤에도 차가 서 있어 거의 못 물러선다(두 차 사이에 낀 차). 제자리에서 앞뒤로 오가며 열린 옆쪽으로 차를 튼 뒤 빠져나간다.
-            if (needed > 0.5f && backOff < Mathf.Min(needed, MinUsefulBackOff) && TryChooseOpenSide(context.Car, out Vector3 turnTo))
+            // 거의 못 물러선다(뒤에 차가 서 있거나 뒤꽁무니가 NavMesh 끝을 향함). 제자리에서 앞뒤로 오가며 열린 옆쪽으로 차를 튼 뒤 빠져나간다.
+            // 앞선 계획이 제자리에서 실패했으면(forceTurn) 물러설 수 있어 보여도 튼다.
+            bool cramped = needed > 0.5f && backOff < Mathf.Min(needed, MinUsefulBackOff);
+            if ((cramped || forceTurn) && TryChooseOpenSide(context.Car, out Vector3 turnTo))
             {
                 context.Departing = false;
                 context.Car.MoveTo(context.ExitPoint);
                 context.Car.TurnInPlace(turnTo);
-                Debug.Log($"[Leaving] {context.Car.name}이(가) 앞뒤 차 사이에 끼어(앞 {frontGap:F1}m, 물러설 수 있는 거리 {room:F1}m) 제자리에서 옆으로 틀어 나갑니다.", context.Car);
+                Debug.Log($"[Leaving] {context.Car.name}이(가) " +
+                          (cramped ? "앞뒤가 막혀" : $"탈출 계획을 {context.LeaveEscapeRetries}번 다시 세워도 제자리라") +
+                          $"(앞 {frontGap:F1}m, 물러설 수 있는 거리 {room:F1}m) 제자리에서 옆으로 틀어 나갑니다.", context.Car);
                 return true;
             }
 
@@ -392,7 +396,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
         /// <summary>앞차 옆을 나란히 지나는 직선의 시작점까지 앞으로 달릴 거리(m). 옆으로 3m쯤 비키려면 이만큼은 있어야 앞차·주유기를 긁지 않고 틀 수 있다.</summary>
         private const float PassRunUp = 8f;
 
-        /// <summary>뒤로 얼마나 물러설 수 있는지. 뒤 범퍼 뒤로 차가 있으면 그 앞까지만.</summary>
+        /// <summary>뒤로 얼마나 물러설 수 있는지. 뒤 범퍼 뒤로 차가 있으면 그 앞까지만.
+        /// 차 NavMesh도 이동 모듈과 같은 기준으로 본다 — 이동 모듈은 뒤 범퍼 너머 <see cref="ReverseMeshClearance"/>까지 NavMesh가 끊기면 후진을 그만둔다.
+        /// 끝점만 보면 비스듬히 선 차의 뒤꽁무니가 주유기 섬을 향해도 물러설 수 있다고 계획하고, 후진은 곧바로 취소돼 앞뒤로 막힌 채 선다.</summary>
         private static bool CanReverse(Car car, out float room)
         {
             ICarTrafficSensor self = car.GetModule<ICarTrafficSensor>();
@@ -402,11 +408,25 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
             forward.Normalize();
             Vector3 rearBumper = (self != null ? self.Center : t.position) - forward * (self != null ? self.BoundingRadius * 0.9f : 2.5f);
 
+            // 서 있던 차는 자기 구멍이 뒤 범퍼 너머 1m까지 나 있을 수 있다. 거기서부터 잰다(이동 모듈의 IsReverseBlocked와 같다).
+            bool hasMeshStart = CarNavMesh.SamplePosition(rearBumper - forward * 1f, out NavMeshHit meshStart, 2f);
+
             for (room = MaxBackOff; room >= 1f; room -= 1f)
             {
                 // 물러선 뒤에도 뒤차와 1m는 떨어져 있어야 한다.
-                if (CarTraffic.IsSegmentClear(rearBumper, rearBumper - forward * (room + 1f), 1.2f, self) &&
-                    TrySampleCarMesh(t.position - forward * room, out _))
+                if (!CarTraffic.IsSegmentClear(rearBumper, rearBumper - forward * (room + 1f), 1.2f, self) ||
+                    !TrySampleCarMesh(t.position - forward * room, out _))
+                {
+                    continue;
+                }
+
+                Vector3 meshEnd = rearBumper - forward * (room + ReverseMeshClearance);
+                if (hasMeshStart)
+                {
+                    meshEnd.y = meshStart.position.y;
+                }
+
+                if (hasMeshStart && !CarNavMesh.Raycast(meshStart.position, meshEnd, out _))
                 {
                     return true;
                 }
@@ -415,6 +435,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
             room = 0f;
             return false;
         }
+
+        /// <summary>물러선 뒤에도 뒤 범퍼 너머로 이만큼(m) 차 NavMesh가 이어져야 한다. 이동 모듈의 후진 여유(_reverseClearance)와 같다.</summary>
+        private const float ReverseMeshClearance = 2.5f;
 
         /// <summary>차 정면 바로 앞에 서 있는 차가 있는지. 움직이는 차는 곧 비키니 뺀다. <paramref name="gap"/>은 앞차 중심까지의 앞쪽 거리(m).</summary>
         private static bool IsBlockedByParkedCar(Car car, out float gap, out ICarTrafficSensor blocker)
@@ -877,6 +900,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
                 context.LeaveStallElapsed = 0f;
                 context.LeaveHonkElapsed = 0f;
                 context.LeaveEscapeElapsed = 0f;
+                context.LeaveEscapeRetries = 0;
                 return false;
             }
 
@@ -893,7 +917,11 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
                 if (context.LeaveEscapeElapsed >= EscapeRetryInterval)
                 {
                     context.LeaveEscapeElapsed = 0f;
-                    TryEscapeParkedBlocker(context);
+                    context.LeaveEscapeRetries++;
+
+                    // 다시 세운 계획으로도 한 발짝 못 나갔다. 같은 계획을 되풀이해 봐야 또 선다 —
+                    // 앞은 앞차, 뒤는 NavMesh 끝이라 물러서기가 곧바로 취소되는 경우다. 제자리에서 열린 옆쪽으로 틀어 본다.
+                    TryEscapeParkedBlocker(context, context.LeaveEscapeRetries >= 2);
                 }
 
                 // 앞차를 기다리는 중이다. 한동안 안 비키면 경적을 울린다.

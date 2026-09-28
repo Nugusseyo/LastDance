@@ -34,6 +34,10 @@ namespace _Works.CJW.Scripts.Cars
         /// <summary>제자리 회전처럼 목적지를 향해 달리는 게 아닌 기동 중인지.</summary>
         bool IsManeuvering => false;
 
+        /// <summary>경로·조향 없이 밖에서 정한 자리로 차를 옮긴다(도로를 지나가기만 하는 차). 바닥 높이는 이동 수단이 맞추고,
+        /// <paramref name="speed"/>는 바퀴를 굴리는 데만 쓴다. 지원하지 않으면 false — 부른 쪽이 위치만 옮긴다.</summary>
+        bool Glide(Vector3 position, Quaternion rotation, float speed) => false;
+
         /// <summary>CarDataSO의 값을 이동 수단에 반영한다. moveSpeed가 0 이하면 프리팹 값을 그대로 쓴다.</summary>
         void ApplyStats(float moveSpeed, float arriveThreshold);
     }

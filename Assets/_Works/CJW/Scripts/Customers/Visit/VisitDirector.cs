@@ -88,6 +88,12 @@ namespace _Works.CJW.Scripts.Customers.Visit
         [Tooltip("나온 차가 주유소에 들어올 확률. 빈 주차 자리가 없거나 동시 방문이 꽉 차면 확률과 상관없이 지나간다.")]
         [SerializeField, Range(0f, 1f)] private float enterChance = 0.3f;
 
+        [Tooltip("지나가는 차가 나눠 달리는 차선 수. 스폰→퇴장 직선을 가운데로 두고 옆으로 나란히 놓는다.")]
+        [SerializeField, Min(1)] private int passingLanes = 2;
+
+        [Tooltip("차선 중심 사이 거리(m). 도로 폭 안에 모든 차선이 들어가야 한다(Demo 도로 폭 8m → 4m).")]
+        [SerializeField, Min(2f)] private float passingLaneSpacing = 4f;
+
         [Tooltip("동시에 도로를 지나가는 차의 최대 수. 꽉 차면 지나갈 차는 나오지 않고 들어올 차만 나온다.")]
         [SerializeField, Min(0)] private int maxPassingCars = 6;
 
@@ -284,29 +290,90 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// 앞 차에 탄 싸움꾼의 짝은 확률과 상관없이 들어온다 — 안 들이면 먼저 온 싸움꾼이 혼자 기다린다.</summary>
         private void TickPassingTraffic(float dt)
         {
-            _passing.Tick(dt, exitPoint.position, passingExitRadius, passingMaxLifetime);
+            _passing.Tick(dt, passingExitRadius, passingMaxLifetime);
 
             _spawnTimer -= dt;
             if (_spawnTimer > 0f)
                 return;
 
-            // 스폰 지점이 막혀 있으면 타이머를 남겨둔다. 빠지는 순간 바로 나온다.
-            if (!CarTraffic.IsAreaClear(spawnPoint.position, spawnClearRadius))
-                return;
+            // 들어올지는 차 한 대마다 한 번만 정한다. 스폰 자리가 막혀 기다리는 동안 매 프레임 다시 뽑으면 들어오는 확률이 부풀어 오른다.
+            _nextSpawnEnters ??= CanEnterStation() && (_pendingPartner != null || Random.value < enterChance);
 
-            // BeginVisit이 짝을 곧바로 보내려고 타이머를 0으로 되돌릴 수 있으므로 먼저 건다.
-            _spawnTimer = Random.Range(passingInterval.x, Mathf.Max(passingInterval.x, passingInterval.y));
-
-            bool enters = CanEnterStation() && (_pendingPartner != null || Random.value < enterChance);
-            if (enters && BeginVisit() != null)
+            if (_nextSpawnEnters.Value)
             {
+                // 방문 차는 도로 가운데 스폰 지점에서 나온다. 막혀 있으면 빠질 때까지 기다린다.
+                if (!CarTraffic.IsAreaClear(spawnPoint.position, spawnClearRadius))
+                    return;
+
+                // 기다리는 사이 자리가 찼으면 다시 정한다.
+                if (!CanEnterStation())
+                {
+                    _nextSpawnEnters = null;
+                    return;
+                }
+
+                // BeginVisit이 짝을 곧바로 보내려고 타이머를 0으로 되돌릴 수 있으므로 먼저 건다.
+                _nextSpawnEnters = null;
+                _spawnTimer = NextPassingInterval();
+                BeginVisit();
                 return;
             }
 
-            if (_passing.Count < maxPassingCars)
+            if (_passing.Count >= maxPassingCars)
             {
-                SpawnPassingCar();
+                _nextSpawnEnters = null;
+                _spawnTimer = NextPassingInterval();
+                return;
             }
+
+            // 비어 있는 차선이 생길 때까지 기다린다.
+            if (!TryPickPassingLane(out Vector3 laneFrom, out Vector3 laneTo))
+                return;
+
+            _nextSpawnEnters = null;
+            _spawnTimer = NextPassingInterval();
+            SpawnPassingCar(laneFrom, laneTo);
+        }
+
+        /// <summary>다음 차가 들어올 차인지. 아직 정하지 않았으면 null.</summary>
+        private bool? _nextSpawnEnters;
+
+        /// <summary>지나가는 차 차선의 시작점을 비었다고 볼 반경(m). 옆 차선 차(중심 간격 passingLaneSpacing)는 걸리지 않고 같은 차선 앞차만 걸리게 작게 둔다.</summary>
+        private const float PassingLaneClearRadius = 2f;
+
+        private float NextPassingInterval() => Random.Range(passingInterval.x, Mathf.Max(passingInterval.x, passingInterval.y));
+
+        /// <summary>시작점이 비어 있는 차선을 무작위 순서로 하나 고른다. 차선은 스폰→퇴장 직선을 옆으로 나란히 옮긴 것이다.</summary>
+        private bool TryPickPassingLane(out Vector3 from, out Vector3 to)
+        {
+            from = to = default;
+
+            Vector3 direction = exitPoint.position - spawnPoint.position;
+            direction.y = 0f;
+            if (direction.sqrMagnitude < 1f)
+            {
+                return false;
+            }
+
+            Vector3 right = Vector3.Cross(Vector3.up, direction.normalized);
+            int lanes = Mathf.Max(1, passingLanes);
+            int first = Random.Range(0, lanes);
+
+            for (int k = 0; k < lanes; k++)
+            {
+                int lane = (first + k) % lanes;
+                Vector3 offset = right * ((lane - (lanes - 1) * 0.5f) * passingLaneSpacing);
+                if (!CarTraffic.IsAreaClear(spawnPoint.position + offset, PassingLaneClearRadius))
+                {
+                    continue;
+                }
+
+                from = spawnPoint.position + offset;
+                to = exitPoint.position + offset;
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>지금 차 한 대를 주유소에 들일 수 있는지. 동시 방문이 남고, 가는 길이 막히지 않은 빈 자리가 있어야 한다.</summary>
@@ -316,7 +383,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
         }
 
         /// <summary>손님 없이 도로만 지나갈 차를 스폰 지점에 꺼내 퇴장 지점으로 보낸다. 겉모습은 평판으로 등급을 뽑아 고른다.</summary>
-        private void SpawnPassingCar()
+        private void SpawnPassingCar(Vector3 from, Vector3 to)
         {
             CarDataSO data = PickGradedCar();
             if (data == null || data.PoolItem == null)
@@ -332,13 +399,18 @@ namespace _Works.CJW.Scripts.Customers.Visit
             }
 
             car.Setup(data);
-            car.transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
+            Vector3 heading = to - from;
+            heading.y = 0f;
+            car.transform.SetPositionAndRotation(from, Quaternion.LookRotation(heading));
+
+            // 틱 등록은 바퀴를 굴리려고 한다. 이동 모듈은 목적지가 없어 가만히 있고, 차는 PassingTraffic이 도로를 따라 옮긴다.
             RegisterAgent(car);
-            _passing.Add(car, exitPoint.position);
+            _passing.Add(car, from, to);
         }
 
         private void ReleasePassingCar(Car car)
         {
+            car.SetGliding(false);
             UnRegisterAgent(car);
             poolManager.Push(car);
         }

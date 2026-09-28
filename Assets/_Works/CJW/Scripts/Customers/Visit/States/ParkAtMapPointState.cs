@@ -76,7 +76,18 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
                 context.Aligning = true;
             }
 
-            return context.Car.AlignTo(context.TargetRotation, dt) ? VisitPhase.Unloading : VisitPhase.Arriving;
+            if (!context.Car.AlignTo(context.TargetRotation, dt))
+            {
+                return VisitPhase.Arriving;
+            }
+
+            // 입구를 가로로 막고 섰다. 이때부터 진상 짓이라 평판을 깎는다(방문 끝에 '놓침'으로 한 번 더 깎지 않는다).
+            if (parkAt == MapPointType.Entrance)
+            {
+                context.ReportCarMisconduct();
+            }
+
+            return VisitPhase.Unloading;
         }
     }
 }

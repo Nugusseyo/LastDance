@@ -14,6 +14,7 @@ namespace _Works.JYG._Scripts.Events
         
         public static readonly RefuelingEvent RefuelingEvent = new RefuelingEvent();
         public static readonly ScrapEvent ScrapEvent = new ScrapEvent();
+        public static readonly WalletEvent WalletEvent = new WalletEvent();
         
         public static readonly MessageEvent MessageEvent = new MessageEvent();
         
@@ -109,6 +110,17 @@ namespace _Works.JYG._Scripts.Events
             CarValue = carValue;
             DisassembledWheel = disassembledWheel;
             WheelPrice = wheelPrice;
+            return this;
+        }
+    }
+
+    public class WalletEvent : GameEvent
+    {
+        public float Duration { get; set; }
+
+        public WalletEvent Init(float duration)
+        {
+            Duration = duration;
             return this;
         }
     }

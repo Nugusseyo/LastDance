@@ -288,10 +288,22 @@ namespace _Works.CJW.Scripts.Cars
             }
         }
 
+        /// <summary>앞차가 내 진행 방향으로 이 속도(m/s) 이상이면 추월하지 않고 따라간다.</summary>
+        private const float FollowSpeed = 3f;
+
         /// <summary>진행 방향 차로에 차가 잡히면 곧바로 빈 쪽을 골라 추월을 시작한다. 기다렸다가 비키지 않는다.</summary>
         private void TryStartBypass(Frame frame, ICarTrafficSensor blocker, bool allowed)
         {
             if (_phase != BypassPhase.None || _cooldownTimer > 0f || blocker == null || !allowed)
+            {
+                return;
+            }
+
+            // 같은 쪽으로 달리는 앞차는 뒤따라간다. 비슷한 속도로 가는 차를 추월하면 끝나지 않아 차로를 오가며 흔들린다.
+            // 서 있거나 느린 차(주차 중·자리로 꺾어 드는 차)만 비켜 간다.
+            Vector3 blockerVelocity = blocker.Velocity;
+            blockerVelocity.y = 0f;
+            if (Vector3.Dot(blockerVelocity, frame.Forward) >= FollowSpeed)
             {
                 return;
             }
