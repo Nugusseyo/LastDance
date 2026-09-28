@@ -85,7 +85,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
         private readonly List<ActiveVisit> _activeVisits = new();
 
-        /// <summary>손님이 다른 차를 훔쳐 떠나며 버리고 간 차. 치울 때까지 주차 자리를 차지한다.</summary>
+        /// <summary>버려진 차 — 손님이 다른 차를 훔쳐 떠났거나, 탄 사람이 모두 죽은 차. 치울 때까지 주차 자리를 차지한다.</summary>
         private readonly List<AbandonedCar> _abandonedCars = new();
         private readonly Stack<VisitSession> _sessionPool = new();
 
@@ -914,6 +914,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 {
                     // 버려진 차가 자리를 계속 차지한다. 자리는 차를 치울 때 돌려준다.
                     _abandonedCars.Add(new AbandonedCar { Car = car, Slot = _activeVisits[i].Slot });
+
+                    // 팀원 쪽 치우기(IRemovableCar.Remove)가 이 차를 찾으면 여기로 돌아온다.
+                    car.SetRemover(ClearAbandonedCar);
                     AbandonedCarCountChanged?.Invoke(_abandonedCars.Count);
                 }
                 else
@@ -946,6 +949,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
                     continue;
                 }
 
+                car.SetRemover(null);
                 mapData.ReleaseParkingSlot(_abandonedCars[i].Slot);
                 poolManager.Push(car);
                 _abandonedCars.RemoveAt(i);

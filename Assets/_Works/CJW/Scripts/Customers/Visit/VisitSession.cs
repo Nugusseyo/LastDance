@@ -43,6 +43,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>주유가 다 끝나고 흐른 시간(초). 음수면 기다리는 중이 아니다.</summary>
         private float _departAfterFuelTimer = -1f;
 
+        /// <summary>주유를 기다리던 손님이 죽어 이 차가 더 머물 이유가 없다. Waiting에 들어서는 대로 곧장 출발시킨다.</summary>
+        private bool _departWhenWaiting;
+
         /// <summary>이번 방문 차의 주유구. 손님이 주유기에 닿기 전에 주유가 끝나도 기록해 두려고 방문 내내 듣는다.</summary>
         private FuelDoor _fuelDoor;
 
@@ -50,7 +53,8 @@ namespace _Works.CJW.Scripts.Customers.Visit
         public Car Car => _context.Car;
         public IReadOnlyList<AbstractCustomer> Customers => _context.Customers;
 
-        /// <summary>손님이 다른 차를 훔쳐 떠나 이 방문의 차가 버려졌는지. 방문을 닫을 때 차를 풀로 돌리지 않고 자리도 비우지 않는다.</summary>
+        /// <summary>이 방문의 차가 버려졌는지. 손님이 다른 차를 훔쳐 떠났거나, 탄 사람이 모두 죽었을 때다.
+        /// 방문을 닫을 때 차를 풀로 돌리지 않고 자리도 비우지 않는다.</summary>
         public bool IsCarAbandoned => _context.Abandoning;
 
         /// <summary>손님이 훔쳐 탄 차. 버려진 방문이 아니면 null이다.</summary>
@@ -231,7 +235,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
         /// <summary>방문에서 손님 하나를 뺀다. 죽은 손님처럼 더는 차에 태울 수 없는 손님에게 쓴다.
         /// 뺀 손님의 행동은 끊고, 풀 반납은 부른 쪽이 한다 — 세션은 이 손님을 다시 건드리지 않는다.
-        /// 남은 손님만으로 방문이 이어지고, 아무도 안 남으면 차는 빈 채로 떠난다.</summary>
+        /// 남은 손님이 있으면 그들만 태우고 평소대로 떠난다. 아무도 안 남으면 차는 떠나지 않고 버려진 차로 자리에 남는다.</summary>
         public bool Remove(AbstractCustomer customer)
         {
             if (customer == null || !_context.Customers.Remove(customer))
@@ -239,10 +243,59 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return false;
             }
 
+            // 행동을 끊기 전에 읽는다. 주유를 받기 전에 빠졌는지가 곧장 출발할지를 정한다.
+            bool waitedForFuel = customer.Fsm != null && customer.Fsm.WantsFuel && !_fueled.Contains(customer);
+            _fueled.Remove(customer);
+
             // 행동을 끊으면 이 손님의 Phase 실행이 곧바로 끝나, 세션이 이 손님을 기다리지 않는다.
             customer.Fsm?.Stop();
             customer.BindSession(null);
+
+            if (_context.Customers.Count == 0)
+            {
+                AbandonEmptyCar();
+            }
+            else if (waitedForFuel && !AnyoneWaitingForFuel())
+            {
+                // 주유를 받으러 온 손님이 죽었다. 남은 일행이 주유 대기 안전망(수 분)을 다 채울 때까지 서 있지 않게 바로 떠나보낸다.
+                _departAfterFuelTimer = -1f;
+                _departWhenWaiting = true;
+            }
+
             return true;
+        }
+
+        /// <summary>남은 손님 중 아직 주유를 받지 못한 주유 손님이 있는지.</summary>
+        private bool AnyoneWaitingForFuel()
+        {
+            List<AbstractCustomer> customers = _context.Customers;
+            for (int i = 0; i < customers.Count; i++)
+            {
+                CustomerFSMModule fsm = customers[i].Fsm;
+                if (fsm != null && fsm.WantsFuel && !_fueled.Contains(customers[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>탈 사람이 모두 사라진(죽은) 차를 그 자리에 버린다. 방문은 다음 틱에 닫히고, 차는 훔쳐 간 손님이 버린 차처럼
+        /// 치울 때까지(<see cref="VisitDirector.ClearAbandonedCar"/>) 주차 자리를 차지한 채 멈춰 있다.</summary>
+        private void AbandonEmptyCar()
+        {
+            // 이미 떠나는 중이거나 닫힌 방문은 건드리지 않는다. 차를 훔쳐 가는 중이면 그 흐름이 방문을 닫는다.
+            if (_context.Abandoning || Phase is VisitPhase.None or VisitPhase.Completed or VisitPhase.Leaving)
+            {
+                return;
+            }
+
+            _context.Abandoning = true;
+            _context.AbandonDone = true;
+
+            // 자리를 맞추던 중이었을 수 있다. 방문이 닫히면 차는 틱을 받지 않으니, 여기서 세워 두지 않으면 하던 움직임 그대로 굳는다.
+            _context.Car?.Stop();
         }
 
         private bool HasCustomerOutside()
@@ -276,6 +329,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return;
             }
 
+            TickDepartWhenWaiting();
             TickFuelDeparture(dt);
             if (_current == null)
             {
@@ -299,6 +353,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
                 // 대기 중인 상태를 먼저 끊는다. 반납 뒤에 끊으면 한 프레임이라도 좀비가 돌 수 있다.
                 customer.Fsm?.Stop();
+
+                // 풀은 꺼낼 때 ResetItem을 부르므로 반납만으로는 말풍선이 접히지 않는다. 여기서 접지 않으면 떠난 손님의 말이 허공에 남는다.
+                customer.Fsm?.Context?.EndSpeech();
                 customer.BindSession(null);
 
                 customer.transform.SetParent(null, true);
@@ -335,6 +392,13 @@ namespace _Works.CJW.Scripts.Customers.Visit
             // Enter가 쓰기 전에 여기서 되돌려 준다.
             _context.ResetPhaseProgress();
             _current?.Enter(_context);
+
+            // 떠나기 시작하면 머물면서 하던 말("가득이요" 같은 요구)은 끝난 것이다. 접지 않으면 말풍선을 단 채 차에 타고 떠난다.
+            // 탑승 단계에서 새로 하는 말은 아래 시퀀스가 이 뒤에 띄운다.
+            if (phase == VisitPhase.Boarding)
+            {
+                EndAllSpeech();
+            }
 
             // 세션 단계가 바뀌면 손님들에게 그 단계의 시퀀스를 돌리게 한다.
             // 세션은 "전원 끝났나"만 보면 되고, 누가 뭐를 했는지는 구별하지 않는다.
@@ -410,6 +474,28 @@ namespace _Works.CJW.Scripts.Customers.Visit
             _departAfterFuelTimer = 0f;
         }
 
+        /// <summary>주유 손님이 죽어 걸어 둔 출발을 낸다. 아직 내리는 중(Unloading)이면 Waiting에 들어설 때까지 들고 있다.</summary>
+        private void TickDepartWhenWaiting()
+        {
+            if (!_departWhenWaiting)
+            {
+                return;
+            }
+
+            // 퇴치로 이미 떠나는 중이거나, 손님이 차를 훔쳐 가는 중이면 끼어들 필요가 없다.
+            if (_context.Abandoning || Phase is VisitPhase.Boarding or VisitPhase.Leaving or VisitPhase.Completed or VisitPhase.None)
+            {
+                _departWhenWaiting = false;
+                return;
+            }
+
+            if (Phase == VisitPhase.Waiting)
+            {
+                _departWhenWaiting = false;
+                RequestDeparture();
+            }
+        }
+
         private void TickFuelDeparture(float dt)
         {
             if (_departAfterFuelTimer < 0f)
@@ -453,10 +539,20 @@ namespace _Works.CJW.Scripts.Customers.Visit
             return true;
         }
 
+        private void EndAllSpeech()
+        {
+            List<AbstractCustomer> customers = _context.Customers;
+            for (int i = 0; i < customers.Count; i++)
+            {
+                customers[i].Fsm?.Context?.EndSpeech();
+            }
+        }
+
         private void ResetFuelDeparture()
         {
             _fueled.Clear();
             _departAfterFuelTimer = -1f;
+            _departWhenWaiting = false;
             ListenFuelDoor(null);
         }
 

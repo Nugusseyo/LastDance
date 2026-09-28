@@ -85,8 +85,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 return VisitOutcome.Done;
             }
 
-            // 인터럽트나 Phase 전환이면 여기서 취소로 빠져나간다.
-            // 말풍선은 남은 시간을 마저 세고 스스로 풀로 돌아가므로 따로 치우지 않는다.
+            // 인터럽트나 Phase 전환이면 여기서 취소로 빠져나간다. 말풍선은 FollowUntilEnd가 접는다.
             await following;
             return VisitOutcome.Done;
         }
@@ -130,6 +129,14 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 }
 
                 ctx.ClearSpeech(end);
+
+                // 대사가 끝나기 전에 빠져나왔다 — 상태가 끊겼거나(맞음·단계 전환) 손님이 풀로 돌아가 꺼졌다.
+                // 여기서 놓아 버리면 말풍선은 주인 없이 그 자리에 멈춰, 제 시간(주유 대사는 최대 240초)을 다 채울 때까지 떠 있다.
+                // 끊긴 대사는 상태가 다시 돌 때 새로 띄운다.
+                if (!ended && bubble != null && bubble.isActiveAndEnabled)
+                {
+                    bubble.EndSpeech();
+                }
             }
         }
 
