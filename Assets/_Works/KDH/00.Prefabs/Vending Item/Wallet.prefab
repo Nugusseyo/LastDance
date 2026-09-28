@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3318044227102675511}
   - component: {fileID: 4466210938857730512}
   - component: {fileID: 7020518861364392201}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Wallet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -175,6 +175,9 @@ MonoBehaviour:
   holdPositionOffset: {x: 0.014, y: 0, z: -0.92}
   holdRotationOffset: {x: 0, y: 0, z: 0}
   holdScale: {x: 0.75, y: 0.15, z: 0.75}
+  minIgnoreTime: 0.2
+  maxIgnoreTime: 2
+  maxDepenetrationVelocity: 1
   UseEvent:
     m_PersistentCalls:
       m_Calls:

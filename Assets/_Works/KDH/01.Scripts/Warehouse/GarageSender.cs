@@ -12,27 +12,35 @@ namespace _Works.KDH._01.Scripts.Warehouse
 {
     public class GarageSender : MonoBehaviour
     {
+        [Header("Points")]
         [SerializeField] private Transform player;
         [SerializeField] private Transform teleportPoint;
         [SerializeField] private Transform carPoint;
+
+        [Header("Look")]
         [SerializeField] private float lookDistance = 4f;
         [SerializeField] private float carPadding = 0.5f;
         [SerializeField] private float playerSize = 0.6f;
+
+        [Header("Money")]
         [SerializeField] private EventChannelSO moneyChannel;
-        [SerializeField] private int garageCarPrice = 300;
-        [SerializeField, Range(0, 100)] private int quickScrapFeePercent = 30;
+        [SerializeField] private int carPrice = 300;
+        [SerializeField] private int wheelPrice = 50;
+
+        [Header("Tilt")]
         [SerializeField] private float tiltPerWheel = 4f;
         [SerializeField] private float sinkPerWheel = 0.06f;
         [SerializeField] private float tiltSpeed = 2f;
 
         private Camera playerCamera;
         private GameObject garageCar;
+        private Vector3 carStartPosition;
         private Vector3 returnPosition;
         private Quaternion returnRotation;
         private float pitch;
         private float roll;
         private float sink;
-        private Vector3 carStartPosition;
+        private int removedWheelCount;
 
         public GameObject GarageCar => garageCar;
 
@@ -54,65 +62,15 @@ namespace _Works.KDH._01.Scripts.Warehouse
             }
         }
 
-        public void SellGarageCar()
-        {
-            if (garageCar == null) return;
-
-            if (moneyChannel != null)
-            {
-                moneyChannel.RaiseEvent(UIEvents.ScrapEvent.Init(garageCarPrice, 0, 0));
-            }
-
-            Debug.Log($"[GarageSender] {garageCar.name}를 팔았어요.");
-            Destroy(garageCar);
-            garageCar = null;
-
-            MovePlayer(returnPosition, returnRotation);
-        }
-
-        public bool QuickScrap(IRemovableCar car)
-        {
-            if (car == null || !car.CanRemove) return false;
-            if (!IsBadCar(car)) return false;
-
-            string carName = car.GameObject.name;
-            if (!car.Remove()) return false;
-
-            int price = garageCarPrice * (100 - quickScrapFeePercent) / 100;
-
-            if (moneyChannel != null)
-            {
-                moneyChannel.RaiseEvent(UIEvents.ScrapEvent.Init(price, 0, 0));
-            }
-
-            Debug.Log($"[GarageSender] {carName}를 빠른 폐차했어요. 수수료 {quickScrapFeePercent}% 떼고 {price}원");
-            return true;
-        }
-
-        private bool IsBadCar(IRemovableCar car)
-        {
-            CustomerCar customerCar = car.GameObject.GetComponent<CustomerCar>();
-            if (customerCar != null && customerCar.HumanType == HumanType.Bad) return true;
-
-            Debug.Log($"[GarageSender] {car.GameObject.name}는 정상 손님 차라서 폐차 못 해요.");
-            return false;
-        }
-
         public bool SendToGarage(IRemovableCar car)
         {
-            if (car == null)
+            if (!CanScrap(car)) return false;
+
+            if (!IsBadCar(car))
             {
-                Debug.Log("[GarageSender] 바라보는 곳에 차가 없어요.");
+                Debug.Log($"[GarageSender] {car.GameObject.name}는 정상 손님 차라서 차고로 못 보내요.");
                 return false;
             }
-
-            if (!car.CanRemove)
-            {
-                Debug.Log($"[GarageSender] {car.GameObject.name}는 아직 버려진 차가 아니라서 못 보내요.");
-                return false;
-            }
-
-            if (!IsBadCar(car)) return false;
 
             if (garageCar != null)
             {
@@ -120,6 +78,7 @@ namespace _Works.KDH._01.Scripts.Warehouse
                 return false;
             }
 
+            string carName = car.GameObject.name;
             GameObject newCar = CopyCarToGarage(car.GameObject);
 
             if (!car.Remove())
@@ -128,61 +87,39 @@ namespace _Works.KDH._01.Scripts.Warehouse
                 return false;
             }
 
-            garageCar = newCar;
-            carStartPosition = newCar.transform.position;
-            pitch = 0f;
-            roll = 0f;
-            sink = 0f;
+            SetGarageCar(newCar);
 
             returnPosition = player.position;
             returnRotation = player.rotation;
-
             MovePlayer(GetPositionOutsideCar(teleportPoint.position), teleportPoint.rotation);
-            Debug.Log($"[GarageSender] {car.GameObject.name}를 차고로 보냈어요.");
+
+            Debug.Log($"[GarageSender] {carName}를 차고로 보냈어요.");
             return true;
         }
 
-        private GameObject CopyCarToGarage(GameObject car)
+        public bool QuickScrap(IRemovableCar car)
         {
-            GameObject holder = new GameObject("Car Copy Holder");
-            holder.SetActive(false);
+            if (!CanScrap(car)) return false;
 
-            GameObject copy = Instantiate(car, carPoint.position, carPoint.rotation, holder.transform);
-            copy.name = car.name + " (Garage)";
+            string carName = car.GameObject.name;
+            if (!car.Remove()) return false;
 
-            foreach (MonoBehaviour script in copy.GetComponentsInChildren<MonoBehaviour>(true))
-            {
-                DestroyImmediate(script);
-            }
+            PayMoney(0);
+            Debug.Log($"[GarageSender] {carName}를 빠른 폐차했어요.");
+            return true;
+        }
 
-            foreach (NavMeshAgent agent in copy.GetComponentsInChildren<NavMeshAgent>(true))
-            {
-                DestroyImmediate(agent);
-            }
+        public void SellGarageCar()
+        {
+            if (garageCar == null) return;
 
-            foreach (NavMeshObstacle obstacle in copy.GetComponentsInChildren<NavMeshObstacle>(true))
-            {
-                DestroyImmediate(obstacle);
-            }
+            PayMoney(removedWheelCount);
+            Debug.Log($"[GarageSender] {garageCar.name}를 팔았어요. 뺀 바퀴 {removedWheelCount}개");
 
-            foreach (Animator animator in copy.GetComponentsInChildren<Animator>(true))
-            {
-                DestroyImmediate(animator);
-            }
+            Destroy(garageCar);
+            garageCar = null;
 
-            foreach (Rigidbody body in copy.GetComponentsInChildren<Rigidbody>(true))
-            {
-                body.isKinematic = true;
-            }
-
-            copy.transform.SetParent(null, true);
-            copy.transform.SetPositionAndRotation(carPoint.position, carPoint.rotation);
-            Destroy(holder);
-
-            BoxCollider wall = copy.AddComponent<BoxCollider>();
-            CarWallMaker.AddBoxLikeCar(wall, copy.transform, 0.2f);
-
-            return copy;
+            MovePlayer(returnPosition, returnRotation);
         }
 
         public void RemoveWheel(GameObject wheel)
@@ -194,6 +131,95 @@ namespace _Works.KDH._01.Scripts.Warehouse
             roll -= Mathf.Sign(wheelPosition.x) * tiltPerWheel;
             pitch += Mathf.Sign(wheelPosition.z) * tiltPerWheel;
             sink += sinkPerWheel;
+            removedWheelCount++;
+        }
+
+        private bool CanScrap(IRemovableCar car)
+        {
+            if (car == null)
+            {
+                Debug.Log("[GarageSender] 바라보는 곳에 차가 없어요.");
+                return false;
+            }
+
+            if (!car.CanRemove)
+            {
+                Debug.Log($"[GarageSender] {car.GameObject.name}는 아직 버려진 차가 아니에요.");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool IsBadCar(IRemovableCar car)
+        {
+            CustomerCar customerCar = car.GameObject.GetComponent<CustomerCar>();
+            return customerCar != null && customerCar.HumanType == HumanType.Bad;
+        }
+
+        private void PayMoney(int wheelCount)
+        {
+            if (moneyChannel == null) return;
+
+            moneyChannel.RaiseEvent(UIEvents.ScrapEvent.Init(carPrice, wheelCount, wheelPrice));
+        }
+
+        private void SetGarageCar(GameObject car)
+        {
+            garageCar = car;
+            carStartPosition = car.transform.position;
+            pitch = 0f;
+            roll = 0f;
+            sink = 0f;
+            removedWheelCount = 0;
+        }
+
+        private GameObject CopyCarToGarage(GameObject car)
+        {
+            GameObject holder = new GameObject("Car Copy Holder");
+            holder.SetActive(false);
+
+            GameObject copy = Instantiate(car, carPoint.position, carPoint.rotation, holder.transform);
+            copy.name = car.name + " (Garage)";
+
+            RemoveMovingParts(copy);
+
+            copy.transform.SetParent(null, true);
+            copy.transform.SetPositionAndRotation(carPoint.position, carPoint.rotation);
+            Destroy(holder);
+
+            BoxCollider wall = copy.AddComponent<BoxCollider>();
+            CarWallMaker.AddBoxLikeCar(wall, copy.transform, 0.2f);
+
+            return copy;
+        }
+
+        private void RemoveMovingParts(GameObject car)
+        {
+            foreach (MonoBehaviour script in car.GetComponentsInChildren<MonoBehaviour>(true))
+            {
+                DestroyImmediate(script);
+            }
+
+            foreach (NavMeshAgent agent in car.GetComponentsInChildren<NavMeshAgent>(true))
+            {
+                DestroyImmediate(agent);
+            }
+
+            foreach (NavMeshObstacle obstacle in car.GetComponentsInChildren<NavMeshObstacle>(true))
+            {
+                DestroyImmediate(obstacle);
+            }
+
+            foreach (Animator animator in car.GetComponentsInChildren<Animator>(true))
+            {
+                DestroyImmediate(animator);
+            }
+
+            foreach (Rigidbody body in car.GetComponentsInChildren<Rigidbody>(true))
+            {
+                body.isKinematic = true;
+            }
         }
 
         private void TiltGarageCar()
@@ -208,14 +234,41 @@ namespace _Works.KDH._01.Scripts.Warehouse
             garageCar.transform.position = Vector3.Lerp(garageCar.transform.position, targetPosition, step);
         }
 
+        private IRemovableCar FindLookingCar()
+        {
+            if (!FindCamera()) return null;
+
+            IRemovableCar closestCar = null;
+            float closestDistance = lookDistance;
+
+            foreach (MonoBehaviour script in FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None))
+            {
+                if (script is not IRemovableCar car) continue;
+
+                if (GetLookDistance(car.GameObject, out float distance) && distance <= closestDistance)
+                {
+                    closestDistance = distance;
+                    closestCar = car;
+                }
+            }
+
+            return closestCar;
+        }
+
         private bool IsLookingAt(GameObject car)
         {
             if (car == null || !FindCamera()) return false;
 
+            return GetLookDistance(car, out float distance) && distance <= lookDistance;
+        }
+
+        private bool GetLookDistance(GameObject car, out float distance)
+        {
             Bounds carBounds = GetCarBounds(car);
             carBounds.Expand(carPadding);
 
-            return carBounds.IntersectRay(GetLookRay(), out float distance) && distance <= lookDistance;
+            Ray lookRay = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+            return carBounds.IntersectRay(lookRay, out distance);
         }
 
         private bool FindCamera()
@@ -226,37 +279,6 @@ namespace _Works.KDH._01.Scripts.Warehouse
             }
 
             return playerCamera != null;
-        }
-
-        private Ray GetLookRay()
-        {
-            return new Ray(playerCamera.transform.position, playerCamera.transform.forward);
-        }
-
-        private IRemovableCar FindLookingCar()
-        {
-            if (!FindCamera()) return null;
-
-            Ray lookRay = GetLookRay();
-
-            IRemovableCar closestCar = null;
-            float closestDistance = lookDistance;
-
-            foreach (MonoBehaviour script in FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None))
-            {
-                if (script is not IRemovableCar car) continue;
-
-                Bounds carBounds = GetCarBounds(car.GameObject);
-                carBounds.Expand(carPadding);
-
-                if (carBounds.IntersectRay(lookRay, out float distance) && distance <= closestDistance)
-                {
-                    closestDistance = distance;
-                    closestCar = car;
-                }
-            }
-
-            return closestCar;
         }
 
         private Bounds GetCarBounds(GameObject car)

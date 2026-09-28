@@ -16,7 +16,6 @@ namespace _Works.KDH._01.Scripts.Wrench
         [SerializeField] private LayerMask wheelLayerMask;
         [SerializeField] private float handDetachTime = 6f;
         [SerializeField] private WrenchTool equippedWrench;
-        [SerializeField] private float popForce = 1.5f;
         [SerializeField] private PlayerGrabModule playerGrab;
         [SerializeField] private GarageSender garageSender;
 
@@ -154,7 +153,7 @@ namespace _Works.KDH._01.Scripts.Wrench
         private void DetachWheel(GameObject wheel)
         {
             garageSender.RemoveWheel(wheel);
-            WheelPopper.Pop(wheel, popForce);
+            Destroy(wheel);
         }
 
         private void ResetHold()
