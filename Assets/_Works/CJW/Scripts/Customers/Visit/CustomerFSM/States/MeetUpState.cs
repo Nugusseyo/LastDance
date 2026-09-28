@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using _Works.CJW.Scripts.Customers.Health;
 using _Works.CJW.Scripts.Sounds;
 using Cysharp.Threading.Tasks;
 using DevLib.AnimatorSystem;
@@ -12,7 +13,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 {
     /// <summary>같은 약속 이름을 가진 다른 손님과 만난다. 다른 차에서 내린 손님이어도 된다.
     /// 만난 뒤에는 서로를 마주 보고 지정한 클립을 번갈아 재생한다 — 싸움이든 말다툼이든 클립만 갈아끼우면 된다.
-    /// 상대에게 실제로 피해를 주지는 않는다. 둘 다 손님이라 한쪽만 쓰러지면 방문 하나가 갈 곳을 잃기 때문이다.</summary>
+    /// 상대에게 실제로 피해를 주지는 않는다. 둘 다 손님이라 한쪽만 쓰러지면 방문 하나가 갈 곳을 잃기 때문이다.
+    /// 짝이 (플레이어에게 맞아) 죽으면 남은 쪽은 그 자리에 서 있지 않고 자기 차로 돌아가 탄다.</summary>
     [Serializable]
     public sealed class MeetUpState : CustomerState
     {
@@ -67,6 +69,12 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
             try
             {
+                // 짝이 죽은 뒤 맞거나 치여 이 행동이 처음부터 다시 돌면, 짝을 다시 찾지 않고 하던 대로 차로 간다.
+                if (_partnerDefeated)
+                {
+                    return await ReturnToCar(ct);
+                }
+
                 // 하차 때 JoinRendezvousState로 이미 짝을 맺었으면 그대로 이어받는다.
                 // 다시 TryPair를 부르면 맺은 짝을 두고 등록소에 새로 올라가 버린다.
                 bool paired = Ctx.Partner != null && ReferenceEquals(Ctx.Partner.Partner, Ctx);
@@ -87,7 +95,19 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                     }
                 }
 
-                VisitOutcome outcome = await MoveAndWait(Ctx.MeetPoint, moveTimeout, ct);
+                // 짝이 죽으면 Partner가 곧바로 비므로, 죽었는지는 맺은 순간 잡아 둔 짝으로 본다.
+                CustomerContext met = Ctx.Partner;
+                if (IsDefeated(met))
+                {
+                    return await ReturnToCar(ct);
+                }
+
+                VisitOutcome outcome = await WalkToMeetPoint(met, ct);
+
+                if (IsDefeated(met))
+                {
+                    return await ReturnToCar(ct);
+                }
 
                 if (outcome != VisitOutcome.Done)
                 {
@@ -103,7 +123,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 // 혼자 먼저 싸우다 떠나지 않도록 상대가 올 때까지 기다린다.
                 if (!await WaitForPartnerArrival(ct))
                 {
-                    return VisitOutcome.Blocked;
+                    return IsDefeated(met) ? await ReturnToCar(ct) : VisitOutcome.Blocked;
                 }
 
                 CustomerContext partner = Ctx.Partner;
@@ -112,7 +132,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                     await FaceTowards(partner.Customer.transform.position, turnSpeed, ct);
                 }
 
-                return await Perform(ct);
+                VisitOutcome fought = await Perform(ct);
+                return fought == VisitOutcome.Blocked && IsDefeated(met) ? await ReturnToCar(ct) : fought;
             }
             finally
             {
@@ -124,6 +145,61 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 RestoreAvoidance();
             }
         }
+
+        /// <summary>만날 지점으로 걷는다. 가는 도중 짝이 죽으면 더 갈 이유가 없으니 바로 멈춘다.</summary>
+        private async UniTask<VisitOutcome> WalkToMeetPoint(CustomerContext met, CancellationToken ct)
+        {
+            // using으로 닫지 않는다. 진 쪽 태스크가 취소를 알아차리는 건 다음 프레임이라, 그 전에 닫으면 닫힌 토큰을 만진다.
+            var walk = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            UniTask<VisitOutcome> move = MoveAndWait(Ctx.MeetPoint, moveTimeout, walk.Token);
+            UniTask defeated = UniTask.WaitUntil(() => IsDefeated(met), cancellationToken: walk.Token);
+
+            try
+            {
+                (bool moveFinished, VisitOutcome result) = await UniTask.WhenAny(move, defeated);
+                return moveFinished ? result : VisitOutcome.Blocked;
+            }
+            finally
+            {
+                // 진 쪽을 끊는다. 걷기가 지면 이동 모듈이 finally에서 걷기 애니메이션을 내린다.
+                walk.Cancel();
+            }
+        }
+
+        /// <summary>짝이 맞아 죽었는지. 죽은 짝은 방문에서 빠지며 짝을 놓으므로 <see cref="CustomerContext.Partner"/>로는 알 수 없다.</summary>
+        private static bool IsDefeated(CustomerContext met)
+        {
+            ICustomerHealth health = met?.Customer != null ? met.Customer.Health : null;
+            return health != null && health.IsDead;
+        }
+
+        /// <summary>싸울 짝이 죽었다. 그 자리에 멍하니 서 있지 않고 자기 차로 걸어가 탄다.
+        /// 같은 차 일행도 할 일을 마쳤으면 차가 바로 떠나고, 주유를 기다리는 일행이 있으면 평소대로 주유 뒤에 떠난다.</summary>
+        private async UniTask<VisitOutcome> ReturnToCar(CancellationToken ct)
+        {
+            _partnerDefeated = true;
+
+            // 짝을 놓고 회피를 되돌린 뒤 걷는다. 회피를 끈 채 걸으면 다른 손님을 뚫고 지나간다.
+            rendezvous.Leave(meetKey, Ctx);
+            RestoreAvoidance();
+
+            // 탑승 단계의 걸음과 같다. 프리팹에 필드로 두면 기존 손님들에 빈 값으로 들어가므로 코드로 만든다.
+            _returnToCar ??= new BoardState();
+            _returnToCar.Bind(Ctx);
+            VisitOutcome outcome = await _returnToCar.Run(ct);
+
+            if (Ctx.Customer.Boarding != null && Ctx.Customer.Boarding.IsBoarded)
+            {
+                Ctx.Customer.Session?.DepartIfEveryoneDone();
+            }
+
+            return outcome;
+        }
+
+        /// <summary>짝이 죽어 차로 돌아가는 중인지. 다시 돌아도 짝을 새로 찾지 않게 방문 동안 기억한다.</summary>
+        [NonSerialized] private bool _partnerDefeated;
+
+        [NonSerialized] private BoardState _returnToCar;
 
         /// <summary>상대가 만날 지점 근처에 올 때까지 기다린다. 상대가 사라지거나 이동 한계 시간을 넘기면 false.</summary>
         private async UniTask<bool> WaitForPartnerArrival(CancellationToken ct)
@@ -311,6 +387,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         public override void Reset()
         {
             RestoreAvoidance();
+            _partnerDefeated = false;
 
             if (rendezvous != null && Ctx != null)
             {

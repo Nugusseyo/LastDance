@@ -256,7 +256,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
         /// 앞차와 붙어 있으면 먼저 곧게 물러나 사이를 벌리고, 줄 옆 빈 곳이 있으면 그리로, 없으면 곧장 퇴장 지점으로 간다.</summary>
         private bool TryEscapeParkedBlocker(VisitContext context)
         {
-            if (!IsBlockedByParkedCar(context.Car, out float frontGap))
+            if (!IsBlockedByParkedCar(context.Car, out float frontGap, out ICarTrafficSensor blocker))
             {
                 return false;
             }
@@ -280,6 +280,15 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
                 context.DepartPoint = escape;
                 context.Departing = true;
                 context.Car.MoveTo(escape);
+            }
+            else if (TryFindPassLane(context.Car, blocker, context.ExitPoint, out Vector3 passFrom, out Vector3 passTo))
+            {
+                // 앞차 옆 틈으로 곧장 퇴장 지점을 겨누면 NavMesh 경로가 앞차 모서리에 바짝 붙어 꺾이고, 조향이 그 모서리를
+                // 더 깎아 교통 센서가 앞차를 막는 차로 잡고 선다. 앞차 옆을 나란히 지나는 직선을 따라가게 한다.
+                context.DepartPoint = passTo;
+                context.Departing = true;
+                context.Car.MoveTo(passTo, passFrom);
+                Debug.Log($"[Leaving] {context.Car.name}이(가) 앞차 옆으로 나란히 지나 빠져나갑니다. ({passFrom.x:F1},{passFrom.z:F1}) → ({passTo.x:F1},{passTo.z:F1})", context.Car);
             }
             else
             {
@@ -395,9 +404,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
         }
 
         /// <summary>차 정면 바로 앞에 서 있는 차가 있는지. 움직이는 차는 곧 비키니 뺀다. <paramref name="gap"/>은 앞차 중심까지의 앞쪽 거리(m).</summary>
-        private static bool IsBlockedByParkedCar(Car car, out float gap)
+        private static bool IsBlockedByParkedCar(Car car, out float gap, out ICarTrafficSensor blocker)
         {
             gap = float.PositiveInfinity;
+            blocker = null;
             ICarTrafficSensor self = car.GetModule<ICarTrafficSensor>();
             Transform t = car.transform;
             Vector3 forward = t.forward;
@@ -431,13 +441,135 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
                 float ahead = Vector3.Dot(rel, forward);
                 float side = Mathf.Abs(Vector3.Dot(rel, right));
                 if (ahead > 0f && ahead <= halfLength + ParkedBlockerLookAhead + other.BoundingRadius &&
-                    side <= other.BoundingRadius + ParkedBlockerSideMargin)
+                    side <= other.BoundingRadius + ParkedBlockerSideMargin && ahead < gap)
                 {
-                    gap = Mathf.Min(gap, ahead);
+                    gap = ahead;
+                    blocker = other;
                 }
             }
 
             return !float.IsPositiveInfinity(gap);
+        }
+
+        /// <summary>앞차 옆을 지날 때 내 차체와 앞차 차체 사이에 둘 여유(m). 교통 센서의 차로 여유(0.3m)보다 커야 지나는 동안 앞차를 막는 차로 잡지 않는다.</summary>
+        private const float PassSideClearance = 0.7f;
+
+        /// <summary>앞차 뒤 범퍼보다 이만큼(m) 뒤에서 나란한 직선에 올라탄다. 그 전에 차 머리를 직선 방향으로 맞춘다.</summary>
+        private const float PassLeadIn = 1.5f;
+
+        /// <summary>앞차 앞 범퍼를 지나 이만큼(m) 더 가서 직선을 끝낸다. 퇴장 지점으로 목적지를 바꾸는 거리(<see cref="departSwitchDistance"/>)보다 커야
+        /// 목적지를 바꿀 때 뒤 범퍼가 앞차를 벗어나 있다.</summary>
+        private const float PassLeadOut = 4.5f;
+
+        /// <summary>서 있는 앞차(<paramref name="blocker"/>) 옆을 나란히 지나는 직선(<paramref name="from"/> → <paramref name="to"/>)을 찾는다.
+        /// 직선은 앞차 차체 방향을 따르고, 앞차 옆면에서 내 차 폭의 절반 + <see cref="PassSideClearance"/>만큼 떨어진다.
+        /// 직선 전체가 차 NavMesh 위로 끊기지 않고 다른 서 있는 차에 걸리지 않아야 한다. 양쪽이 다 되면 퇴장 지점에 가까운 쪽.</summary>
+        private bool TryFindPassLane(Car car, ICarTrafficSensor blocker, Vector3 exitPoint, out Vector3 from, out Vector3 to)
+        {
+            from = to = default;
+            if (blocker == null)
+            {
+                return false;
+            }
+
+            ICarTrafficSensor self = car.GetModule<ICarTrafficSensor>();
+            Transform t = car.transform;
+
+            // 앞차 차체 축을 내가 가는 쪽으로 맞춘다. 서로 마주 보고 서 있어도 내 진행 방향 기준으로 앞·뒤 범퍼를 잰다.
+            Vector3[] corners = new Vector3[4];
+            blocker.GetCorners(corners);
+            Vector3 blockerCenter = blocker.Center;
+            // GetCorners 순서: 0 앞오른쪽, 1 뒤오른쪽, 2 뒤왼쪽, 3 앞왼쪽.
+            Vector3 axis = (corners[0] + corners[3]) * 0.5f - (corners[1] + corners[2]) * 0.5f;
+            axis.y = 0f;
+            Vector3 myForward = t.forward;
+            myForward.y = 0f;
+            if (axis.sqrMagnitude < 1e-4f || myForward.sqrMagnitude < 1e-4f)
+            {
+                return false;
+            }
+
+            Vector3 forward = axis.normalized;
+            if (Vector3.Dot(forward, myForward) < 0f)
+            {
+                forward = -forward;
+            }
+
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+
+            float front = float.NegativeInfinity, rear = float.PositiveInfinity;
+            float maxSide = float.NegativeInfinity, minSide = float.PositiveInfinity;
+            for (int i = 0; i < 4; i++)
+            {
+                Vector3 local = corners[i] - blockerCenter;
+                float z = Vector3.Dot(local, forward);
+                float x = Vector3.Dot(local, right);
+                front = Mathf.Max(front, z);
+                rear = Mathf.Min(rear, z);
+                maxSide = Mathf.Max(maxSide, x);
+                minSide = Mathf.Min(minSide, x);
+            }
+
+            // 내 차 크기. 센서가 없으면 흔한 승용차 크기로 어림한다.
+            float myHalfWidth = 1f, myHalfLength = 2.3f;
+            if (self != null)
+            {
+                self.GetCorners(corners);
+                Vector3 myCenter = self.Center;
+                Vector3 myRight = Vector3.Cross(Vector3.up, myForward.normalized);
+                myHalfWidth = 0f;
+                myHalfLength = 0f;
+                for (int i = 0; i < 4; i++)
+                {
+                    Vector3 local = corners[i] - myCenter;
+                    myHalfWidth = Mathf.Max(myHalfWidth, Mathf.Abs(Vector3.Dot(local, myRight)));
+                    myHalfLength = Mathf.Max(myHalfLength, Mathf.Abs(Vector3.Dot(local, myForward.normalized)));
+                }
+            }
+
+            // 차 기준점(피벗)은 떠 있다. 직선은 바닥 높이에서 긋는다.
+            Vector3 ground = blockerCenter;
+            if (CarNavMesh.SamplePosition(blockerCenter, out NavMeshHit groundHit, 3f))
+            {
+                ground.y = groundHit.position.y;
+            }
+
+            float best = float.PositiveInfinity;
+            for (int s = 1; s >= -1; s -= 2)
+            {
+                float lateral = s > 0
+                    ? maxSide + myHalfWidth + PassSideClearance
+                    : minSide - myHalfWidth - PassSideClearance;
+
+                Vector3 laneFrom = ground + right * lateral + forward * (rear - myHalfLength - PassLeadIn);
+                Vector3 laneTo = ground + right * lateral + forward * (front + myHalfLength + PassLeadOut);
+
+                if (!TrySampleCarMesh(laneFrom, out Vector3 a) || !TrySampleCarMesh(laneTo, out Vector3 b))
+                {
+                    continue;
+                }
+
+                // 차 NavMesh는 차 폭만큼 벽·주유기에서 깎여 있어, 중심선이 끊기지 않으면 차체도 지나간다.
+                if (CarNavMesh.Raycast(a, b, out _))
+                {
+                    continue;
+                }
+
+                if (!IsClearOfParkedCars(a, b, self, blocker))
+                {
+                    continue;
+                }
+
+                float score = PlanarDistance(t.position, a) + PlanarDistance(b, exitPoint);
+                if (score < best)
+                {
+                    best = score;
+                    from = a;
+                    to = b;
+                }
+            }
+
+            return best < float.PositiveInfinity;
         }
 
         /// <summary>줄 옆(차 좌우)으로 비켜 나올 지점을 찾는다. 그 지점이 차 NavMesh 위이고 비어 있으며, 내 자리에서 끊기지 않고 닿고,
@@ -567,7 +699,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
         private const float ParkedSpeed = 0.5f;
 
         /// <summary>from→to를 차 폭만큼 쓸고 지나가는 띠 안에 서 있는 차가 없는지. 움직이는 차와 자기 차는 뺀다.</summary>
-        private static bool IsClearOfParkedCars(Vector3 from, Vector3 to, ICarTrafficSensor self)
+        private static bool IsClearOfParkedCars(Vector3 from, Vector3 to, ICarTrafficSensor self, ICarTrafficSensor ignore = null)
         {
             const float step = 0.5f;
 
@@ -579,7 +711,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
             for (int s = 0; s < sensors.Count; s++)
             {
                 ICarTrafficSensor sensor = sensors[s];
-                if (ReferenceEquals(sensor, self))
+                if (ReferenceEquals(sensor, self) || ReferenceEquals(sensor, ignore))
                 {
                     continue;
                 }

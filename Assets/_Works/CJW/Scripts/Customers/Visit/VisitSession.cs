@@ -221,6 +221,36 @@ namespace _Works.CJW.Scripts.Customers.Visit
             ChangeState(VisitPhase.Boarding);
         }
 
+        /// <summary>손님 하나가 볼일을 접고 먼저 차에 탔을 때 부른다(싸울 짝이 죽은 싸움꾼 등).
+        /// 남은 일행도 모두 차에 탔거나 할 일을 마치고 출발만 기다리면 떠난다. 주유를 기다리거나 아직 무언가 하는 일행이 있으면
+        /// 끼어들지 않는다 — 주유 뒤 출발이나 자동 출발이 평소대로 떠나보낸다.</summary>
+        public void DepartIfEveryoneDone()
+        {
+            if (_context.Abandoning || Phase != VisitPhase.Waiting || AnyoneWaitingForFuel())
+            {
+                return;
+            }
+
+            List<AbstractCustomer> customers = _context.Customers;
+            for (int i = 0; i < customers.Count; i++)
+            {
+                AbstractCustomer customer = customers[i];
+                if (customer.Boarding != null && customer.Boarding.IsBoarded)
+                {
+                    continue;
+                }
+
+                CustomerState current = customer.Fsm?.Machine?.Current;
+                if (current != null && !(current is StayState stay && stay.IsIndefinite))
+                {
+                    return;
+                }
+            }
+
+            // 부른 손님의 상태가 아직 도는 중이다. 여기서 바로 출발시키면 그 상태 안에서 다음 단계가 시작되므로 다음 틱으로 미룬다.
+            _departWhenWaiting = true;
+        }
+
         /// <summary>손님을 쫓아낸다. 어느 단계에서든 부를 수 있다. 무엇이 이걸 부를지는 아직 정하지 않았다.</summary>
         public void Repel()
         {

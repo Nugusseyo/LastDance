@@ -9,15 +9,15 @@ using UnityEngine.AI;
 
 namespace _Works.CJW.Scripts.Cars.Editor
 {
-    /// <summary>차 전용 NavMesh를 만든다. 차 에이전트 타입을 준비하고, 사람용 NavMesh와 같은 범위를 굽되
-    /// Map/Plane과 Map/Road 아래만 걸을 수 있게 한다. 차 프리팹의 NavMeshAgent도 차 타입으로 바꾼다.</summary>
+    /// <summary>현재 씬에 차 전용 NavMesh를 만든다. 차 에이전트 타입을 준비하고, 사람용 NavMesh와 같은 범위를 굽되
+    /// 바닥(Map/Plane 또는 Map/Terrain)과 Map/Road 아래만 걸을 수 있게 한다. 차 프리팹의 NavMeshAgent도 차 타입으로 바꾼다.</summary>
     public static class CarNavMeshBuilder
     {
         private const string SurfaceObjectName = "CarNavMesh";
-        private const string DataFolder = "Assets/_Works/CJW/Scene/JW_RealMapTest";
-        private const string DataPath = DataFolder + "/CarNavMesh.asset";
+        private const string DataFileName = "NavMesh-CarNavMesh.asset";
 
-        private static readonly string[] WalkableRoots = { "Map/Plane", "Map/Road" };
+        // 씬마다 바닥 이름이 다르다(JW_RealMapTest는 Plane, Demo는 Terrain). 있는 것만 쓴다.
+        private static readonly string[] WalkableRoots = { "Map/Plane", "Map/Terrain", "Map/Road" };
 
         private static readonly string[] CarPrefabs =
         {
@@ -30,6 +30,11 @@ namespace _Works.CJW.Scripts.Cars.Editor
         private const float AgentHeight = 1.6f;
         private const float AgentSlope = 30f;
         private const float AgentClimb = 0.3f;
+
+        // JW_RealMapTest에서 맞춰 둔 값(바닥 4.44, 볼륨 중심 5.02, 높이 1.51)을 바닥 기준으로 옮긴 것.
+        private const float VolumeCenterAboveGround = 0.58f;
+        private const float VolumeHeight = 1.51f;
+        private const float VolumeMargin = 2f;
 
         private const int WalkableArea = 0;
         private const int NotWalkableArea = 1;
@@ -48,16 +53,22 @@ namespace _Works.CJW.Scripts.Cars.Editor
 
             NavMeshSurface surface = EnsureSurface(humanSurface, agentId);
             int modifiers = EnsureModifiers(agentId);
+            if (modifiers == 0)
+            {
+                Debug.LogError($"[CarNavMesh] 걸을 수 있는 바닥({string.Join(", ", WalkableRoots)})을 하나도 찾지 못했습니다.");
+                return;
+            }
 
+            string oldDataPath = surface.navMeshData != null ? AssetDatabase.GetAssetPath(surface.navMeshData) : null;
             surface.BuildNavMesh();
-            SaveData(surface);
+            string dataPath = SaveData(surface, oldDataPath);
 
             int prefabs = RetargetPrefabs(agentId);
 
             EditorSceneManager.MarkSceneDirty(surface.gameObject.scene);
             EditorSceneManager.SaveScene(surface.gameObject.scene);
 
-            Debug.Log($"[CarNavMesh] 완료. 에이전트 '{CarNavMesh.AgentTypeName}'(id {agentId}), 수정자 {modifiers}개, 차 프리팹 {prefabs}개를 차 타입으로 바꿨습니다.");
+            Debug.Log($"[CarNavMesh] 완료({surface.gameObject.scene.name}). 에이전트 '{CarNavMesh.AgentTypeName}'(id {agentId}), 수정자 {modifiers}개, 데이터 {dataPath}, 차 프리팹 {prefabs}개를 차 타입으로 바꿨습니다.");
             Report();
         }
 
@@ -71,6 +82,33 @@ namespace _Works.CJW.Scripts.Cars.Editor
             };
 
             var sb = new StringBuilder("[CarNavMesh] 지점별로 차 NavMesh에 닿는지(가장 가까운 점까지 거리):\n");
+            foreach (NavMeshSurface s in NavMeshSurface.activeSurfaces)
+            {
+                sb.AppendLine($"  표면 {s.name} 타입 {NavMesh.GetSettingsNameFromID(s.agentTypeID)} 수집 {s.collectObjects} 볼륨중심 {s.transform.TransformPoint(s.center)} 크기 {s.size} " +
+                              $"데이터 {(s.navMeshData != null ? $"{AssetDatabase.GetAssetPath(s.navMeshData)} 범위 {s.navMeshData.sourceBounds}" : "없음")}");
+            }
+
+            GameObject map = GameObject.Find("Map");
+            if (map != null)
+            {
+                foreach (Transform child in map.transform)
+                {
+                    Collider[] colliders = child.GetComponentsInChildren<Collider>();
+                    if (colliders.Length == 0 || child.GetComponent<Terrain>() != null)
+                    {
+                        continue;
+                    }
+
+                    Bounds b = colliders[0].bounds;
+                    foreach (Collider c in colliders)
+                    {
+                        b.Encapsulate(c.bounds);
+                    }
+
+                    sb.AppendLine($"  맵 {child.name}(layer {LayerMask.LayerToName(child.gameObject.layer)}) 콜라이더 {colliders.Length}개 x {b.min.x:F1}..{b.max.x:F1} y {b.min.y:F1}..{b.max.y:F1} z {b.min.z:F1}..{b.max.z:F1}");
+                }
+            }
+
             var points = new List<(string, Vector3)>();
 
             foreach (MapPosition p in Object.FindObjectsByType<MapPosition>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
@@ -96,9 +134,16 @@ namespace _Works.CJW.Scripts.Cars.Editor
             {
                 bool ok = NavMesh.SamplePosition(position, out NavMeshHit hit, 3f, filter);
                 float distance = ok ? Vector2.Distance(new Vector2(position.x, position.z), new Vector2(hit.position.x, hit.position.z)) : -1f;
-                sb.AppendLine(ok
-                    ? $"  {(distance < 0.5f ? "OK " : "먼 ")} {label} {Round(position)} → {distance:F1}m"
-                    : $"  없음 {label} {Round(position)} (3m 안에 차 NavMesh 없음)");
+                if (ok)
+                {
+                    sb.AppendLine($"  {(distance < 0.5f ? "OK " : "먼 ")} {label} {Round(position)} → {distance:F1}m");
+                    continue;
+                }
+
+                // 3m 안에 없으면 높이가 어긋났는지 볼 수 있게, 넓게 찾아 NavMesh 높이와 지점 높이를 같이 적는다.
+                sb.AppendLine(NavMesh.SamplePosition(position, out NavMeshHit far, 30f, filter)
+                    ? $"  없음 {label} {Round(position)} y {position.y:F2} (가장 가까운 차 NavMesh {Round(far.position)} y {far.position.y:F2})"
+                    : $"  없음 {label} {Round(position)} y {position.y:F2} (30m 안에도 차 NavMesh 없음)");
             }
 
             Debug.Log(sb.ToString());
@@ -118,7 +163,18 @@ namespace _Works.CJW.Scripts.Cars.Editor
                 areaMask = NavMesh.AllAreas,
             };
 
-            const int minX = -40, maxX = 40, minZ = -45, maxZ = 45;
+            int minX = -40, maxX = 40, minZ = -45, maxZ = 45;
+            NavMeshSurface surface = FindSurface(filter.agentTypeID);
+            if (surface != null && surface.collectObjects == CollectObjects.Volume)
+            {
+                Vector3 c = surface.transform.TransformPoint(surface.center);
+                Vector3 half = Vector3.Scale(surface.size, surface.transform.lossyScale) * 0.5f;
+                minX = Mathf.FloorToInt(c.x - half.x);
+                maxX = Mathf.CeilToInt(c.x + half.x);
+                minZ = Mathf.FloorToInt(c.z - half.z);
+                maxZ = Mathf.CeilToInt(c.z + half.z);
+            }
+
             var marks = new Dictionary<(int, int), char>();
 
             foreach (MapPosition p in Object.FindObjectsByType<MapPosition>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
@@ -199,6 +255,19 @@ namespace _Works.CJW.Scripts.Cars.Editor
                         sb.AppendLine($"  ({x},{z}) nav {hit.position.y:F3} / ground {rh.point.y:F3} ({rh.collider.name}) / {hit.position.y - rh.point.y:+0.000;-0.000}");
                     }
                 }
+            }
+
+            sb.AppendLine("[CarHeight] 맵 지점: 지점 y / 위에서 쏜 레이가 처음 닿은 콜라이더 / 사람 NavMesh y / 차 NavMesh y");
+            var human = new NavMeshQueryFilter { agentTypeID = 0, areaMask = NavMesh.AllAreas };
+            foreach (MapPosition p in Object.FindObjectsByType<MapPosition>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+            {
+                Vector3 pos = p.Position;
+                string ground = Physics.Raycast(pos + Vector3.up * 50f, Vector3.down, out RaycastHit rh, 100f, ~0, QueryTriggerInteraction.Ignore)
+                    ? $"{rh.collider.name}(layer {LayerMask.LayerToName(rh.collider.gameObject.layer)}) y {rh.point.y:F2}"
+                    : "없음";
+                string humanY = NavMesh.SamplePosition(pos, out NavMeshHit hh, 30f, human) ? hh.position.y.ToString("F2") : "없음";
+                string carY = NavMesh.SamplePosition(pos, out NavMeshHit ch, 30f, filter) ? ch.position.y.ToString("F2") : "없음";
+                sb.AppendLine($"  {p.Type} {p.name} {Round(pos)} y {pos.y:F2} / {ground} / {humanY} / {carY}");
             }
 
             sb.AppendLine("[CarHeight] 프리팹: 루트 y=0 기준 렌더러 바닥 높이(음수면 루트보다 아래로 파묻힘)");
@@ -305,15 +374,81 @@ namespace _Works.CJW.Scripts.Cars.Editor
             }
 
             surface.agentTypeID = agentId;
-            surface.collectObjects = human.collectObjects;
-            surface.center = human.center;
-            surface.size = human.size;
+            // 사람용이 All이어도 차는 볼륨 안만 굽는다. 지형 전체를 수집하면 맵 밖 벌판까지 차 길이 된다.
+            surface.collectObjects = CollectObjects.Volume;
             surface.layerMask = human.layerMask;
             surface.useGeometry = human.useGeometry;
+
+            // 씬마다 맵 위치와 바닥 높이가 다르므로(JW_RealMapTest 바닥 4.44, Demo 0) 볼륨을 맵에서 잰다.
+            // 수평은 맵의 도로·장애물을 모두 덮고, 수직은 바닥을 가운데쯤 끼고 얇게 잡는다. 바닥이 볼륨 밖이면 장애물이 깎이지 않는다.
+            if (TryMeasureMap(surface.layerMask, out Bounds area, out float groundY))
+            {
+                surface.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+                surface.transform.localScale = Vector3.one;
+                surface.center = new Vector3(area.center.x, groundY + VolumeCenterAboveGround, area.center.z);
+                surface.size = new Vector3(area.size.x + VolumeMargin * 2f, VolumeHeight, area.size.z + VolumeMargin * 2f);
+            }
+            else
+            {
+                Debug.LogWarning("[CarNavMesh] Map 아래 도로·장애물 콜라이더를 찾지 못해 사람용 볼륨을 그대로 씁니다.");
+                surface.center = human.center;
+                surface.size = human.size;
+            }
             surface.defaultArea = NotWalkableArea;
 
             EditorUtility.SetDirty(surface);
             return surface;
+        }
+
+        /// <summary>Map 아래에서 굽는 레이어에 든 콜라이더(지형 제외)를 모두 덮는 범위와, 도로(Plane·Road) 윗면 높이를 잰다.
+        /// 지형은 맵보다 훨씬 넓어(Demo 1000m) 범위에서 뺀다.</summary>
+        private static bool TryMeasureMap(LayerMask layerMask, out Bounds area, out float groundY)
+        {
+            area = default;
+            groundY = 0f;
+
+            GameObject map = GameObject.Find("Map");
+            if (map == null)
+            {
+                return false;
+            }
+
+            bool hasArea = false;
+            foreach (Collider c in map.GetComponentsInChildren<Collider>())
+            {
+                if (c is TerrainCollider || c.isTrigger || (layerMask.value & (1 << c.gameObject.layer)) == 0)
+                {
+                    continue;
+                }
+
+                if (hasArea)
+                {
+                    area.Encapsulate(c.bounds);
+                }
+                else
+                {
+                    area = c.bounds;
+                    hasArea = true;
+                }
+            }
+
+            bool hasGround = false;
+            foreach (string path in WalkableRoots)
+            {
+                GameObject root = GameObject.Find(path);
+                if (root == null || root.GetComponent<Terrain>() != null)
+                {
+                    continue;
+                }
+
+                foreach (Collider c in root.GetComponentsInChildren<Collider>())
+                {
+                    groundY = hasGround ? Mathf.Max(groundY, c.bounds.max.y) : c.bounds.max.y;
+                    hasGround = true;
+                }
+            }
+
+            return hasArea && hasGround;
         }
 
         /// <summary>Plane과 Road 아래에만 Walkable 수정자를 단다. 차 타입에만 적용해 사람용 NavMesh는 건드리지 않는다.</summary>
@@ -326,7 +461,6 @@ namespace _Works.CJW.Scripts.Cars.Editor
                 GameObject root = GameObject.Find(path);
                 if (root == null)
                 {
-                    Debug.LogError($"[CarNavMesh] '{path}'를 찾지 못했습니다.");
                     continue;
                 }
 
@@ -354,20 +488,34 @@ namespace _Works.CJW.Scripts.Cars.Editor
             return count;
         }
 
-        private static void SaveData(NavMeshSurface surface)
+        /// <summary>구운 데이터를 씬 옆 폴더(씬 이름)에 저장한다. 예전 데이터는 이 씬 폴더 안에 있을 때만 지운다.
+        /// 씬을 복사해 오면 다른 씬의 데이터를 가리키고 있을 수 있는데, 그건 원래 씬이 쓰므로 남긴다.</summary>
+        private static string SaveData(NavMeshSurface surface, string oldDataPath)
         {
-            if (!AssetDatabase.IsValidFolder(DataFolder))
+            string scenePath = surface.gameObject.scene.path;
+            string sceneDir = System.IO.Path.GetDirectoryName(scenePath).Replace('\\', '/');
+            string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+            string folder = $"{sceneDir}/{sceneName}";
+            string dataPath = $"{folder}/{DataFileName}";
+
+            if (!AssetDatabase.IsValidFolder(folder))
             {
-                AssetDatabase.CreateFolder("Assets/_Works/CJW/Scene", "JW_RealMapTest");
+                AssetDatabase.CreateFolder(sceneDir, sceneName);
             }
 
-            if (AssetDatabase.LoadAssetAtPath<NavMeshData>(DataPath) != null)
+            if (!string.IsNullOrEmpty(oldDataPath) && oldDataPath != dataPath && oldDataPath.StartsWith(folder + "/"))
             {
-                AssetDatabase.DeleteAsset(DataPath);
+                AssetDatabase.DeleteAsset(oldDataPath);
             }
 
-            AssetDatabase.CreateAsset(surface.navMeshData, DataPath);
+            if (AssetDatabase.LoadAssetAtPath<NavMeshData>(dataPath) != null)
+            {
+                AssetDatabase.DeleteAsset(dataPath);
+            }
+
+            AssetDatabase.CreateAsset(surface.navMeshData, dataPath);
             AssetDatabase.SaveAssets();
+            return dataPath;
         }
 
         private static int RetargetPrefabs(int agentId)

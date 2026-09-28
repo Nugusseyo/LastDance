@@ -6,16 +6,17 @@ using UnityEngine.AI;
 
 namespace _Works.CJW.Scripts.Customers.Ragdoll
 {
-    /// <summary>휴머노이드 visual을 래그돌로 만든다. 뼈에 붙일 강체·콜라이더·관절은 처음 초기화할 때 Animator의 휴머노이드 뼈로
-    /// 직접 만든다 — visual을 어떤 캐릭터로 갈아 끼워도 프리팹마다 래그돌을 다시 짤 필요가 없다.
-    /// 평소에는 뼈 강체가 kinematic이고 콜라이더가 꺼져 있어 이동·길찾기·차 감지에 끼어들지 않는다.</summary>
+    /// <summary>휴머노이드 visual을 래그돌로 쓰러뜨린다. 뼈의 강체·콜라이더·관절은 프리팹에 미리 구워 둔 것을 쓴다
+    /// (Tools/JW/Customers/Bake Customer Ragdoll). 평소에는 강체가 kinematic이고 콜라이더가 꺼져 있어 이동·길찾기·차 감지에 끼어들지 않고,
+    /// 쓰러질 때 kinematic과 콜라이더만 뒤집는다. 관절을 쓰러지는 순간에 새로 만들면 걷던 자세가 기준이 돼 관절이 뼈를 잡아당기며
+    /// 메시가 찢어졌다 — 미리 만든 관절은 기준 자세가 늘 같아 그런 일이 없다.</summary>
     public class RagdollModule : AbstractModule, IRagdoll
     {
-        [Header("몸")]
-        [Tooltip("몸 전체 질량(kg). 뼈 길이에 비례해 나눈다.")]
+        [Header("몸 (굽기 메뉴가 씀)")]
+        [Tooltip("몸 전체 질량(kg). 굽기 메뉴가 뼈마다 나눠 준다. 바꾸면 다시 구워야 한다.")]
         [SerializeField, Min(1f)] private float totalMass = 60f;
 
-        [Tooltip("팔다리 굵기 = 뼈 길이 × 이 값.")]
+        [Tooltip("팔다리 굵기 = 뼈 길이 × 이 값. 바꾸면 다시 구워야 한다.")]
         [SerializeField, Range(0.05f, 0.5f)] private float limbThickness = 0.22f;
 
         [Header("쓰러짐")]
@@ -41,6 +42,10 @@ namespace _Works.CJW.Scripts.Customers.Ragdoll
         [Tooltip("쓰러진 자리보다 이만큼(m) 아래로 떨어지면 바닥을 뚫은 것으로 보고 곧바로 일으킨다.")]
         [SerializeField, Min(0.5f)] private float fallThroughDepth = 3f;
 
+        public float TotalMass => totalMass;
+
+        public float LimbThickness => limbThickness;
+
         public bool IsActive { get; private set; }
 
 
@@ -48,29 +53,6 @@ namespace _Works.CJW.Scripts.Customers.Ragdoll
 
         private readonly List<Rigidbody> _bodies = new();
         private readonly List<Collider> _colliders = new();
-
-        /// <summary>관절 하나를 만들 설정. 관절은 만들어지는 순간의 자세를 기준으로 각도를 재므로, 미리 만들어 두면
-        /// 걷던 자세로 쓰러질 때 이미 한계를 넘은 관절이 한순간에 몸을 끌어당겨 튕겨 낸다. 그래서 쓰러질 때 만든다.</summary>
-        private readonly struct JointSpec
-        {
-            public readonly Rigidbody Body;
-            public readonly Rigidbody Parent;
-            public readonly float Twist;
-            public readonly float Swing1;
-            public readonly float Swing2;
-
-            public JointSpec(Rigidbody body, Rigidbody parent, float twist, float swing1, float swing2)
-            {
-                Body = body;
-                Parent = parent;
-                Twist = twist;
-                Swing1 = swing1;
-                Swing2 = swing2;
-            }
-        }
-
-        private readonly List<JointSpec> _jointSpecs = new();
-        private readonly List<CharacterJoint> _joints = new();
 
         private Animator _animator;
         private Transform _hips;
@@ -102,7 +84,7 @@ namespace _Works.CJW.Scripts.Customers.Ragdoll
                 return;
             }
 
-            Build();
+            Collect();
         }
 
         // 물리가 한 번 튀면 다음 스텝에서 되돌릴 길이 없다. 매 물리 스텝마다 속도를 묶어 둔다.
@@ -160,9 +142,54 @@ namespace _Works.CJW.Scripts.Customers.Ragdoll
 
         public void Activate(Vector3 launchVelocity, bool stayDown = false)
         {
-            if (!_built)
+            if (!Enable(stayDown))
             {
                 return;
+            }
+
+            for (int i = 0; i < _bodies.Count; i++)
+            {
+                _bodies[i].linearVelocity += launchVelocity;
+            }
+        }
+
+        public void ActivateAt(Vector3 hitPoint, Vector3 impulse, bool stayDown = false)
+        {
+            if (!Enable(stayDown))
+            {
+                return;
+            }
+
+            Rigidbody target = ClosestBody(hitPoint);
+            if (target != null)
+            {
+                target.AddForce(impulse, ForceMode.Impulse);
+            }
+        }
+
+        private Rigidbody ClosestBody(Vector3 point)
+        {
+            Rigidbody closest = null;
+            float best = float.MaxValue;
+            for (int i = 0; i < _bodies.Count; i++)
+            {
+                float distance = (_bodies[i].position - point).sqrMagnitude;
+                if (distance < best)
+                {
+                    best = distance;
+                    closest = _bodies[i];
+                }
+            }
+
+            return closest;
+        }
+
+        /// <summary>물리로 넘긴다. 이미 쓰러져 있으면 일어설 시간만 미룬다. 구운 래그돌이 없으면 false.</summary>
+        private bool Enable(bool stayDown)
+        {
+            if (!_built)
+            {
+                return false;
             }
 
             // 한 번 눕힌 몸은 다시 맞아도 그대로 누워 있어야 한다. 켜기만 하고 끄는 건 Recover가 한다.
@@ -204,11 +231,7 @@ namespace _Works.CJW.Scripts.Customers.Ragdoll
             }
 
             _recoverAt = Time.time + recoverAfter;
-
-            for (int i = 0; i < _bodies.Count; i++)
-            {
-                _bodies[i].linearVelocity += launchVelocity;
-            }
+            return true;
         }
 
         private readonly List<Collider> _ignored = new();
@@ -304,15 +327,6 @@ namespace _Works.CJW.Scripts.Customers.Ragdoll
 
         private void SetPhysics(bool on)
         {
-            if (on)
-            {
-                CreateJoints();
-            }
-            else
-            {
-                DestroyJoints();
-            }
-
             for (int i = 0; i < _bodies.Count; i++)
             {
                 Rigidbody body = _bodies[i];
@@ -328,9 +342,12 @@ namespace _Works.CJW.Scripts.Customers.Ragdoll
                 {
                     body.isKinematic = false;
                     body.collisionDetectionMode = CollisionDetectionMode.Continuous;
+                    body.interpolation = RigidbodyInterpolation.Interpolate;
                 }
                 else
                 {
+                    // 서 있을 땐 애니메이션이 뼈를 옮긴다. 보간을 켜 두면 물리가 지난 스텝 자세로 뼈를 되돌려 떨린다.
+                    body.interpolation = RigidbodyInterpolation.None;
                     body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
                     body.isKinematic = true;
                 }
@@ -374,158 +391,26 @@ namespace _Works.CJW.Scripts.Customers.Ragdoll
             }
         }
 
-        // ---------------- 휴머노이드 뼈로 래그돌 만들기 ----------------
-
-        private void Build()
+        /// <summary>프리팹에 구워 둔 뼈 강체와 그 콜라이더를 모은다. 머리카락이 들고 있는 뼈대 사본에는 강체가 없어 섞이지 않는다.</summary>
+        private void Collect()
         {
-            _hips = Bone(HumanBodyBones.Hips);
-            Transform spine = Bone(HumanBodyBones.Chest) ?? Bone(HumanBodyBones.Spine);
-            Transform head = Bone(HumanBodyBones.Head);
-            if (_hips == null || spine == null || head == null)
+            _hips = _animator.GetBoneTransform(HumanBodyBones.Hips);
+            _animator.GetComponentsInChildren(true, _bodies);
+
+            for (int i = 0; i < _bodies.Count; i++)
             {
-                Debug.LogError($"[{nameof(RagdollModule)}] {_owner.name}의 휴머노이드 뼈(엉덩이·척추·머리)를 찾지 못해 래그돌을 만들지 못합니다.", this);
-                return;
+                _bodies[i].maxDepenetrationVelocity = maxDepenetration;
+                _colliders.AddRange(_bodies[i].GetComponents<Collider>());
             }
 
-            float height = Vector3.Distance(_hips.position, head.position) * 2.2f;
-
-            Rigidbody hipsBody = AddBody(_hips, null, 0.2f);
-            AddBox(_hips, spine, height * 0.09f);
-
-            Rigidbody spineBody = AddBody(spine, hipsBody, 0.2f);
-            AddCapsule(spine, head, height * 0.09f);
-            _jointSpecs.Add(new JointSpec(spineBody, hipsBody, 20f, 20f, 15f));
-
-            Rigidbody headBody = AddBody(head, spineBody, 0.08f);
-            AddSphere(head, height * 0.06f);
-            _jointSpecs.Add(new JointSpec(headBody, spineBody, 30f, 30f, 25f));
-
-            Limb(HumanBodyBones.LeftUpperArm, HumanBodyBones.LeftLowerArm, HumanBodyBones.LeftHand, spineBody, 0.035f, 0.025f, false);
-            Limb(HumanBodyBones.RightUpperArm, HumanBodyBones.RightLowerArm, HumanBodyBones.RightHand, spineBody, 0.035f, 0.025f, false);
-            Limb(HumanBodyBones.LeftUpperLeg, HumanBodyBones.LeftLowerLeg, HumanBodyBones.LeftFoot, hipsBody, 0.1f, 0.06f, true);
-            Limb(HumanBodyBones.RightUpperLeg, HumanBodyBones.RightLowerLeg, HumanBodyBones.RightFoot, hipsBody, 0.1f, 0.06f, true);
+            if (_hips == null || _bodies.Count == 0)
+            {
+                Debug.LogError($"[{nameof(RagdollModule)}] {_owner.name}에 구운 래그돌이 없습니다. Tools/JW/Customers/Bake Customer Ragdoll을 눌러 주세요.", this);
+                return;
+            }
 
             _built = true;
             SetPhysics(false);
-        }
-
-        private void Limb(HumanBodyBones upper, HumanBodyBones lower, HumanBodyBones end, Rigidbody parent,
-            float upperMass, float lowerMass, bool leg)
-        {
-            Transform u = Bone(upper), l = Bone(lower), e = Bone(end);
-            if (u == null || l == null)
-            {
-                return;
-            }
-
-            Rigidbody upperBody = AddBody(u, parent, upperMass);
-            AddCapsule(u, l, Vector3.Distance(u.position, l.position) * limbThickness * 0.5f);
-            _jointSpecs.Add(new JointSpec(upperBody, parent, leg ? 30f : 40f, leg ? 40f : 60f, leg ? 20f : 40f));
-
-            Rigidbody lowerBody = AddBody(l, upperBody, lowerMass);
-            Vector3 tip = e != null ? e.position : l.position + (l.position - u.position) * 0.9f;
-            AddCapsule(l, tip, Vector3.Distance(l.position, tip) * limbThickness * 0.45f);
-
-            // 쓰러지는 순간의 자세가 기준이라 한쪽으로만 굽는 한계는 둘 수 없다. 좌우로 고르게, 굽는 축만 넉넉히 준다.
-            _jointSpecs.Add(new JointSpec(lowerBody, upperBody, 60f, 10f, 5f));
-        }
-
-        private Transform Bone(HumanBodyBones bone) => _animator.GetBoneTransform(bone);
-
-        private Rigidbody AddBody(Transform bone, Rigidbody parent, float massShare)
-        {
-            Rigidbody body = bone.gameObject.AddComponent<Rigidbody>();
-            body.mass = totalMass * massShare;
-            body.interpolation = RigidbodyInterpolation.Interpolate;
-            body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
-            body.maxDepenetrationVelocity = maxDepenetration;
-            body.isKinematic = true;
-            _bodies.Add(body);
-            return body;
-        }
-
-        /// <summary>지금 자세를 기준으로 관절을 만든다.</summary>
-        private void CreateJoints()
-        {
-            for (int i = 0; i < _jointSpecs.Count; i++)
-            {
-                JointSpec spec = _jointSpecs[i];
-                CharacterJoint joint = spec.Body.gameObject.AddComponent<CharacterJoint>();
-                joint.connectedBody = spec.Parent;
-                joint.enablePreprocessing = false;
-                joint.enableProjection = true;
-                joint.lowTwistLimit = new SoftJointLimit { limit = -spec.Twist };
-                joint.highTwistLimit = new SoftJointLimit { limit = spec.Twist };
-                joint.swing1Limit = new SoftJointLimit { limit = spec.Swing1 };
-                joint.swing2Limit = new SoftJointLimit { limit = spec.Swing2 };
-                _joints.Add(joint);
-            }
-        }
-
-        private void DestroyJoints()
-        {
-            for (int i = 0; i < _joints.Count; i++)
-            {
-                if (_joints[i] != null)
-                {
-                    DestroyImmediate(_joints[i]);
-                }
-            }
-
-            _joints.Clear();
-        }
-
-        /// <summary>뼈에서 다음 뼈(또는 끝점)까지 이어지는 캡슐. 뼈의 로컬 축 중 그 방향과 가장 가까운 축으로 세운다.</summary>
-        private void AddCapsule(Transform bone, Transform next, float radius) => AddCapsule(bone, next.position, radius);
-
-        private void AddCapsule(Transform bone, Vector3 end, float radius)
-        {
-            Vector3 local = bone.InverseTransformPoint(end);
-            CapsuleCollider capsule = bone.gameObject.AddComponent<CapsuleCollider>();
-            capsule.direction = LargestAxis(local);
-
-            float scale = AxisScale(bone, capsule.direction);
-            float length = local.magnitude;
-            capsule.center = local * 0.5f;
-            capsule.radius = Mathf.Max(radius / scale, 0.01f);
-            capsule.height = length + capsule.radius;
-            _colliders.Add(capsule);
-        }
-
-        private void AddBox(Transform bone, Transform next, float halfWidth)
-        {
-            Vector3 local = bone.InverseTransformPoint(next.position);
-            BoxCollider box = bone.gameObject.AddComponent<BoxCollider>();
-            int axis = LargestAxis(local);
-            float w = halfWidth * 2f / AxisScale(bone, axis == 0 ? 1 : 0);
-            Vector3 size = new(w, w, w);
-            size[axis] = Mathf.Abs(local[axis]);
-            box.size = size;
-            box.center = local * 0.5f;
-            _colliders.Add(box);
-        }
-
-        private void AddSphere(Transform bone, float radius)
-        {
-            SphereCollider sphere = bone.gameObject.AddComponent<SphereCollider>();
-            sphere.radius = radius / AxisScale(bone, 1);
-            sphere.center = new Vector3(0f, sphere.radius, 0f);
-            _colliders.Add(sphere);
-        }
-
-        private static int LargestAxis(Vector3 v)
-        {
-            Vector3 a = new(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
-            return a.x >= a.y && a.x >= a.z ? 0 : a.y >= a.z ? 1 : 2;
-        }
-
-        /// <summary>뼈 로컬 축 하나가 월드에서 몇 m인지. 모델이 스케일돼 있어도 콜라이더 크기를 월드 기준으로 맞춘다.</summary>
-        private static float AxisScale(Transform bone, int axis)
-        {
-            Vector3 unit = Vector3.zero;
-            unit[axis] = 1f;
-            float s = bone.TransformVector(unit).magnitude;
-            return s > 1e-5f ? s : 1f;
         }
     }
 }

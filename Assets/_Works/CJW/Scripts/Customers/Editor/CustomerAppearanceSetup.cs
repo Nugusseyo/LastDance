@@ -37,11 +37,11 @@ namespace _Works.CJW.Scripts.Customers.Editor
                         continue;
                     }
 
-                    var module = root.GetComponent<CustomerAppearanceModule>();
+                    var module = CustomerModuleSlots.Find<CustomerAppearanceModule>(root);
                     bool added = module == null;
                     if (added)
                     {
-                        module = root.AddComponent<CustomerAppearanceModule>();
+                        module = CustomerModuleSlots.Add<CustomerAppearanceModule>(root);
                     }
 
                     var so = new SerializedObject(module);
