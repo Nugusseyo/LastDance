@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
 using _Works.JYG._Scripts.Events;
 using DevLib.EventChannelSystem;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace _Works.JYG._Scripts.UI.KeyHint
@@ -40,7 +40,7 @@ namespace _Works.JYG._Scripts.UI.KeyHint
         public void Subscribe(KeyHintType type, object owner)
         {
             if (owner == null) return;
-            
+
             if (hintType.TryAdd(owner, type))
             {
                 HintArrangementAndInvoke();
@@ -50,7 +50,7 @@ namespace _Works.JYG._Scripts.UI.KeyHint
         public void Unsubscribe(KeyHintType type, object owner)
         {
             if (owner == null) return;
-            
+
             if (hintType.Remove(owner))
             {
                 HintArrangementAndInvoke();
@@ -89,5 +89,6 @@ namespace _Works.JYG._Scripts.UI.KeyHint
         SellingCar = 1 << 3,
         Interact = 1 << 4,
         RemoveWheel = 1 << 5,
+        GoToGarage = 1 << 6,
     }
 }
