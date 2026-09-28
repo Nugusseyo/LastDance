@@ -1,5 +1,7 @@
+using _Works.JYG._Scripts.Events;
 using _Works.KDH._01.Scripts.Car;
 using _Works.Shared.Cars;
+using DevLib.EventChannelSystem;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -13,14 +15,54 @@ namespace _Works.KDH._01.Scripts.Warehouse
         [SerializeField] private Transform carPoint;
         [SerializeField] private float lookDistance = 4f;
         [SerializeField] private float carPadding = 0.5f;
+        [SerializeField] private float playerSize = 0.6f;
+        [SerializeField] private EventChannelSO moneyChannel;
+        [SerializeField] private int garageCarPrice = 300;
+        [SerializeField] private float tiltPerWheel = 4f;
+        [SerializeField] private float sinkPerWheel = 0.06f;
+        [SerializeField] private float tiltSpeed = 2f;
 
         private Camera playerCamera;
+        private GameObject garageCar;
+        private Vector3 returnPosition;
+        private Quaternion returnRotation;
+        private float pitch;
+        private float roll;
+        private float sink;
+
+        public GameObject GarageCar => garageCar;
 
         private void Update()
         {
-            if (Keyboard.current == null || !Keyboard.current.gKey.wasPressedThisFrame) return;
+            TiltGarageCar();
 
-            SendToGarage(FindLookingCar());
+            if (Keyboard.current == null) return;
+
+            if (Keyboard.current.gKey.wasPressedThisFrame)
+            {
+                SendToGarage(FindLookingCar());
+            }
+
+            if (Keyboard.current.eKey.wasPressedThisFrame && IsLookingAt(garageCar))
+            {
+                SellGarageCar();
+            }
+        }
+
+        public void SellGarageCar()
+        {
+            if (garageCar == null) return;
+
+            if (moneyChannel != null)
+            {
+                moneyChannel.RaiseEvent(UIEvents.ScrapEvent.Init(garageCarPrice, 0, 0));
+            }
+
+            Debug.Log($"[GarageSender] {garageCar.name}를 팔았어요.");
+            Destroy(garageCar);
+            garageCar = null;
+
+            MovePlayer(returnPosition, returnRotation);
         }
 
         public bool SendToGarage(IRemovableCar car)
@@ -37,15 +79,29 @@ namespace _Works.KDH._01.Scripts.Warehouse
                 return false;
             }
 
-            GameObject garageCar = CopyCarToGarage(car.GameObject);
-
-            if (!car.Remove())
+            if (garageCar != null)
             {
-                Destroy(garageCar);
+                Debug.Log("[GarageSender] 차고에 이미 차가 있어요. 먼저 팔아주세요.");
                 return false;
             }
 
-            TeleportPlayer();
+            GameObject newCar = CopyCarToGarage(car.GameObject);
+
+            if (!car.Remove())
+            {
+                Destroy(newCar);
+                return false;
+            }
+
+            garageCar = newCar;
+            pitch = 0f;
+            roll = 0f;
+            sink = 0f;
+
+            returnPosition = player.position;
+            returnRotation = player.rotation;
+
+            MovePlayer(GetPositionOutsideCar(teleportPoint.position), teleportPoint.rotation);
             Debug.Log($"[GarageSender] {car.GameObject.name}를 차고로 보냈어요.");
             return true;
         }
@@ -87,34 +143,65 @@ namespace _Works.KDH._01.Scripts.Warehouse
             copy.transform.SetPositionAndRotation(carPoint.position, carPoint.rotation);
             Destroy(holder);
 
-            PutOnFloor(copy);
-
             BoxCollider wall = copy.AddComponent<BoxCollider>();
             CarWallMaker.AddBoxLikeCar(wall, copy.transform, 0.2f);
 
             return copy;
         }
 
-        private void PutOnFloor(GameObject car)
+        public void RemoveWheel(GameObject wheel)
         {
-            Bounds bounds = GetCarBounds(car);
+            if (garageCar == null) return;
 
-            Vector3 rayStart = carPoint.position + Vector3.up * 1.5f;
-            if (!Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, 10f, ~0, QueryTriggerInteraction.Ignore)) return;
+            Vector3 wheelPosition = garageCar.transform.InverseTransformPoint(wheel.transform.position);
 
-            float lift = hit.point.y - bounds.min.y;
-            car.transform.position += Vector3.up * lift;
+            roll -= Mathf.Sign(wheelPosition.x) * tiltPerWheel;
+            pitch += Mathf.Sign(wheelPosition.z) * tiltPerWheel;
+            sink += sinkPerWheel;
         }
 
-        private IRemovableCar FindLookingCar()
+        private void TiltGarageCar()
+        {
+            if (garageCar == null) return;
+
+            Quaternion targetRotation = carPoint.rotation * Quaternion.Euler(pitch, 0f, roll);
+            Vector3 targetPosition = carPoint.position + Vector3.down * sink;
+
+            float step = tiltSpeed * Time.deltaTime;
+            garageCar.transform.rotation = Quaternion.Slerp(garageCar.transform.rotation, targetRotation, step);
+            garageCar.transform.position = Vector3.Lerp(garageCar.transform.position, targetPosition, step);
+        }
+
+        private bool IsLookingAt(GameObject car)
+        {
+            if (car == null || !FindCamera()) return false;
+
+            Bounds carBounds = GetCarBounds(car);
+            carBounds.Expand(carPadding);
+
+            return carBounds.IntersectRay(GetLookRay(), out float distance) && distance <= lookDistance;
+        }
+
+        private bool FindCamera()
         {
             if (playerCamera == null)
             {
                 playerCamera = Camera.main;
-                if (playerCamera == null) return null;
             }
 
-            Ray lookRay = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+            return playerCamera != null;
+        }
+
+        private Ray GetLookRay()
+        {
+            return new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+        }
+
+        private IRemovableCar FindLookingCar()
+        {
+            if (!FindCamera()) return null;
+
+            Ray lookRay = GetLookRay();
 
             IRemovableCar closestCar = null;
             float closestDistance = lookDistance;
@@ -150,17 +237,46 @@ namespace _Works.KDH._01.Scripts.Warehouse
             return bounds;
         }
 
-        private void TeleportPlayer()
+        private void MovePlayer(Vector3 position, Quaternion rotation)
         {
             Rigidbody playerRigidbody = player.GetComponent<Rigidbody>();
 
             if (playerRigidbody != null)
             {
                 playerRigidbody.linearVelocity = Vector3.zero;
-                playerRigidbody.position = teleportPoint.position;
+                playerRigidbody.position = position;
             }
 
-            player.SetPositionAndRotation(teleportPoint.position, teleportPoint.rotation);
+            CharacterController controller = player.GetComponent<CharacterController>();
+            if (controller != null) controller.enabled = false;
+
+            player.SetPositionAndRotation(position, rotation);
+
+            if (controller != null) controller.enabled = true;
+        }
+
+        private Vector3 GetPositionOutsideCar(Vector3 position)
+        {
+            if (garageCar == null) return position;
+
+            Bounds carBounds = GetCarBounds(garageCar);
+            carBounds.Expand(playerSize * 2f);
+
+            Vector3 flatPosition = new Vector3(position.x, carBounds.center.y, position.z);
+            if (!carBounds.Contains(flatPosition)) return position;
+
+            float toLeft = position.x - carBounds.min.x;
+            float toRight = carBounds.max.x - position.x;
+            float toBack = position.z - carBounds.min.z;
+            float toFront = carBounds.max.z - position.z;
+            float shortest = Mathf.Min(Mathf.Min(toLeft, toRight), Mathf.Min(toBack, toFront));
+
+            if (shortest == toLeft) position.x = carBounds.min.x;
+            else if (shortest == toRight) position.x = carBounds.max.x;
+            else if (shortest == toBack) position.z = carBounds.min.z;
+            else position.z = carBounds.max.z;
+
+            return position;
         }
     }
 }
