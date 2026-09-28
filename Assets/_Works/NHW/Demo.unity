@@ -7529,8 +7529,8 @@ MonoBehaviour:
   carPadding: 0.5
   playerSize: 0.6
   moneyChannel: {fileID: 0}
-  garageCarPrice: 300
-  quickScrapFeePercent: 30
+  carPrice: 300
+  wheelPrice: 50
   tiltPerWheel: 4
   sinkPerWheel: 0.06
   tiltSpeed: 2
@@ -8738,7 +8738,6 @@ MonoBehaviour:
     m_Bits: 1024
   handDetachTime: 6
   equippedWrench: {fileID: 0}
-  popForce: 1.5
   playerGrab: {fileID: 1865818728}
   garageSender: {fileID: 1039004556}
 --- !u!4 &1176738547
@@ -10209,11 +10208,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6908908579237361986, guid: 29e11aaf70e10a94a880bedc4cd57b3a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.77999866
+      value: -0.14
       objectReference: {fileID: 0}
     - target: {fileID: 6908908579237361986, guid: 29e11aaf70e10a94a880bedc4cd57b3a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 30.289999
+      value: 30.29
       objectReference: {fileID: 0}
     - target: {fileID: 6908908579237361986, guid: 29e11aaf70e10a94a880bedc4cd57b3a, type: 3}
       propertyPath: m_LocalRotation.w
@@ -11448,7 +11447,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6908908579237361986, guid: 29e11aaf70e10a94a880bedc4cd57b3a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.79
+      value: 0.041
       objectReference: {fileID: 0}
     - target: {fileID: 6908908579237361986, guid: 29e11aaf70e10a94a880bedc4cd57b3a, type: 3}
       propertyPath: m_LocalPosition.z
