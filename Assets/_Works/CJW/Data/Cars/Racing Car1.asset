@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.CarDataSO
   poolItem: {fileID: 11400000, guid: bcad8672b57823f4087a50b19491c1ed, type: 2}
   boardingInterval: 0.4
-  moveSpeed: 6
+  moveSpeed: 8
   arriveThreshold: 0.5
   customers: []
   stateOverrides: []

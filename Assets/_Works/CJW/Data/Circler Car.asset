@@ -15,7 +15,7 @@ MonoBehaviour:
   poolItem: {fileID: 11400000, guid: aad0cb14499e4e64899bc5c133d29f38, type: 2}
   randomVisual: 1
   boardingInterval: 0.4
-  moveSpeed: 5
+  moveSpeed: 7
   arriveThreshold: 0.5
   customers:
   - {fileID: 11400000, guid: 9a6262fdb6760684b9bf637525b4f5d1, type: 2}

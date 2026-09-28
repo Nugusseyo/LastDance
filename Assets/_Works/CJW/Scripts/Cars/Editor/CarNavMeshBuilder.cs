@@ -25,8 +25,8 @@ namespace _Works.CJW.Scripts.Cars.Editor
             "Assets/_Works/Share/Prefabs/TestSUV.prefab",
         };
 
-        // 차 반폭(Car 0.8, TestSUV 약 1.06)보다 조금 크게 잡아, 경로가 장애물에 차체가 닿을 만큼 붙지 않게 한다.
-        private const float AgentRadius = 1.0f;
+        // 차 반폭(Racing Car 1.2배 키운 뒤 약 1.1~1.2)에 맞춰, 경로가 장애물에 차체가 닿을 만큼 붙지 않게 한다.
+        private const float AgentRadius = 1.2f;
         private const float AgentHeight = 1.6f;
         private const float AgentSlope = 30f;
         private const float AgentClimb = 0.3f;

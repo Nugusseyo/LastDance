@@ -85,7 +85,7 @@ MonoBehaviour:
   _arrivalRadius: 1
   _maxApproachRetries: 2
   _avoidancePriority: 0
-  _wheelBase: 1.1869403
+  _wheelBase: 1.4243283
   _maxSteerAngle: 40
   _steerRate: 140
   _accel: 6
@@ -121,7 +121,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 3197711461899631149}
   m_Enabled: 1
   m_AgentTypeID: -334000983
-  m_Radius: 0.836659
+  m_Radius: 1.0039908
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -130,7 +130,7 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 0.9009121
+  m_Height: 1.0810945
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Cars.CarTrafficSensorModule
   footprint: {fileID: 0}
-  fallbackHalfSize: {x: 0.6640151, y: 1.5599787}
+  fallbackHalfSize: {x: 0.7968181, y: 1.8719743}
   laneMargin: 0.3
   enableBypass: 1
   bypassSideMargin: 0.5
@@ -229,7 +229,6 @@ MonoBehaviour:
   wheelLayerMask:
     serializedVersion: 2
     m_Bits: 0
-  walletEffect: {fileID: 0}
 --- !u!114 &7930433389585838408
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -316,7 +315,7 @@ Transform:
   m_GameObject: {fileID: 6364127310243173067}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.3648177, y: 0, z: -0.22789255}
+  m_LocalPosition: {x: 0.4377812, y: 0, z: -0.27347103}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -347,7 +346,7 @@ Transform:
   m_GameObject: {fileID: 6562778840889873444}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.33466363, y: 0, z: -0.18991046}
+  m_LocalPosition: {x: -0.40159634, y: 0, z: -0.22789253}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -378,7 +377,7 @@ Transform:
   m_GameObject: {fileID: 6914875186403097895}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.7264392, y: 0, z: -0.15667613}
+  m_LocalPosition: {x: -2.071727, y: 0, z: -0.18801135}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -411,8 +410,8 @@ Transform:
   m_GameObject: {fileID: 8578531960473758723}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.828851, y: 0.18292864, z: -1.3304547}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.9946211, y: 0.21951436, z: -1.5965456}
+  m_LocalScale: {x: 1.1999999, y: 1.1999999, z: 1.1999999}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4632282670120229631}
@@ -477,7 +476,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_LocalScale: {x: 0.8399999, y: 0.8399999, z: 0.8399999}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4632282670120229631}
@@ -528,19 +527,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c935558ea4ee63746a5a53b50804994b, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.7
+      value: 0.8399999
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c935558ea4ee63746a5a53b50804994b, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.7
+      value: 0.8399999
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c935558ea4ee63746a5a53b50804994b, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.7
+      value: 0.8399999
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c935558ea4ee63746a5a53b50804994b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.048905134
+      value: 0.058686156
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c935558ea4ee63746a5a53b50804994b, type: 3}
       propertyPath: m_LocalPosition.y
@@ -548,7 +547,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c935558ea4ee63746a5a53b50804994b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.3034141
+      value: -0.3640969
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c935558ea4ee63746a5a53b50804994b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -711,6 +710,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
+  holdPositionOffset: {x: 0, y: 0, z: 0}
+  holdRotationOffset: {x: 0, y: 0, z: 0}
+  holdScale: {x: 1, y: 1, z: 1}
   UseEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -801,6 +803,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
+  holdPositionOffset: {x: 0, y: 0, z: 0}
+  holdRotationOffset: {x: 0, y: 0, z: 0}
+  holdScale: {x: 1, y: 1, z: 1}
   UseEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -891,6 +896,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
+  holdPositionOffset: {x: 0, y: 0, z: 0}
+  holdRotationOffset: {x: 0, y: 0, z: 0}
+  holdScale: {x: 1, y: 1, z: 1}
   UseEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -981,6 +989,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
+  holdPositionOffset: {x: 0, y: 0, z: 0}
+  holdRotationOffset: {x: 0, y: 0, z: 0}
+  holdScale: {x: 1, y: 1, z: 1}
   UseEvent:
     m_PersistentCalls:
       m_Calls: []

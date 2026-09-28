@@ -27,7 +27,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_LocalScale: {x: 0.8399999, y: 0.8399999, z: 0.8399999}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8139028609359990002}
@@ -73,7 +73,7 @@ Transform:
   m_GameObject: {fileID: 964023899339310369}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.4358146, y: 0, z: -0.25064796}
+  m_LocalPosition: {x: -0.5229775, y: 0, z: -0.30077752}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -104,7 +104,7 @@ Transform:
   m_GameObject: {fileID: 1267709486421025361}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.47508267, y: 0, z: -0.30077755}
+  m_LocalPosition: {x: 0.5700992, y: 0, z: -0.36093304}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -135,7 +135,7 @@ Transform:
   m_GameObject: {fileID: 2582215847017080736}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.2482498, y: 0, z: -0.20678458}
+  m_LocalPosition: {x: -2.6978996, y: 0, z: -0.24814148}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -226,7 +226,7 @@ MonoBehaviour:
   _arrivalRadius: 1
   _maxApproachRetries: 2
   _avoidancePriority: 0
-  _wheelBase: 1.5665498
+  _wheelBase: 1.8798596
   _maxSteerAngle: 40
   _steerRate: 140
   _accel: 6
@@ -262,7 +262,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 7092125046746352269}
   m_Enabled: 1
   m_AgentTypeID: -334000983
-  m_Radius: 1.0895364
+  m_Radius: 1.3074436
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -271,7 +271,7 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 1.212572
+  m_Height: 1.4550862
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
@@ -288,7 +288,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Cars.CarTrafficSensorModule
   footprint: {fileID: 0}
-  fallbackHalfSize: {x: 0.86471146, y: 2.058894}
+  fallbackHalfSize: {x: 1.0376537, y: 2.4706726}
   laneMargin: 0.3
   enableBypass: 1
   bypassSideMargin: 0.5
@@ -370,7 +370,6 @@ MonoBehaviour:
   wheelLayerMask:
     serializedVersion: 2
     m_Bits: 0
-  walletEffect: {fileID: 0}
 --- !u!114 &5211818916731416533
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -459,8 +458,8 @@ Transform:
   m_GameObject: {fileID: 7301508252532507970}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.0941498, y: 0.20767635, z: -1.7559632}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -1.3129797, y: 0.24921161, z: -2.1071558}
+  m_LocalScale: {x: 1.1999999, y: 1.1999999, z: 1.1999999}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8139028609359990002}
@@ -528,19 +527,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.7
+      value: 0.8399999
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.7
+      value: 0.8399999
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.7
+      value: 0.8399999
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.048905134
+      value: 0.058686156
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
       propertyPath: m_LocalPosition.y
@@ -548,7 +547,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.40045255
+      value: -0.48054305
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a6c1dd22aab11f943a7de21a160938a7, type: 3}
       propertyPath: m_LocalRotation.w
@@ -731,6 +730,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
+  holdPositionOffset: {x: 0, y: 0, z: 0}
+  holdRotationOffset: {x: 0, y: 0, z: 0}
+  holdScale: {x: 1, y: 1, z: 1}
   UseEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -821,6 +823,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
+  holdPositionOffset: {x: 0, y: 0, z: 0}
+  holdRotationOffset: {x: 0, y: 0, z: 0}
+  holdScale: {x: 1, y: 1, z: 1}
   UseEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -911,6 +916,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
+  holdPositionOffset: {x: 0, y: 0, z: 0}
+  holdRotationOffset: {x: 0, y: 0, z: 0}
+  holdScale: {x: 1, y: 1, z: 1}
   UseEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -1001,6 +1009,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
+  holdPositionOffset: {x: 0, y: 0, z: 0}
+  holdRotationOffset: {x: 0, y: 0, z: 0}
+  holdScale: {x: 1, y: 1, z: 1}
   UseEvent:
     m_PersistentCalls:
       m_Calls: []

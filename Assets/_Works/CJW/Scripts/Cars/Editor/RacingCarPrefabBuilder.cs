@@ -22,7 +22,8 @@ namespace _Works.CJW.Scripts.Cars.Editor
         private const string PoolItemFolder = "Assets/DevLib/ObjectPool/Items";
         private const string PoolManagerPath = "Assets/DevLib/ObjectPool/PoolManager.asset";
         private const string CarDataFolder = "Assets/_Works/CJW/Data/Cars";
-        private const float VisualScale = 0.7f;
+        /// <summary>팩 모델에 곱할 크기. 0.7에서 1.2배 키웠다(2026-09-28). 바꾼 뒤 Resize Racing Car Prefabs를 돌리면 만든 프리팹에 반영된다.</summary>
+        private const float VisualScale = 0.84f;
 
         [MenuItem("Tools/JW/Cars/Build Racing Car Prefabs")]
         public static void Build()
@@ -170,6 +171,116 @@ namespace _Works.CJW.Scripts.Cars.Editor
             sensorSo.ApplyModifiedPropertiesWithoutUndo();
 
             sb.AppendLine($"  {carName}: size={b.size} ratio={ratio} wheelBase={wheelBase.floatValue:F2} bodies={bodies.Count}");
+        }
+
+        /// <summary>이미 만든 차 프리팹의 크기를 <see cref="VisualScale"/>에 맞춘다. Build를 다시 돌리면 뒤에 붙인 설정(바퀴·주유구·사운드 등)이
+        /// 날아가므로, 지금 모델 배율과의 비율만큼 크기에 묶인 값을 함께 늘리고 줄인다. 이미 맞춰져 있으면 건너뛴다.
+        /// 좌석·하차 지점은 위치만 옮긴다 — 좌석을 키우면 거기 앉는 손님도 커지고, 내릴 때 그 크기로 남는다.</summary>
+        [MenuItem("Tools/JW/Cars/Resize Racing Car Prefabs")]
+        public static void Resize()
+        {
+            var sb = new StringBuilder("[RacingCarPrefabBuilder] Resize\n");
+
+            foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { OutputFolder }))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                GameObject root = PrefabUtility.LoadPrefabContents(path);
+                try
+                {
+                    if (ResizeOne(root, sb))
+                    {
+                        PrefabUtility.SaveAsPrefabAsset(root, path);
+                    }
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(root);
+                }
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log(sb.ToString());
+        }
+
+        private static bool ResizeOne(GameObject root, StringBuilder sb)
+        {
+            TestCar car = root.GetComponent<TestCar>();
+            if (car == null || root.transform.childCount == 0)
+            {
+                sb.AppendLine($"  {root.name}: 차가 아님, 건너뜀");
+                return false;
+            }
+
+            // Build가 모델을 첫 번째 자식으로 넣는다.
+            Transform visual = root.transform.GetChild(0);
+            if (PrefabUtility.IsAnyPrefabInstanceRoot(visual.gameObject) == false)
+            {
+                sb.AppendLine($"  !! {root.name}: 첫 자식 {visual.name}이(가) 모델 프리팹이 아님, 건너뜀");
+                return false;
+            }
+
+            float current = visual.localScale.x;
+            float factor = VisualScale / current;
+            if (current <= 0f || Mathf.Abs(factor - 1f) < 1e-3f)
+            {
+                sb.AppendLine($"  {root.name}: 이미 {current:F2}배, 건너뜀");
+                return false;
+            }
+
+            var carSo = new SerializedObject(car);
+            var markers = new HashSet<Transform>();
+            SerializedProperty seats = carSo.FindProperty("seats");
+            for (int i = 0; i < seats.arraySize; i++)
+            {
+                if (seats.GetArrayElementAtIndex(i).objectReferenceValue is Transform seat)
+                {
+                    markers.Add(seat);
+                }
+            }
+
+            if (carSo.FindProperty("dropOffPoint").objectReferenceValue is Transform dropOff)
+            {
+                markers.Add(dropOff);
+            }
+
+            // 루트 바로 아래 자식은 루트 기준으로 벌어진다. 표식(좌석·하차 지점)은 위치만, 나머지(모델·장애물·주유구)는 크기까지.
+            foreach (Transform child in root.transform)
+            {
+                child.localPosition *= factor;
+                if (markers.Contains(child) == false)
+                {
+                    child.localScale *= factor;
+                }
+            }
+
+            // 좌석이 루트 바로 아래가 아니면 위에서 못 옮겼다.
+            foreach (Transform marker in markers)
+            {
+                if (marker.parent != root.transform)
+                {
+                    sb.AppendLine($"  !! {root.name}: {marker.name}이(가) 루트 바로 아래가 아니라 위치를 못 옮김");
+                }
+            }
+
+            NavMeshAgent agent = root.GetComponent<NavMeshAgent>();
+            if (agent != null)
+            {
+                agent.radius *= factor;
+                agent.height *= factor;
+            }
+
+            var moveSo = new SerializedObject(root.GetComponent<CarSteeringMoveModule>());
+            SerializedProperty wheelBase = moveSo.FindProperty("_wheelBase");
+            wheelBase.floatValue *= factor;
+            moveSo.ApplyModifiedPropertiesWithoutUndo();
+
+            var sensorSo = new SerializedObject(root.GetComponent<CarTrafficSensorModule>());
+            SerializedProperty half = sensorSo.FindProperty("fallbackHalfSize");
+            half.vector2Value *= factor;
+            sensorSo.ApplyModifiedPropertiesWithoutUndo();
+
+            sb.AppendLine($"  {root.name}: {current:F2} → {VisualScale:F2} (x{factor:F2}), wheelBase={wheelBase.floatValue:F2}, 표식 {markers.Count}개");
+            return true;
         }
 
         /// <summary>만든 풀 아이템을 PoolManager에 올리고, 차마다 CarDataSO를 만든다.
