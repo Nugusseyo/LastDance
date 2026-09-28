@@ -129,6 +129,12 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>이번 방문에 주유를 원하는 손님을 이미 태웠는지. 역할과 따로 본다 — <see cref="CustomerRoles.WantsFuel"/> 참고.</summary>
         private bool _fuelTaken;
 
+        /// <summary>이번 차에 탄 손님의 정상/진상. 첫 손님이 정하고, 다음 좌석은 같은 쪽 손님만 뽑는다. None이면 아직 아무도 안 탔다.</summary>
+        private Resources.DataBase.Human_Data.HumanType _carHumanType;
+
+        /// <summary>손님 데이터마다 정상/진상 판정을 캐시한다. 프리팹을 뒤지는 일이라 좌석마다 다시 하지 않는다.</summary>
+        private readonly Dictionary<CustomerDataSO, Resources.DataBase.Human_Data.HumanType> _humanTypeCache = new();
+
         /// <summary>앞 차에 탄 짝 손님을 기다리는 종류. 다음 차는 이 손님을 첫 좌석에 태운다.</summary>
         private CustomerDataSO _pendingPartner;
 
@@ -494,6 +500,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return null;
             }
 
+            // 한 차에는 한쪽 손님만 탄다. 차만 보고도 정상/진상 차를 알 수 있게 넘겨 둔다.
+            car.SetHumanType(_carHumanType);
+
             // 짝으로 오는 손님을 태웠으면 다음 차에 짝을 태워 곧바로 보낸다. 짝을 태운 차였다면 기다림을 끝낸다.
             if (_spawnedPartner)
             {
@@ -802,6 +811,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             _spawnBuffer.Clear();
             _takenRoles.Clear();
             _fuelTaken = false;
+            _carHumanType = Resources.DataBase.Human_Data.HumanType.None;
 
             // 차가 자기 손님 목록을 들고 있으면 그쪽이 우선. 없으면 디렉터의 기본 목록을 쓴다.
             CustomerDataSO[] pool = carData.Customers ?? defaultCustomerDataList;
@@ -918,6 +928,48 @@ namespace _Works.CJW.Scripts.Customers.Visit
             {
                 _fuelTaken = true;
             }
+
+            // 첫 손님이 이 차를 정상 차로 할지 진상 차로 할지 정한다.
+            if (_carHumanType == Resources.DataBase.Human_Data.HumanType.None)
+            {
+                _carHumanType = HumanTypeOf(customerData);
+            }
+        }
+
+        /// <summary>손님 데이터가 정상인지 진상인지. 평판 판정(VisitReputationReporter)과 같게 리뷰 글 번호를 HumanDB에서 찾아 쓴다 —
+        /// 번호가 여럿인데 타입이 갈리거나 번호가 없으면 프리팹의 HumanType을 쓴다. 프리팹을 못 찾으면 None(어느 차에나 탐).</summary>
+        private Resources.DataBase.Human_Data.HumanType HumanTypeOf(CustomerDataSO data)
+        {
+            if (_humanTypeCache.TryGetValue(data, out Resources.DataBase.Human_Data.HumanType cached))
+            {
+                return cached;
+            }
+
+            var type = Resources.DataBase.Human_Data.HumanType.None;
+            GameObject prefab = data.PoolItem != null ? data.PoolItem.prefab : null;
+            AbstractCustomer customer = prefab != null ? prefab.GetComponentInChildren<AbstractCustomer>(true) : null;
+            if (customer != null)
+            {
+                type = customer.HumanType;
+                int[] reviews = customer.ReviewIndices;
+                if (reviews is { Length: > 0 })
+                {
+                    var first = HumanTypeTable.Of(reviews[0], customer.HumanType);
+                    bool same = true;
+                    for (int i = 1; i < reviews.Length && same; i++)
+                    {
+                        same = HumanTypeTable.Of(reviews[i], customer.HumanType) == first;
+                    }
+
+                    if (same)
+                    {
+                        type = first;
+                    }
+                }
+            }
+
+            _humanTypeCache[data] = type;
+            return type;
         }
 
         /// <summary>손님 하나를 풀에서 꺼내 태울 목록에 넣는다. 꺼내지 못하면 false.</summary>
@@ -974,6 +1026,16 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 if (_fuelTaken && CustomerRoles.WantsFuel(data))
                 {
                     continue;
+                }
+
+                // 한 차에는 정상 손님만, 또는 진상 손님만 탄다. 첫 손님과 다른 쪽은 후보에서 뺀다.
+                if (_carHumanType != Resources.DataBase.Human_Data.HumanType.None)
+                {
+                    var type = HumanTypeOf(data);
+                    if (type != Resources.DataBase.Human_Data.HumanType.None && type != _carHumanType)
+                    {
+                        continue;
+                    }
                 }
 
                 // 혼자 오는 손님은 첫 좌석에서만 뽑힌다. 이미 누가 탔으면 후보에서 뺀다.

@@ -34,6 +34,13 @@ namespace _Works.CJW.Scripts.Cars
         /// <summary>이 차의 수치. 스폰될 때 <see cref="Setup"/>으로 주입된다.</summary>
         public CarDataSO Data { get; private set; }
 
+        /// <summary>이 차가 정상 손님 차인지 진상 손님 차인지. 한 차에는 한쪽 손님만 타므로 탄 손님으로 정해진다
+        /// (방문 차는 VisitDirector가 손님을 태울 때, 훔친 차는 훔친 손님이 몰고 떠날 때). 손님이 없는 차(지나가는 차 등)는 None.
+        /// 손님이 죽거나 차를 버리고 가도 바뀌지 않는다 — 버려진 진상 차는 여전히 진상 차다.</summary>
+        public Resources.DataBase.Human_Data.HumanType HumanType { get; private set; }
+
+        public void SetHumanType(Resources.DataBase.Human_Data.HumanType type) => HumanType = type;
+
         /// <summary>실제로 쓸 수 있는 좌석 수. 배열 길이가 아니라 채워진 칸의 수다.</summary>
         public int SeatCount
         {
@@ -188,6 +195,7 @@ namespace _Works.CJW.Scripts.Cars
         {
             // 다음 스폰에서 Setup이 다시 넣어준다. 남겨두면 이전 방문의 값이 샌다.
             Data = null;
+            HumanType = Resources.DataBase.Human_Data.HumanType.None;
             _remover = null;
             Stop();
             ClearBodyColor();

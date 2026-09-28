@@ -65,6 +65,15 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 boarded = true;
                 target.DriveAway();
 
+                // 훔친 차도 탄 손님 쪽이 된다. 타고 온 차의 판정을 그대로 넘기고, 없으면 손님 프리팹의 값을 쓴다.
+                if (target.Car != null)
+                {
+                    Car ownCar = Ctx.Visit?.Car;
+                    target.Car.SetHumanType(ownCar != null && ownCar.HumanType != Resources.DataBase.Human_Data.HumanType.None
+                        ? ownCar.HumanType
+                        : customer.HumanType);
+                }
+
                 float deadline = driveTimeout > 0f ? Time.time + driveTimeout : float.MaxValue;
                 while (!target.HasEscaped && Time.time < deadline)
                 {
