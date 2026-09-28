@@ -3271,7 +3271,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Title.TitleMenu
   startSceneName: Demo
-  settingsPanel: {fileID: 0}
+  settingsPanel: {fileID: 1254022922017221907, guid: 96bbaba97c946fc47ac625cbf1a9035d, type: 3}
 --- !u!114 &256299585
 MonoBehaviour:
   m_ObjectHideFlags: 0
