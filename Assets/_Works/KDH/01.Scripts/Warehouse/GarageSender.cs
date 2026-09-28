@@ -29,6 +29,7 @@ namespace _Works.KDH._01.Scripts.Warehouse
         private float pitch;
         private float roll;
         private float sink;
+        private Vector3 carStartPosition;
 
         public GameObject GarageCar => garageCar;
 
@@ -94,6 +95,7 @@ namespace _Works.KDH._01.Scripts.Warehouse
             }
 
             garageCar = newCar;
+            carStartPosition = newCar.transform.position;
             pitch = 0f;
             roll = 0f;
             sink = 0f;
@@ -165,7 +167,7 @@ namespace _Works.KDH._01.Scripts.Warehouse
             if (garageCar == null) return;
 
             Quaternion targetRotation = carPoint.rotation * Quaternion.Euler(pitch, 0f, roll);
-            Vector3 targetPosition = carPoint.position + Vector3.down * sink;
+            Vector3 targetPosition = carStartPosition + Vector3.down * sink;
 
             float step = tiltSpeed * Time.deltaTime;
             garageCar.transform.rotation = Quaternion.Slerp(garageCar.transform.rotation, targetRotation, step);
