@@ -398,7 +398,7 @@ MonoBehaviour:
   RefuelingPrice: 8000
   wheelLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
 --- !u!114 &7180145335016454850
 MonoBehaviour:
   m_ObjectHideFlags: 0
