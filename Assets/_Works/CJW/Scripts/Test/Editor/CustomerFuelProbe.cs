@@ -12,6 +12,9 @@ using _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States;
 using _Works.JJH._02_Scripts.Agents.Players.Grabs;
 using _Works.JJH._02_Scripts.Objects;
 using _Works.JYG._Scripts.UI.SpeechBubble;
+using _Works.JYG._Scripts.Events;
+using _Works.JYG._Scripts.Data_Container.Money;
+using DevLib.EventChannelSystem;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -70,6 +73,10 @@ namespace _Works.CJW.Scripts.Test.Editor
 
             /// <summary>차에서 내리지 않고 주유를 기다리는 손님(InCarFuelState).</summary>
             public bool InCar;
+
+            /// <summary>주유를 끝낸 순간의 결제 기록 수와 가진 돈. 이 뒤로 이 차의 주유비가 한 번 들어와야 한다.</summary>
+            public int PaymentIndex;
+            public int MoneyBefore;
         }
 
         private static readonly List<Target> Targets = new();
@@ -77,6 +84,13 @@ namespace _Works.CJW.Scripts.Test.Editor
         private static readonly StringBuilder Log = new();
         private static readonly List<string> Errors = new();
         private static FuelInjector _injector;
+
+        private const string MoneyChannelPath = "Assets/_Works/JYG/Data/EventSO/UIEventSO.asset";
+        private static EventChannelSO _moneyChannel;
+        private static readonly List<int> Payments = new();
+
+        private static readonly FieldInfo MoneyField =
+            typeof(MoneyManager).GetField("moneyContainer", BindingFlags.Instance | BindingFlags.NonPublic);
         private static int _pass;
         private static int _fail;
         private static float _startTime;
@@ -131,9 +145,27 @@ namespace _Works.CJW.Scripts.Test.Editor
                 EditorUtility.CopySerialized(playerInjector, _injector);
             }
 
+            // 주유가 끝나면 방문이 이 채널로 주유비(RefuelingEvent)를 쏜다. MoneyManager도 같은 채널을 듣는다.
+            Payments.Clear();
+            _moneyChannel = AssetDatabase.LoadAssetAtPath<EventChannelSO>(MoneyChannelPath);
+            _moneyChannel?.AddListener<RefuelingEvent>(OnRefueling);
+
             Application.logMessageReceived += OnLog;
             EditorApplication.update += Tick;
             Write($"시작 {SessionState.GetInt(RunIndexKey, 1)}회차, 주입기: 임시(설정은 {(playerInjector != null ? playerInjector.name : "기본값")})");
+        }
+
+        private static void OnRefueling(RefuelingEvent evt)
+        {
+            Payments.Add(evt.MoneyValue);
+            Write($"주유비 이벤트: {evt.MoneyValue}");
+        }
+
+        /// <summary>MoneyManager가 들고 있는 돈. 씬에 없으면 -1.</summary>
+        private static int ReadMoney()
+        {
+            MoneyManager manager = Object.FindFirstObjectByType<MoneyManager>();
+            return manager != null && MoneyField?.GetValue(manager) is IntegerDataContainer money ? money.Value : -1;
         }
 
         private static void OnLog(string condition, string stackTrace, LogType type)
@@ -255,6 +287,8 @@ namespace _Works.CJW.Scripts.Test.Editor
                         t.Door.NotifyFuelingStarted();
                         t.Door.NotifyFuelingCompleted();
                         Write($"{t.Name}: 차 안 손님 주유 완료");
+                        t.PaymentIndex = Payments.Count;
+                        t.MoneyBefore = ReadMoney();
                         t.Step = Step.AfterEnd;
                         t.StepAt = now;
                         return;
@@ -266,6 +300,8 @@ namespace _Works.CJW.Scripts.Test.Editor
                         t.Door.NotifyFuelingStarted();
                         t.Door.NotifyFuelingCompleted();
                         Write($"{t.Name}: 주유기에 닿기 전에 주유 완료 (주유기까지 {Planar(c.transform.position, c.Fsm.Context.RentedPosition?.Position ?? c.transform.position):F1}m 남음)");
+                        t.PaymentIndex = Payments.Count;
+                        t.MoneyBefore = ReadMoney();
                         t.Step = Step.AfterEnd;
                         t.StepAt = now;
                         return;
@@ -387,6 +423,8 @@ namespace _Works.CJW.Scripts.Test.Editor
 
                     Check(!t.Door.IsFueling && t.CompletedCount == 1,
                           $"{t.Name} 게이지 다 차서 주유 완료({now - t.StepAt:F1}s): door.IsFueling={t.Door.IsFueling}, 완료 {t.CompletedCount}회");
+                    t.PaymentIndex = Payments.Count;
+                    t.MoneyBefore = ReadMoney();
                     t.Step = Step.AfterEnd;
                     t.StepAt = now;
                     return;
@@ -400,6 +438,7 @@ namespace _Works.CJW.Scripts.Test.Editor
 
                     Check(moved, $"{t.Name} 주유 끝나고 {now - t.StepAt:F2}s 뒤 다음 행동으로: {current?.GetType().Name ?? "-"}");
                     Check(!IsWaitingOn(t.Door, c), $"{t.Name} 주유구 구독 해제");
+                    CheckPayment(t);
                     Check(c.Fsm?.Context?.RentedPosition == null, $"{t.Name} 주유기 자리 반납");
                     CheckFuelSound(t, false);
 
@@ -426,6 +465,21 @@ namespace _Works.CJW.Scripts.Test.Editor
                     t.Step = Step.Done;
                     return;
             }
+        }
+
+        /// <summary>주유가 끝나면 이 차의 주유비(차종 주유가 × 손님 지불 배율)가 한 번 들어오고, MoneyManager의 돈이 오르는지.</summary>
+        private static void CheckPayment(Target t)
+        {
+            var car = t.Customer.Session?.Car;
+            int expected = car != null && car.Data != null
+                ? (t.Customer.Data != null ? t.Customer.Data.FuelPayment(car.Data.FuelPrice) : car.Data.FuelPrice)
+                : -1;
+            List<int> paid = Payments.Skip(t.PaymentIndex).ToList();
+            Check(paid.Count == 1 && paid[0] == expected,
+                  $"{t.Name} 주유 끝나면 주유비 이벤트 한 번: 기대 {expected}, 받은 [{string.Join(", ", paid)}]");
+
+            int money = ReadMoney();
+            Check(t.MoneyBefore >= 0 && money > t.MoneyBefore, $"{t.Name} 주유 끝나면 돈이 오름: {t.MoneyBefore} → {money}");
         }
 
         /// <summary>주유하는 동안 차가 주유 소리를 반복하고, 손을 떼면 끄는지.</summary>
@@ -504,6 +558,7 @@ namespace _Works.CJW.Scripts.Test.Editor
         {
             EditorApplication.update -= Tick;
             Application.logMessageReceived -= OnLog;
+            _moneyChannel?.RemoveListener<RefuelingEvent>(OnRefueling);
             SessionState.SetBool(RunningKey, false);
 
             if (_injector != null && _injector.IsFueling)

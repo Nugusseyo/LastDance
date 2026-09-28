@@ -8,6 +8,7 @@ using _Works.CJW.Scripts.Customers.Data;
 using _Works.CJW.Scripts.Customers.Health;
 using _Works.CJW.Scripts.Customers.Interaction;
 using _Works.CJW.Scripts.Customers.Movement;
+using _Works.CJW.Scripts.Customers.Patience;
 using _Works.CJW.Scripts.ManagingAgents;
 using _Works.CJW.Scripts.Sounds;
 using _Works.Shared.Boarding;
@@ -44,6 +45,9 @@ namespace _Works.CJW.Scripts.Customers
 
         /// <summary>체력과 맞는 창구. 프리팹에 체력 모듈이 없으면 null이고, 그 손님은 맞지 않는다.</summary>
         public ICustomerHealth Health { get; private set; }
+
+        /// <summary>플레이어를 기다리며 줄어드는 인내심. 프리팹에 인내심 모듈이 없으면 null이고, 그 손님은 참을성을 드러내지 않는다.</summary>
+        public ICustomerPatience Patience { get; private set; }
 
         /// <summary>소리를 내는 창구. 프리팹에 사운드 모듈이 없으면 null이고, 그 손님은 소리 없이 움직인다.</summary>
         public ISoundEmitter Sound { get; private set; }
@@ -142,6 +146,9 @@ namespace _Works.CJW.Scripts.Customers
 
             // 맞던 손님이 반납됐을 수 있다. 채우지 않으면 다음 손님이 깎인 체력으로 나온다.
             Health?.ResetHealth();
+
+            // 기다리다 반납됐을 수 있다. 끄지 않으면 다음 손님이 줄어든 인내심을 띄운 채로 나온다.
+            Patience?.End();
         }
     
 
@@ -158,6 +165,7 @@ namespace _Works.CJW.Scripts.Customers
             Request = GetModule<ICustomerRequest>();
             Ragdoll = GetModule<IRagdoll>();
             Health = GetModule<ICustomerHealth>();
+            Patience = GetModule<ICustomerPatience>();
             Sound = GetModule<ISoundEmitter>();
             Appearance = GetModule<ICustomerAppearance>();
         }
