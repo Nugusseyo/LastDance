@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using _Works.CJW.Scripts.MapSystems.Events;
 using _Works.JJH._02_Scripts.Objects;
 using _Works.JYG._Scripts.Events;
 using DevLib.EventChannelSystem;
@@ -9,19 +10,14 @@ namespace _Works.JYG._Scripts.GasStation
 {
     public class GasStationManager : MonoBehaviour
     {
-        public List<GasStationController> gasStations = new List<GasStationController>();
         [SerializeField] private EventChannelSO upgradeEventChannel;
+        [SerializeField] private EventChannelSO stationEvent;
         private const int UpgradeIndex = 5;
         
         private void Awake()
         {
             if(upgradeEventChannel != null)
                 upgradeEventChannel.AddListener<UpgradeItem>(HandleUpgradeItem);
-            
-            
-            if(gasStations != null && gasStations.Count > 0)
-                foreach (GasStationController gasStation in gasStations)
-                    gasStation.gameObject.SetActive(false);
         }
         
         private void OnDestroy()
@@ -40,12 +36,8 @@ namespace _Works.JYG._Scripts.GasStation
 
         private void ActiveGasStation(int count)
         {
-            int cnt = Mathf.Clamp(count, 1, gasStations.Count - 1);
-            for (int i = 0; i < count; ++i)
-            {
-                GasStationController controller = gasStations[i];
-                controller.gameObject.SetActive(true);
-            }
+            if (stationEvent != null)
+                stationEvent.RaiseEvent(MapEvents.GasStationEvent.Init(count));
         }
     }
 }
