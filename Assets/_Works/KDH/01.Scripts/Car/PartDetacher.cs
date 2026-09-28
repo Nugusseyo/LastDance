@@ -1,5 +1,6 @@
 using _Works.JJH._02_Scripts.Items;
 using _Works.JYG._Scripts.Events;
+using _Works.KDH._01.Scripts.Warehouse;
 using _Works.KDH._01.Scripts.Wrench;
 using DevLib.EventChannelSystem;
 using System.Collections;
@@ -25,6 +26,9 @@ namespace _Works.KDH._01.Scripts.Car
         [Header("Detach Time / UI")]
         [SerializeField] private EventChannelSO durationChannel;
         [SerializeField] private float handDetachTime = 8f;
+
+        [Header("Garage")]
+        [SerializeField] private GarageSender garageSender;
 
         public LayerMask PartLayerMask => partLayerMask;
         public bool IsDetaching => _pendingPart != null;
@@ -52,6 +56,9 @@ namespace _Works.KDH._01.Scripts.Car
 
             if (part.transform.parent == null)
                 return true;
+
+            if (IsWheel(part.gameObject) && !IsInGarage(part.transform))
+                return false;
 
             if (_pendingPart != part)
             {
@@ -95,6 +102,14 @@ namespace _Works.KDH._01.Scripts.Car
             StartCoroutine(RestoreCarRoutine(socket.parent, socket.carHeight));
 
             return true;
+        }
+
+        private bool IsInGarage(Transform part)
+        {
+            if (garageSender == null || garageSender.GarageCar == null)
+                return false;
+
+            return part.IsChildOf(garageSender.GarageCar.transform);
         }
 
         private bool IsWheel(GameObject partObject)

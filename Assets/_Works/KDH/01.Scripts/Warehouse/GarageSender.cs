@@ -18,6 +18,8 @@ namespace _Works.KDH._01.Scripts.Warehouse
         [SerializeField] private float playerSize = 0.6f;
         [SerializeField] private EventChannelSO moneyChannel;
         [SerializeField] private int garageCarPrice = 300;
+        [SerializeField] private BadCustomerCars badCustomerCars;
+        [SerializeField, Range(0, 100)] private int quickScrapFeePercent = 30;
         [SerializeField] private float tiltPerWheel = 4f;
         [SerializeField] private float sinkPerWheel = 0.06f;
         [SerializeField] private float tiltSpeed = 2f;
@@ -44,9 +46,10 @@ namespace _Works.KDH._01.Scripts.Warehouse
                 SendToGarage(FindLookingCar());
             }
 
-            if (Keyboard.current.eKey.wasPressedThisFrame && IsLookingAt(garageCar))
+            if (Keyboard.current.eKey.wasPressedThisFrame)
             {
-                SellGarageCar();
+                if (IsLookingAt(garageCar)) SellGarageCar();
+                else QuickScrap(FindLookingCar());
             }
         }
 
@@ -66,6 +69,33 @@ namespace _Works.KDH._01.Scripts.Warehouse
             MovePlayer(returnPosition, returnRotation);
         }
 
+        public bool QuickScrap(IRemovableCar car)
+        {
+            if (car == null || !car.CanRemove) return false;
+            if (!IsBadCar(car)) return false;
+
+            string carName = car.GameObject.name;
+            if (!car.Remove()) return false;
+
+            int price = garageCarPrice * (100 - quickScrapFeePercent) / 100;
+
+            if (moneyChannel != null)
+            {
+                moneyChannel.RaiseEvent(UIEvents.ScrapEvent.Init(price, 0, 0));
+            }
+
+            Debug.Log($"[GarageSender] {carName}를 빠른 폐차했어요. 수수료 {quickScrapFeePercent}% 떼고 {price}원");
+            return true;
+        }
+
+        private bool IsBadCar(IRemovableCar car)
+        {
+            if (badCustomerCars != null && badCustomerCars.IsBadCar(car.GameObject)) return true;
+
+            Debug.Log($"[GarageSender] {car.GameObject.name}는 정상 손님 차라서 폐차 못 해요.");
+            return false;
+        }
+
         public bool SendToGarage(IRemovableCar car)
         {
             if (car == null)
@@ -79,6 +109,8 @@ namespace _Works.KDH._01.Scripts.Warehouse
                 Debug.Log($"[GarageSender] {car.GameObject.name}는 아직 버려진 차가 아니라서 못 보내요.");
                 return false;
             }
+
+            if (!IsBadCar(car)) return false;
 
             if (garageCar != null)
             {
