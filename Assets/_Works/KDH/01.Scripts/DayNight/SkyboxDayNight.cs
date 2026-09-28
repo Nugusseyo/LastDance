@@ -19,8 +19,10 @@ namespace _Works.KDH._01.Scripts.DayNight
         [SerializeField, Range(0f, 1f)] private float fadeLowestBrightness = 0.6f;
         [SerializeField, Range(0f, 5f)] private float cloudSpeed = 0.5f;
         [SerializeField] private Material fadeableSkyboxTemplate;
+        [SerializeField] private float nightSkyBrightness = 7f;
 
         private readonly Dictionary<Material, float> baseExposures = new Dictionary<Material, float>();
+        private readonly Dictionary<Material, Material> copies = new Dictionary<Material, Material>();
         private Material dawnSky;
         private Material daySky;
         private Material sunsetSky;
@@ -35,6 +37,9 @@ namespace _Works.KDH._01.Scripts.DayNight
             daySky = CopySkybox(daySkybox);
             sunsetSky = CopySkybox(sunsetSkybox);
             nightSky = CopySkybox(nightSkybox);
+
+            baseExposures[nightSky] *= nightSkyBrightness;
+            ResetExposure(nightSky);
         }
 
         private void Update()
@@ -116,7 +121,10 @@ namespace _Works.KDH._01.Scripts.DayNight
 
         private Material CopySkybox(Material original)
         {
+            if (copies.TryGetValue(original, out Material savedCopy)) return savedCopy;
+
             Material copy = new Material(original);
+            copies[original] = copy;
 
             if (!copy.HasProperty("_Exposure"))
             {
