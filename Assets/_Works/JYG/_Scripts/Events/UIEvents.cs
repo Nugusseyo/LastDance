@@ -1,3 +1,4 @@
+using _Works.JYG._Scripts.UI.KeyHint;
 using DevLib.EventChannelSystem;
 using Resources.DataBase.Review_Data;
 using UnityEngine;
@@ -23,6 +24,8 @@ namespace _Works.JYG._Scripts.Events
 
         public static readonly TooltipEvent TooltipEvent = new TooltipEvent();
         public static readonly TipMoveEvent TipMoveEvent = new TipMoveEvent();
+        
+        public static readonly KeyHintEvent KeyHintType = new KeyHintEvent();
     }
 
     #region GaugeEvents
@@ -196,6 +199,25 @@ namespace _Works.JYG._Scripts.Events
         public TipMoveEvent Init(Vector2 pos)
         {
             Position = pos;
+            return this;
+        }
+    }
+    
+    #endregion
+    
+    #region KeyHint
+
+    public class KeyHintEvent : GameEvent
+    {
+        public KeyHintType KeyHintType { get; set; }
+        public object Owner { get; set; }
+        public bool IsSubscribe { get; set; }
+
+        public KeyHintEvent Init(KeyHintType keyHintType, object owner, bool isSub)
+        {
+            KeyHintType = keyHintType;
+            Owner = owner;
+            IsSubscribe = isSub;
             return this;
         }
     }
