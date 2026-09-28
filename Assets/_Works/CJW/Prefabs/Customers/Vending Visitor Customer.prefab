@@ -89,7 +89,7 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: a8fa614ffa7dc624690c40fa69ddec86, type: 2}
     - target: {fileID: 6130640838041544283, guid: 0e596dc8acd9ba94f9cde82e28e01474, type: 3}
-      propertyPath: 'managedReferences[4377106929555079263].lineIndices.Array.data[0]'
+      propertyPath: 'managedReferences[4377106815191875678].targetLines.Array.data[0]'
       value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []

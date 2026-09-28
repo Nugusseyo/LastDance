@@ -48,6 +48,13 @@ namespace _Works.CJW.Scripts.Customers.Visit.States
             context.PhaseElapsed += dt;
             context.PatrolPointElapsed += dt;
 
+            // 들어와서 돌기 시작하는 것부터 진상 짓이다. 평판을 여기서 깎는다(방문 끝에 '놓침'으로 한 번 더 깎지 않는다).
+            // Enter에서 알리지 않는다 — Enter는 방문이 시작되는 순간(VisitSession.Begin) 불려, 평판 쪽이 아직 듣기 전이다.
+            if (context.PhaseElapsed <= dt)
+            {
+                context.ReportCarMisconduct();
+            }
+
             if (lapTimeout > 0f && context.PhaseElapsed >= lapTimeout)
             {
                 // 다 돌았으면 그 자리에 서지 않고 곧장 떠난다. 도로 한가운데서 하차·대기로 넘어가면

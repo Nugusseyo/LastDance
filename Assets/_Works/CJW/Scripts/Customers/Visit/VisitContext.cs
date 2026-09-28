@@ -60,6 +60,9 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>Leaving 전용. 서 있는 앞차에 막혀 제자리인 채 마지막 탈출 계획 뒤로 흐른 시간(초).</summary>
         public float LeaveEscapeElapsed;
 
+        /// <summary>Leaving 전용. 탈출 계획을 다시 세웠는데도 제자리인 횟수. 앞으로 나아가면 0으로 돌아간다.</summary>
+        public int LeaveEscapeRetries;
+
         /// <summary>손님이 다른 차를 훔치러 나섰는지. 이때부터 방문은 출발·퇴치 요청을 받지 않고 손님이 떠나기를 기다린다.</summary>
         public bool Abandoning;
 
@@ -91,6 +94,15 @@ namespace _Works.CJW.Scripts.Customers.Visit
         public event Action<AbstractCustomer> Misconduct;
 
         public void ReportMisconduct(AbstractCustomer customer) => Raise(Misconduct, customer);
+
+        /// <summary>차째로 하는 진상 짓(입구 막기·뺑뺑 돌기)을 알린다. 손님이 차에서 내리지 않아 누가 했다고 할 수 없으니 첫 손님 이름으로 한 번 알린다.</summary>
+        public void ReportCarMisconduct()
+        {
+            if (Customers.Count > 0)
+            {
+                ReportMisconduct(Customers[0]);
+            }
+        }
 
         /// <summary>듣는 쪽(평판·UI)이 예외를 던져도 알린 손님의 행동까지 끊기지 않게 여기서 받아 남긴다.
         /// 그대로 흘리면 주유를 기다리던 상태가 예외로 끝나, 그 뒤 주유를 해 줘도 아무도 듣지 않는다.</summary>
@@ -129,6 +141,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             LeaveRestarts = 0;
             LeaveHonkElapsed = 0f;
             LeaveEscapeElapsed = 0f;
+            LeaveEscapeRetries = 0;
         }
 
         public void Clear()

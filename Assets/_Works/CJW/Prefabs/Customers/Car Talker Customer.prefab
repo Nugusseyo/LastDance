@@ -40,6 +40,10 @@ PrefabInstance:
       propertyPath: 'managedReferences[4377106815191875682].targetLines.Array.data[0]'
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 2383952036485700464, guid: e0a39a5b340f0aa4db363c84eda15a8d, type: 3}
+      propertyPath: managedReferences[4377106815191875682].speakOnArrival
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3770552447671277581, guid: e0a39a5b340f0aa4db363c84eda15a8d, type: 3}
       propertyPath: m_Name
       value: Car Talker Customer

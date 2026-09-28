@@ -19,7 +19,6 @@ namespace _Works.CJW.Scripts.MapSystems
         [SerializeField] private EventChannelSO systemChannel;
         [SerializeField] private MapDataSo mapData;
         [SerializeField] private OilDispenser[] dispensers;
-        [SerializeField] private NavMeshSurface surfaces;
         private bool _installed;
         
         #if UNITY_EDITOR
