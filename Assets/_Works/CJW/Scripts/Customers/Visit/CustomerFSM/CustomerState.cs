@@ -31,11 +31,19 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
             return condition == null || condition.IsMet(Ctx);
         }
 
+        /// <summary>조건이 안 맞아 이 행동을 건너뛸 때 대신 돌릴 행동. null이면(기본) 그냥 건너뛰고 다음 행동으로 넘어간다.
+        /// 싸움꾼처럼 조건이 안 맞으면 멍하니 서 있게 되는 손님이 대신 돌아다니게 할 때 쓴다. 돌려주는 행동은 이미 Bind돼 있어야 한다.</summary>
+        public virtual CustomerState WhenConditionFails => null;
+
         /// <summary>이 행동을 수행하고 어떻게 끝났는지 반환한다. 모든 대기에 <paramref name="ct"/>를 물려야 반납 후에도 태스크가 계속 도는 일이 없다.</summary>
         public abstract UniTask<VisitOutcome> Run(CancellationToken ct);
 
         /// <summary>이 행동이 주유를 원하는지. 한 차에 주유 손님을 하나만 태우려고 차를 채울 때 프리팹의 행동을 훑어 판단한다.</summary>
         public virtual bool WantsFuel => false;
+
+        /// <summary>이 행동이 진상 짓을 시작하는 순간을 스스로 알리는지(<see cref="VisitContext.ReportMisconduct"/>).
+        /// 그런 손님은 그 순간에만 평판이 깎이고, 방문이 끝날 때 '진상을 놓침'으로 다시 깎이지 않는다.</summary>
+        public virtual bool ReportsMisconduct => false;
 
         /// <summary>방문 시작 시 호출. 인스턴스가 재사용되므로 진행값을 들고 있다면 여기서 되돌린다.</summary>
         public virtual void Reset() { }

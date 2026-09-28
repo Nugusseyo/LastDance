@@ -7,6 +7,7 @@ using _Works.CJW.Scripts.Customers.Interaction;
 using _Works.CJW.Scripts.Customers.Movement;
 using _Works.CJW.Scripts.MapSystems;
 using DevLib.AnimatorSystem;
+using DevLib.ObjectPool.Runtime;
 using DevLib.SoundSystem;
 using UnityEngine;
 using UnityEngine.AI;
@@ -18,8 +19,10 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
     /// 나머지는 같아서 한 상태로 묶었다 — 종류가 늘 때 프리팹에서 대상만 바꾸면 된다.
     /// 맞는 쪽은 <see cref="IVandalTarget"/>으로만 안다. 대상이 그걸 구현하지 않았으면 때리는 시늉만 하고 끝난다.</summary>
     [Serializable]
-    public sealed class VandalizeState : CustomerState, IDestinationState
+    public sealed class VandalizeState : CustomerState, IDestinationState, ISpeakingState
     {
+        public int[] SpokenLines => targetLines;
+
         public MapPointType Destination => source == TargetSource.MapPoint ? targetPoint : MapPointType.None;
 
         /// <summary>때릴 물건을 고르는 방법.</summary>
@@ -45,8 +48,15 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("OtherCar일 때 둘러볼 반경(m).")]
         [SerializeField, Min(0f)] private float searchRadius = 25f;
 
-        [Tooltip("대상이 없을 때 다시 찾아볼 시간(초). 때릴 차나 닿는 자판기가 아직 없으면 생길 때까지 기다린다. 0이면 바로 넘어간다.")]
+        [Tooltip("대상이 없을 때 다시 찾아볼 시간(초). 닿는 자판기가 아직 없으면 생길 때까지 기다린다. 0이면 바로 넘어간다.\n" +
+                 "OtherCar는 이 시간과 상관없이 차가 나타날 때까지 돌아다니며 찾는다.")]
         [SerializeField, Min(0f)] private float targetWaitTimeout = 10f;
+
+        [Tooltip("끄면(기본) 아직 때릴 대상이 없는 동안은 일반 손님처럼 돌아다니고 평판도 일반인으로 셈한다(때리면 깎이고, 그냥 떠나도 깎이지 않는다).\n" +
+                 "차를 때리는 손님은 돌아다니다 차가 나타나면 그때부터 진상으로 돌아가 때리러 간다. 자판기처럼 대상이 아예 없으면 끝까지 돌아다닌다.\n" +
+                 "켜면 예전처럼 대상이 없을 땐 다음 행동으로 넘어가고 평판은 늘 진상으로 셈한다.\n" +
+                 "켜는 쪽을 옵션으로 둔 건 [SerializeReference] 상태의 새 필드가 기존 프리팹에 false로 들어가기 때문이다.")]
+        [SerializeField] private bool standIfNoTarget;
 
         [Header("접근")]
         [Tooltip("대상에서 이만큼 떨어져 선다(m). 0이면 대상 한가운데로 파고들어 몸이 겹친다.")]
@@ -79,6 +89,29 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("주먹이 대상에 닿을 때마다 낼 소리. 맞은 자리에서 난다.")]
         [SerializeField] private SoundClipSo hitSound;
 
+        [Header("말풍선")]
+        [Tooltip("말풍선을 꺼내 올 풀. 비우면 말하지 않는다.")]
+        [SerializeField] private PoolManagerSO speechPool;
+
+        [Tooltip("말풍선 프리팹의 풀 아이템.")]
+        [SerializeField] private PoolItemSO speechBubble;
+
+        [Tooltip("때릴 대상(차·자판기)을 찾아 다가가기 시작할 때 할 대사(HumanDB index) 후보. 비우면 말하지 않는다.\n" +
+                 "'아저씨 창문 내려봐요'처럼 대상에게 거는 말은 여기에 둔다 — 내리자마자 말하면 차가 없어도 허공에 대고 말한다.")]
+        [SerializeField] private int[] targetLines;
+
+        [Tooltip("손님 기준으로 말풍선을 띄울 위치(m). 0이면 머리 위 기본 위치를 쓴다.")]
+        [SerializeField] private Vector3 speechOffset;
+
+        [Tooltip("말풍선이 뜰 때 낼 소리.")]
+        [SerializeField] private SoundClipSo speechSound;
+
+        /// <summary>이번 방문에서 이미 대상을 찾아 진상 짓을 시작했는지. 맞아서 이 행동이 처음부터 다시 돌아도 일반인 취급으로 되돌리지 않는다.</summary>
+        [NonSerialized] private bool _engaged;
+
+        /// <summary>마지막으로 말을 건 대상. 같은 대상에게 다시 다가갈 때(맞고 나서 등) 같은 말을 되풀이하지 않는다.</summary>
+        [NonSerialized] private Transform _spokenTo;
+
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
         {
             AbstractCustomer customer = Ctx.Customer;
@@ -95,6 +128,12 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                     // 걸을 때는 연출을 접어야 한다. 안 접으면 이동 모듈이 걷기 클립을 틀지 못해 주먹을 뻗은 채 미끄러진다.
                     customer.ActionAnimator?.End();
 
+                    // 아직 대상을 못 찾았다. 차가 나타날 때까지 일반 손님처럼 돌아다니므로 그동안은 평판도 일반인으로 셈한다.
+                    if (!_engaged && !standIfNoTarget)
+                    {
+                        Ctx.Harmless = true;
+                    }
+
                     Transform target = source == TargetSource.OtherCar ? await WanderUntilCar(ct) : await WaitForTarget(ct);
                     if (target == null)
                     {
@@ -103,10 +142,23 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                             break;
                         }
 
+                        if (!standIfNoTarget)
+                        {
+                            // 때릴 게 아예 없다(자판기가 없는 맵 등). 멍하니 서 있지 않고 일반 손님처럼 돌아다닌다(평판도 일반인으로).
+                            Debug.Log($"[{nameof(VandalizeState)}] {customer.name}이(가) 때릴 대상이 없어 일반 손님처럼 돌아다닙니다.", customer);
+                            customer.ActionAnimator?.End();
+                            return await Wander.Run(ct);
+                        }
+
                         // 때릴 게 없다고 방문을 세우지는 않는다. 다음 행동으로 넘긴다.
                         Debug.LogWarning($"[{nameof(VandalizeState)}] {customer.name}이(가) 때릴 대상을 찾지 못했습니다.", customer);
                         return VisitOutcome.Blocked;
                     }
+
+                    // 대상이 생겼다. 이제부터는 진상이다. 대상에게 거는 말도 이때 한다.
+                    _engaged = true;
+                    Ctx.Harmless = false;
+                    SayTo(target, ct);
 
                     if (!await Approach(target, ct))
                     {
@@ -253,6 +305,22 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             }
         }
 
+        /// <summary>조건이 안 맞아 이 행동을 건너뛸 때도 서 있지 않고 돌아다닌다.</summary>
+        public override CustomerState WhenConditionFails => standIfNoTarget ? null : Wander;
+
+        [NonSerialized] private WanderState _wander;
+
+        /// <summary>때릴 대상이 없을 때 돌릴 돌아다니기. 프리팹에 필드로 두면 기존 손님들에 빈 값으로 들어가므로 코드로 만든다.</summary>
+        private WanderState Wander
+        {
+            get
+            {
+                _wander ??= new WanderState();
+                _wander.Bind(Ctx);
+                return _wander;
+            }
+        }
+
         /// <summary>때릴 차가 나타날 때까지 주변을 돌아다닌다. 제자리에 서서 기다리면 손님이 굳은 것처럼 보인다.
         /// 걷는 도중에도 계속 둘러보다가 차가 서면 곧장 그 차를 돌려준다. 취소(Phase 전환)로만 빈손으로 끝난다.</summary>
         private async UniTask<Transform> WanderUntilCar(CancellationToken ct)
@@ -374,6 +442,23 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         public override void Reset()
         {
             _unreachableCar = null;
+            _engaged = false;
+            _spokenTo = null;
+        }
+
+        /// <summary>새 대상에게 다가가기 시작할 때 한마디 한다. 말풍선은 걸어가며 머리 위를 따라다니다 대사가 끝나거나 이 행동이 끊기면 접힌다.</summary>
+        private void SayTo(Transform target, CancellationToken ct)
+        {
+            if (target == _spokenTo)
+            {
+                return;
+            }
+
+            _spokenTo = target;
+            if (CustomerSpeech.TrySay(Ctx, speechPool, speechBubble, targetLines, speechOffset, speechSound, ct, out UniTask speaking))
+            {
+                speaking.Forget();
+            }
         }
 
         /// <summary>차를 때릴 때 차 몸체 표면에서 설 거리(m). 몸 반지름(0.5)에 조금 더한 값이라 사실상 붙어 선다.

@@ -47,6 +47,35 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
 
         public CustomerContext Context => Machine?.Context;
 
+        /// <summary>이 손님이 방문 중에 말하게 될 대사 index 후보. 시퀀스를 단계 순서대로 훑어 처음으로 대사를 가진 행동의 것을 돌려준다.
+        /// 리뷰 글을 고를 때 손님이 아직 말하기 전이어도(말하는 시점이 뒤인 싸움꾼·차 때리는 손님 등) 그 손님다운 글을 쓰게 한다. 없으면 null.</summary>
+        public int[] ConfiguredLines()
+        {
+            if (sequences == null)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < sequences.Length; i++)
+            {
+                CustomerState[] states = sequences[i]?.States;
+                if (states == null)
+                {
+                    continue;
+                }
+
+                for (int j = 0; j < states.Length; j++)
+                {
+                    if (states[j] is ISpeakingState speaking && speaking.SpokenLines != null && speaking.SpokenLines.Length > 0)
+                    {
+                        return speaking.SpokenLines;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public override void Initialize(ModuleOwner owner)
         {
             base.Initialize(owner);
@@ -94,34 +123,36 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM
         }
 
         /// <summary>시퀀스 어딘가에서 주유를 원하는지. 초기화 전에도 직렬화된 값만 보므로 프리팹 에셋에 바로 물어볼 수 있다.</summary>
-        public bool WantsFuel
+        public bool WantsFuel => AnyState(state => state.WantsFuel);
+
+        /// <summary>시퀀스 어딘가의 행동이 진상 짓을 시작하는 순간을 스스로 알리는지. 평판은 그 순간에 깎고 방문 끝에 다시 깎지 않는다.</summary>
+        public bool ReportsMisconduct => AnyState(state => state.ReportsMisconduct);
+
+        private bool AnyState(Predicate<CustomerState> match)
         {
-            get
+            if (sequences == null)
             {
-                if (sequences == null)
-                {
-                    return false;
-                }
-
-                for (int i = 0; i < sequences.Length; i++)
-                {
-                    CustomerState[] states = sequences[i]?.States;
-                    if (states == null)
-                    {
-                        continue;
-                    }
-
-                    for (int j = 0; j < states.Length; j++)
-                    {
-                        if (states[j] != null && states[j].WantsFuel)
-                        {
-                            return true;
-                        }
-                    }
-                }
-
                 return false;
             }
+
+            for (int i = 0; i < sequences.Length; i++)
+            {
+                CustomerState[] states = sequences[i]?.States;
+                if (states == null)
+                {
+                    continue;
+                }
+
+                for (int j = 0; j < states.Length; j++)
+                {
+                    if (states[j] != null && match(states[j]))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         /// <summary>방문 시작. VisitSession.Begin이 손님마다 호출한다.</summary>

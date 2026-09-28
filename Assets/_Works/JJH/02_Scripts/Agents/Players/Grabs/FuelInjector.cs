@@ -1,4 +1,5 @@
-﻿using _Works.JJH._02_Scripts.Objects;
+﻿using System;
+using _Works.JJH._02_Scripts.Objects;
 using _Works.JYG._Scripts.Events;
 using DevLib.EventChannelSystem;
 using DevLib.SoundSystem;
@@ -14,8 +15,12 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
         [Header("Fuel")]
         [SerializeField] private float fuelDuration = 5f;
 
+        private float originDuration;
+
         [Header("Duration / UI")]
         [SerializeField] private EventChannelSO durationChannel;
+        [SerializeField] private EventChannelSO upgradeChannel;
+        private const int UpgradeIndex = 1;
 
         [Header("Sound")]
         [SerializeField] private EventChannelSO soundChannel;
@@ -29,6 +34,26 @@ namespace _Works.JJH._02_Scripts.Agents.Players.Grabs
         private float _holdTime;
         private bool _progressShown;
         private bool _isFuelSoundPlaying;
+
+        private void Awake()
+        {
+            if(upgradeChannel != null)
+                upgradeChannel.AddListener<UpgradeItem>(HandleUpgradeItem);
+            originDuration = fuelDuration;
+        }
+
+        private void HandleUpgradeItem(UpgradeItem evt)
+        {
+            if (evt.Index != UpgradeIndex) return;
+            float value = originDuration - evt.Item.value.Value * originDuration; //%단위이다.
+            fuelDuration = (float)Math.Round(value, 2);
+        }
+
+        private void OnDestroy()
+        {
+            if(upgradeChannel != null)
+                upgradeChannel.RemoveListener<UpgradeItem>(HandleUpgradeItem);
+        }
 
         public bool TryStartFueling(FuelDoor door)
         {

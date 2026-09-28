@@ -1,3 +1,4 @@
+using _Works.JJH._02_Scripts.Items;
 using _Works.JJH._02_Scripts.Systems.Events;
 using DevLib.EventChannelSystem;
 using UnityEngine;
@@ -41,6 +42,11 @@ namespace _Works.KDH._01.Scripts.Vending
 
             GameObject droppedItem = Instantiate(item.ItemPrefab, vendingPoint.position, vendingPoint.rotation);
 
+            GrabItem grabItem = droppedItem.GetComponent<GrabItem>();
+            if (grabItem != null)
+            {
+                grabItem.SetPhysicsState();
+            }
 
             Collider collider = droppedItem.GetComponentInChildren<Collider>();
             if (collider == null)

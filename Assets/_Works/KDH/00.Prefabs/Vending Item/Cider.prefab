@@ -51,6 +51,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.ItemType.CiderEffect
   itemSO: {fileID: 11400000, guid: c6e240c66d1536541a4e604ccbb225bb, type: 2}
+  eventChannelSO: {fileID: 11400000, guid: 5ca454320a311264a830e271fd884517, type: 2}
 --- !u!114 &3021705950023277124
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72,7 +73,20 @@ MonoBehaviour:
   holdScale: {x: 4, y: 4, z: 4}
   UseEvent:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1771749185731302058}
+        m_TargetAssemblyTypeName: _Works.KDH._01.Scripts.ItemType.CiderEffect,
+          Assembly-CSharp
+        m_MethodName: Apply
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!54 &2334178528018300591
 Rigidbody:
   m_ObjectHideFlags: 0

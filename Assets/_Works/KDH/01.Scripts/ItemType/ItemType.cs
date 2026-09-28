@@ -6,6 +6,7 @@ namespace _Works.KDH._01.Scripts.ItemType
         Nail,
         Cola,
         Cider,
-        Wallet
+        Wallet,
+        Weapon
     }
 }

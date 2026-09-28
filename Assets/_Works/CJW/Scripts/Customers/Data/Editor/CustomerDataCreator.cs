@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using DevLib.ObjectPool.Runtime;
+using _Works.CJW.Scripts.Customers.Editor;
 using _Works.CJW.Scripts.Customers.Visit;
 using _Works.CJW.Scripts.Customers.Visit.CustomerFSM;
 using _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States;
@@ -462,8 +463,8 @@ namespace _Works.CJW.Scripts.Customers.Data.Editor
 
             if (target == null)
             {
-                target = root.AddComponent<CustomerFSMModule>();
-                Debug.LogWarning($"[손님 만들기] {root.name}에 CustomerFSMModule이 없어 루트에 새로 붙였습니다.", root);
+                target = CustomerModuleSlots.Add<CustomerFSMModule>(root);
+                Debug.LogWarning($"[손님 만들기] {root.name}에 CustomerFSMModule이 없어 자식 오브젝트에 새로 붙였습니다.", root);
             }
 
             if (!overwriteStates && HasStates(target))

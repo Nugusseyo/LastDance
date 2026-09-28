@@ -4,12 +4,13 @@ using _Works.CJW.Scripts.Customers.Data;
 using _Works.CJW.Scripts.ManagingAgents;
 using _Works.CJW.Scripts.MapSystems;
 using _Works.CJW.Scripts.Sounds;
+using _Works.Shared.Cars;
 using DevLib.ObjectPool.Runtime;
 using UnityEngine;
 
 namespace _Works.CJW.Scripts.Cars
 {
-    public abstract class Car : ManagingAgent, IPoolable
+    public abstract class Car : ManagingAgent, IPoolable, IRemovableCar
     {
         [field: SerializeField] public PoolItemSO PoolItem { get; set; }
         public GameObject GameObject => this != null ? gameObject : null;
@@ -89,6 +90,16 @@ namespace _Works.CJW.Scripts.Cars
         }
 
         private bool _moduleMissingLogged;
+
+        /// <summary>이 차를 치워 줄 쪽. 버려진 차일 때만 채워진다.</summary>
+        private Func<Car, bool> _remover;
+
+        public bool CanRemove => _remover != null;
+
+        public bool Remove() => _remover != null && _remover(this);
+
+        /// <summary>버려진 차로 등록한 쪽(<see cref="Customers.Visit.VisitDirector"/>)이 치우는 방법을 맡긴다. null이면 더는 치울 수 없다.</summary>
+        public void SetRemover(Func<Car, bool> remover) => _remover = remover;
 
         /// <summary>풀에서 꺼낸 직후 이 차가 쓸 데이터를 넣어준다.</summary>
         public virtual void Setup(CarDataSO data)
@@ -181,6 +192,7 @@ namespace _Works.CJW.Scripts.Cars
         {
             // 다음 스폰에서 Setup이 다시 넣어준다. 남겨두면 이전 방문의 값이 샌다.
             Data = null;
+            _remover = null;
             Stop();
             ClearBodyColor();
             GetModule<ICarWheelModule>()?.ResetPose();

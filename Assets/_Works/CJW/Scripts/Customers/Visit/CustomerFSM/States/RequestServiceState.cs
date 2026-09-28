@@ -119,6 +119,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 customer.ActionAnimator?.Begin(waitClip, true);
             }
 
+            // 답을 기다리는 동안 인내심이 준다. 바닥나는 순간이 요구를 거두는 순간이다.
+            customer.Patience?.Begin(waitTimeout);
+
             try
             {
                 float deadline = waitTimeout > 0f ? Time.time + waitTimeout : float.MaxValue;
@@ -155,6 +158,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 // 퇴치나 Phase 전환으로 끊겨도 여기는 반드시 지난다.
                 // 빼먹으면 답을 기다리는 요구가 영영 열린 채로 남아 UI가 사라진 손님을 계속 가리킨다.
                 Withdraw(true);
+                customer.Patience?.End();
 
                 if (waitClip != null)
                 {

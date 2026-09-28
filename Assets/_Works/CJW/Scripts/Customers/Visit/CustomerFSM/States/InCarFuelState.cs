@@ -24,28 +24,42 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             float start = Time.time;
             bool lateReported = false;
 
-            while (Ctx.Visit == null || !Ctx.Visit.CarFueled)
+            // 인내심은 늦었다고 알리는 순간 바닥나게 맞춘다. 알리지 않는 손님은 떠나는 순간에 맞춘다.
+            Ctx.Customer.Patience?.Begin(lateSeconds > 0f ? lateSeconds : fuelTimeout);
+
+            try
             {
-                float waited = Time.time - start;
-
-                if (!lateReported && lateSeconds > 0f && waited >= lateSeconds)
+                while (Ctx.Visit == null || !Ctx.Visit.CarFueled)
                 {
-                    lateReported = true;
-                    Ctx.Visit?.ReportFuelLate(Ctx.Customer);
-                }
+                    float waited = Time.time - start;
 
-                if (fuelTimeout > 0f && waited >= fuelTimeout)
-                {
-                    // 기다리다 떠나는 것도 늦은 것이다. 이미 알렸으면 두 번 깎지 않는다.
-                    if (!lateReported)
+                    if (!lateReported && lateSeconds > 0f && waited >= lateSeconds)
                     {
+                        lateReported = true;
                         Ctx.Visit?.ReportFuelLate(Ctx.Customer);
                     }
 
-                    return VisitOutcome.Timeout;
-                }
+                    if (fuelTimeout > 0f && waited >= fuelTimeout)
+                    {
+                        // 기다리다 떠나는 것도 늦은 것이다. 이미 알렸으면 두 번 깎지 않는다.
+                        if (!lateReported)
+                        {
+                            Ctx.Visit?.ReportFuelLate(Ctx.Customer);
+                        }
 
-                await UniTask.Yield(PlayerLoopTiming.Update, ct);
+                        // 주유를 못 받고 그만둔다. 주유를 달라던 말풍선도 접고, 방문이 곧 출발하도록 알린다.
+                        Ctx.EndSpeech();
+                        Ctx.Visit?.ReportFuelGaveUp(Ctx.Customer);
+                        return VisitOutcome.Timeout;
+                    }
+
+                    await UniTask.Yield(PlayerLoopTiming.Update, ct);
+                }
+            }
+            finally
+            {
+                // 인터럽트나 Phase 전환으로 끊겨도 끈다. 안 그러면 떠나는 손님 위에 인내심이 계속 준다.
+                Ctx.Customer.Patience?.End();
             }
 
             Ctx.EndSpeech();

@@ -51,7 +51,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             else if (!Ctx.MapData.TryGetNearest(MapPointType.WaitingLine, originPos, out mapPos))
             {
                 Debug.Log("대기열도 없음.");
-                return VisitOutcome.Blocked;
+                return GiveUp(VisitOutcome.Blocked);
             }
 
             try
@@ -77,7 +77,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 // 주유기에 닿지 못했으면 주유를 기다릴 이유가 없다. 이동 결과를 그대로 넘긴다.
                 if (outcome != VisitOutcome.Done)
                 {
-                    return outcome;
+                    return GiveUp(outcome);
                 }
 
                 FuelDoor fuelDoor = Ctx.Visit?.Car != null ? Ctx.Visit.Car.GetComponentInChildren<FuelDoor>(true) : null;
@@ -86,7 +86,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                 {
                     // 여기서 멈추면 방문 전체가 굳는다. 주유를 못 받은 사실만 남기고 넘어간다.
                     Debug.LogError($"[OilingState] {customer.name}의 차에 {nameof(FuelDoor)}가 없어 주유를 기다릴 수 없습니다.", customer);
-                    return VisitOutcome.Blocked;
+                    return GiveUp(VisitOutcome.Blocked);
                 }
 
                 return await WaitForFuelingEnded(fuelDoor, ct);
@@ -118,6 +118,9 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
             fuelDoor.OnFuelingCompleted += OnEnded;
 
+            // 인내심은 늦었다고 알리는 순간 바닥나게 맞춘다. 알리지 않는 손님은 떠나는 순간에 맞춘다.
+            Ctx.Customer.Patience?.Begin(lateSeconds > 0f ? lateSeconds : fuelTimeout);
+
             try
             {
                 float start = Time.time;
@@ -142,7 +145,7 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
                             Ctx.Visit?.ReportFuelLate(Ctx.Customer);
                         }
 
-                        return VisitOutcome.Timeout;
+                        return GiveUp(VisitOutcome.Timeout);
                     }
 
                     await UniTask.Yield(PlayerLoopTiming.Update, ct);
@@ -154,7 +157,19 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
             {
                 // 풀링으로 차가 재사용되므로 구독을 남기면 다음 방문의 주유 끝 신호가 이미 끝난 손님에게 간다.
                 fuelDoor.OnFuelingCompleted -= OnEnded;
+                Ctx.Customer.Patience?.End();
             }
+        }
+
+        /// <summary>주유를 못 받고 그만둔다. 주유를 달라던 말풍선도 이제 할 말이 없으니 접는다.
+        /// 취소(맞음·단계 전환)로 끊긴 건 여기로 오지 않는다 — 맞은 뒤에는 이 상태가 처음부터 다시 돌며 계속 주유를 기다린다.</summary>
+        private VisitOutcome GiveUp(VisitOutcome outcome)
+        {
+            Ctx.EndSpeech();
+
+            // 방문은 주유 손님이 모두 주유를 받아야 곧 출발한다. 포기도 알리지 않으면 자동 출발 안전망이 돌 때까지 서 있다.
+            Ctx.Visit?.ReportFuelGaveUp(Ctx.Customer);
+            return outcome;
         }
 
         /// <summary>방문이 중단돼 Run이 다시 돌지 않는 경우에도 자리를 돌려주기 위해 여기서도 정리한다.</summary>

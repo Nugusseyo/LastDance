@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Racing Car4
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.MapSystems.CarDataSO
   poolItem: {fileID: 11400000, guid: 33e4af6937ed1b949b3767b5b664c74b, type: 2}
+  randomVisual: 0
   boardingInterval: 0.4
-  moveSpeed: 6
+  moveSpeed: 11
   arriveThreshold: 0.5
   customers: []
   stateOverrides: []
@@ -22,6 +23,7 @@ MonoBehaviour:
   spawnWeight: 1
   maxConcurrent: 0
   price: 0
+  fuelPrice: 50
   references:
     version: 2
     RefIds: []

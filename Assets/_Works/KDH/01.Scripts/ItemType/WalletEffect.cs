@@ -1,24 +1,21 @@
+using _Works.JYG._Scripts.Events;
+using DevLib.EventChannelSystem;
 using UnityEngine;
 
 namespace _Works.KDH._01.Scripts.ItemType
 {
     public class WalletEffect : MonoBehaviour, IItemEffect
     {
-        [SerializeField] private float duration = 5f;
-
-        public bool IsMoneyDoubled { get; private set; }
+        [SerializeField] private EventChannelSO eventChannelSO;
+        [SerializeField] private float duration = 30f;
 
         public void Apply()
         {
-            StopAllCoroutines();
-            StartCoroutine(DoubleMoneyRoutine());
-        }
+            eventChannelSO.RaiseEvent(UIEvents.BuffEvent.Init(BuffType.Wallet, duration));
 
-        private System.Collections.IEnumerator DoubleMoneyRoutine()
-        {
-            IsMoneyDoubled = true;
-            yield return new WaitForSeconds(duration);
-            IsMoneyDoubled = false;
+#if UNITY_EDITOR
+            Debug.Log("Wallet Effect Apply");
+#endif
         }
     }
 }
