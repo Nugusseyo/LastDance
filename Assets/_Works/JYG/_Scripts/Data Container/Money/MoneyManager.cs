@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using _Works.JYG._Scripts.Events;
 using _Works.JYG._Scripts.UI.StoreUI;
 using DevLib.EventChannelSystem;
@@ -15,14 +16,21 @@ namespace _Works.JYG._Scripts.Data_Container.Money
 
         private StoreItem _refuelingItem;
         private StoreItem _scrapItem;
+        private StoreItem _quickScrapItem;
+        
+        private const int QuickScrapIndex = 2; //빠른 폐차 인덱스는 2번이다. 
         private const int RefuelingBonusIndex = 3; //주유 추가 보너스 인덱스는 3번이다. 
         private const int ScrapBonusIndex = 4; //폐차 보너스 인덱스는 4번이다. 
+
+        private bool _isBuff = false;
+        private Coroutine _buffCoroutine;
         private void Start()
         {
             if (eventChannel != null)
             {
                 eventChannel.AddListener<RefuelingEvent>(HandleMoneyRefueling);
                 eventChannel.AddListener<ScrapEvent>(HandleMoneyScrap);
+                eventChannel.AddListener<WalletEvent>(HandleWalletEvent);
             }
 
             if (store != null)
@@ -34,6 +42,10 @@ namespace _Works.JYG._Scripts.Data_Container.Money
                 block = store.GetStoreItemWithIndex(ScrapBonusIndex);
                 block.OnValueChanged += HandleScrapValueChanged;
                 _scrapItem = block.GetUpgradeStoreItem();
+                
+                block = store.GetStoreItemWithIndex(QuickScrapIndex);
+                block.OnValueChanged += HandleQuickScrapValueChanged;
+                _quickScrapItem = block.GetUpgradeStoreItem();
             }
         }
 
@@ -43,12 +55,14 @@ namespace _Works.JYG._Scripts.Data_Container.Money
             {
                 eventChannel.RemoveListener<RefuelingEvent>(HandleMoneyRefueling);
                 eventChannel.RemoveListener<ScrapEvent>(HandleMoneyScrap);
+                eventChannel.RemoveListener<WalletEvent>(HandleWalletEvent);
             }
 
             if (store != null)
             {
                 store.GetStoreItemWithIndex(RefuelingBonusIndex).OnValueChanged -= HandleRefuelingValueChanged;
                 store.GetStoreItemWithIndex(ScrapBonusIndex).OnValueChanged -= HandleScrapValueChanged;
+                store.GetStoreItemWithIndex(QuickScrapIndex).OnValueChanged -= HandleQuickScrapValueChanged;
             }
         }
 
@@ -69,21 +83,49 @@ namespace _Works.JYG._Scripts.Data_Container.Money
             //빠른폐차수수료 <<-- 이거 좀 물어봐야할듯.
             if (moneyContainer != null)
             {
+                int multiplier = _isBuff ? 2 : 1;
                 //(차종 기본가 × 폐차 보너스 레벨) + 분해한 바퀴 개수 × ( 차종 바퀴가 × 폐차 보너스 레벨)
                 float finalValue = (evt.CarValue * _scrapItem.value.Value)
                                    + evt.DisassembledWheel
                                    * (evt.WheelPrice * _scrapItem.value.Value);
+
+                int AssembledWheel = 4 - evt.DisassembledWheel;
+                if (AssembledWheel > 0)
+                {
+                    finalValue += evt.WheelPrice * (1 - _quickScrapItem.value.Value) * AssembledWheel;
+                }
                 
-                moneyContainer.Value += Mathf.RoundToInt(finalValue);
+                moneyContainer.Value += Mathf.RoundToInt(finalValue * multiplier);
             }
         }
         
         
+        private void HandleWalletEvent(WalletEvent evt)
+        {
+            if (_buffCoroutine != null)
+                StopCoroutine(_buffCoroutine);
+            
+            _buffCoroutine = StartCoroutine(BuffCooldown(evt.Duration));
+        }
+
+        private IEnumerator BuffCooldown(float duration)
+        {
+            _isBuff = true;
+            
+            yield return new WaitForSeconds(duration);
+
+            _isBuff = false;
+            _buffCoroutine = null;
+        }
+
+
         private void HandleRefuelingValueChanged(StoreItem item)
             => _refuelingItem = item;
         
         private void HandleScrapValueChanged(StoreItem item) 
             => _scrapItem = item;
-
+        
+        private void HandleQuickScrapValueChanged(StoreItem item)
+            => _quickScrapItem = item;
     }
 }

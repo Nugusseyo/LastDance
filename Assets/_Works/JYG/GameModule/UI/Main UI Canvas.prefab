@@ -4951,9 +4951,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG.Data.Vending_Machine.VendingMachine
   vendingItems:
+  - {fileID: 11400000, guid: db853ea823a6656489615a38ea4adc70, type: 2}
   - {fileID: 11400000, guid: c852f62d5badfa543bf26aa2881ad8cd, type: 2}
   - {fileID: 11400000, guid: 790269fcddab761489a555c7a0637b5f, type: 2}
-  - {fileID: 11400000, guid: db853ea823a6656489615a38ea4adc70, type: 2}
   - {fileID: 11400000, guid: 3e763834ebc981742a7f7b1b4b3ed829, type: 2}
   - {fileID: 11400000, guid: 5078df31c0727624d846efd8c4d31f42, type: 2}
   - {fileID: 11400000, guid: 7cb403c3983c1d747818f87b57a1919e, type: 2}
