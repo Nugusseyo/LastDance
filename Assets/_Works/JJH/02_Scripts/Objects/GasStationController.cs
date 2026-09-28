@@ -148,5 +148,13 @@ namespace _Works.JJH._02_Scripts.Objects
                 hoseLine.SetPosition(i, point);
             }
         }
+
+        public void ForceResetNozzle()
+        {
+            if (!IsDetached)
+                return;
+
+            SnapHose();
+        }
     }
 }
