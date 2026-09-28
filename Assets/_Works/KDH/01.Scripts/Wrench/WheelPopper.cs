@@ -9,6 +9,7 @@ namespace _Works.KDH._01.Scripts.Wrench
             Transform car = wheel.transform.parent;
             if (car == null) return;
 
+            Collider[] carColliders = wheel.transform.root.GetComponentsInChildren<Collider>();
             wheel.transform.SetParent(null);
 
             WheelCollider wheelCollider = wheel.GetComponent<WheelCollider>();
@@ -16,6 +17,14 @@ namespace _Works.KDH._01.Scripts.Wrench
             {
                 Object.Destroy(wheelCollider);
                 AddSolidCollider(wheel);
+            }
+
+            foreach (Collider wheelPart in wheel.GetComponentsInChildren<Collider>())
+            {
+                foreach (Collider carPart in carColliders)
+                {
+                    if (carPart != null && carPart != wheelPart) Physics.IgnoreCollision(wheelPart, carPart);
+                }
             }
 
             Rigidbody rb = wheel.GetComponent<Rigidbody>();

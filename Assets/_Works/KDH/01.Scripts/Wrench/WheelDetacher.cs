@@ -1,5 +1,6 @@
 using _Works.JJH._02_Scripts.Agents.Players.Grabs;
 using _Works.JYG._Scripts.Events;
+using _Works.KDH._01.Scripts.Warehouse;
 using DevLib.EventChannelSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -15,8 +16,9 @@ namespace _Works.KDH._01.Scripts.Wrench
         [SerializeField] private LayerMask wheelLayerMask;
         [SerializeField] private float handDetachTime = 6f;
         [SerializeField] private WrenchTool equippedWrench;
-        [SerializeField] private float popForce = 5f;
+        [SerializeField] private float popForce = 1.5f;
         [SerializeField] private PlayerGrabModule playerGrab;
+        [SerializeField] private GarageSender garageSender;
 
         private WheelCollider[] cachedWheels = new WheelCollider[0];
         private float nextRefreshTime;
@@ -130,6 +132,8 @@ namespace _Works.KDH._01.Scripts.Wrench
 
         private void CheckWheel(GameObject wheel, Vector3 cameraPosition, ref GameObject bestWheel, ref float bestDot)
         {
+            if (!IsInGarage(wheel)) return;
+
             Vector3 directionToWheel = (wheel.transform.position - cameraPosition).normalized;
             float dot = Vector3.Dot(playerCamera.transform.forward, directionToWheel);
 
@@ -140,8 +144,16 @@ namespace _Works.KDH._01.Scripts.Wrench
             }
         }
 
+        private bool IsInGarage(GameObject wheel)
+        {
+            if (garageSender == null || garageSender.GarageCar == null) return false;
+
+            return wheel.transform.IsChildOf(garageSender.GarageCar.transform);
+        }
+
         private void DetachWheel(GameObject wheel)
         {
+            garageSender.RemoveWheel(wheel);
             WheelPopper.Pop(wheel, popForce);
         }
 
