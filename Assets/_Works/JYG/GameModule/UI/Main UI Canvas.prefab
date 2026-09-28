@@ -4955,6 +4955,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 790269fcddab761489a555c7a0637b5f, type: 2}
   - {fileID: 11400000, guid: db853ea823a6656489615a38ea4adc70, type: 2}
   - {fileID: 11400000, guid: 3e763834ebc981742a7f7b1b4b3ed829, type: 2}
+  - {fileID: 11400000, guid: 5078df31c0727624d846efd8c4d31f42, type: 2}
+  - {fileID: 11400000, guid: 7cb403c3983c1d747818f87b57a1919e, type: 2}
+  - {fileID: 11400000, guid: 5617f7b5db3ef4d49820bf8254446c2a, type: 2}
+  - {fileID: 11400000, guid: a66b4278d300e1040ace39a1c79e6901, type: 2}
+  - {fileID: 11400000, guid: 89adf5806e6d1a84e84b969ad78d03c7, type: 2}
   itemPrefab: {fileID: 336951927654853692, guid: 5d3105bfa4d446f4a8b09fafca1d32e0, type: 3}
   parent: {fileID: 5267988703121168886}
   moneyManager: {fileID: 11400000, guid: e2d9677edeb7e28419dd3296b34645f6, type: 2}

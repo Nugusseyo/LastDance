@@ -142,6 +142,38 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8649817081433913747}
     m_Modifications:
+    - target: {fileID: 1858309917192736813, guid: 74429f3cf098e4f4eb59dcec57e84659, type: 3}
+      propertyPath: items.Array.size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1858309917192736813, guid: 74429f3cf098e4f4eb59dcec57e84659, type: 3}
+      propertyPath: 'items.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 575171ec18c149e1b50cfd5eae433342, type: 2}
+    - target: {fileID: 1858309917192736813, guid: 74429f3cf098e4f4eb59dcec57e84659, type: 3}
+      propertyPath: 'items.Array.data[4]'
+      value: 
+      objectReference: {fileID: 11400000, guid: b933b27044f24803a0359d7ef4784a42, type: 2}
+    - target: {fileID: 1858309917192736813, guid: 74429f3cf098e4f4eb59dcec57e84659, type: 3}
+      propertyPath: 'items.Array.data[5]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 7e514b4b688e48909ff11bdd7a002bb8, type: 2}
+    - target: {fileID: 1858309917192736813, guid: 74429f3cf098e4f4eb59dcec57e84659, type: 3}
+      propertyPath: 'items.Array.data[6]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 6e371c8484224f498986fd32cdb05765, type: 2}
+    - target: {fileID: 1858309917192736813, guid: 74429f3cf098e4f4eb59dcec57e84659, type: 3}
+      propertyPath: 'items.Array.data[7]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 81bbf941ed5945eaa67bb68af41bdc90, type: 2}
+    - target: {fileID: 1858309917192736813, guid: 74429f3cf098e4f4eb59dcec57e84659, type: 3}
+      propertyPath: 'items.Array.data[8]'
+      value: 
+      objectReference: {fileID: 11400000, guid: d5899e3904b346758ff2a27a96fc7bee, type: 2}
+    - target: {fileID: 1858309917192736813, guid: 74429f3cf098e4f4eb59dcec57e84659, type: 3}
+      propertyPath: 'items.Array.data[9]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 056deb7bed5349e487362aee51feb08f, type: 2}
     - target: {fileID: 3510892102988657862, guid: 74429f3cf098e4f4eb59dcec57e84659, type: 3}
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.size
       value: 1
