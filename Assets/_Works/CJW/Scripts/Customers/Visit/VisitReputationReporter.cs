@@ -36,10 +36,6 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
             /// <summary>이 방문에서 진상 짓을 알려 이미 깎았는지. 그랬으면 방문 끝에 '진상을 놓침'으로 한 번 더 깎지 않는다.</summary>
             public bool MisconductReported;
-
-            /// <summary>이 방문에서 주유를 받은 손님. 네고 손님처럼 진상이면서 주유를 받으러 온 손님은 주유해 주면 할 일을 한 것이라
-            /// 방문 끝에 '진상을 놓침'으로 깎지 않는다.</summary>
-            public readonly HashSet<AbstractCustomer> Fueled = new();
         }
 
         [Header("참조")]
@@ -97,11 +93,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
         private void OnVisitStarted(VisitSession session)
         {
             var hooks = new SessionHooks();
-            hooks.OnFueled = customer =>
-            {
-                hooks.Fueled.Add(customer);
-                Raise(reportFueled, ReviewType.Good, customer, "주유 받음");
-            };
+            hooks.OnFueled = customer => Raise(reportFueled, ReviewType.Good, customer, "주유 받음");
             hooks.OnFuelLate = customer => Raise(reportFuelLate, ReviewType.Late, customer, "주유 늦음");
             hooks.OnMisconduct = customer =>
             {
@@ -173,7 +165,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             for (int i = 0; i < hooks.Customers.Count; i++)
             {
                 Tracked tracked = hooks.Customers[i];
-                if (!hooks.MisconductReported && !tracked.Defeated && tracked.Customer != null && !hooks.Fueled.Contains(tracked.Customer) && ActsBad(tracked.Customer))
+                if (!hooks.MisconductReported && !tracked.Defeated && tracked.Customer != null && ActsBad(tracked.Customer))
                 {
                     Raise(reportBadMissed, ReviewType.Bad, tracked.Customer, "진상을 놓침");
                 }
@@ -215,6 +207,13 @@ namespace _Works.CJW.Scripts.Customers.Visit
         {
             // 진상 짓을 시작할 때 스스로 알리는 손님은 그때 이미 깎았다. 시작하지 못했으면 깎을 일도 없다.
             if (customer.Fsm != null && customer.Fsm.ReportsMisconduct)
+            {
+                return false;
+            }
+
+            // 네고 손님처럼 주유를 받으러 온 진상은 주유 결과로만 셈한다. 주유해 주면 좋은 리뷰, 못 해 주면 이미 '주유 늦음'으로 깎였다.
+            // 여기서 또 깎으면 기다리다 떠난 손님이 늦음(-1)에 놓침(-3)까지 두 번 깎인다.
+            if (customer.Fsm != null && customer.Fsm.WantsFuel)
             {
                 return false;
             }

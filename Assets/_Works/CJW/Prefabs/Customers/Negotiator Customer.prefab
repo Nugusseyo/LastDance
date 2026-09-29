@@ -158,6 +158,10 @@ PrefabInstance:
       propertyPath: '<ReviewIndices>k__BackingField.Array.data[0]'
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 5480191591732219101, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5790812639602798014, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: agent
       value: 
@@ -165,10 +169,6 @@ PrefabInstance:
     - target: {fileID: 7189175007966602525, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: m_Name
       value: Negotiator Customer
-      objectReference: {fileID: 0}
-    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
-      propertyPath: 'managedReferences[4377106771376341108].lineIndices.Array.data[0]'
-      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: 'sequences.Array.data[1].States.Array.data[0]'
@@ -181,6 +181,10 @@ PrefabInstance:
     - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
       propertyPath: managedReferences[4377106771376341108].runAlongside
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8539909365150688864, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
+      propertyPath: 'managedReferences[4377106771376341108].lineIndices.Array.data[0]'
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5790812639602798014, guid: 3c7ce376ce3b0784b8cc46eda3962db1, type: 3}
