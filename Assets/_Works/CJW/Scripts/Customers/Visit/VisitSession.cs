@@ -46,8 +46,8 @@ namespace _Works.CJW.Scripts.Customers.Visit
         /// <summary>주유를 기다리던 손님이 죽어 이 차가 더 머물 이유가 없다. Waiting에 들어서는 대로 곧장 출발시킨다.</summary>
         private bool _departWhenWaiting;
 
-        /// <summary>이번 방문 차의 주유구. 손님이 주유기에 닿기 전에 주유가 끝나도 기록해 두려고 방문 내내 듣는다.</summary>
-        private FuelDoor _fuelDoor;
+        /// <summary>이번 방문 차의 주유구들. 손님이 주유기에 닿기 전에 주유가 끝나도 기록해 두려고 방문 내내 듣는다.</summary>
+        private readonly List<FuelDoor> _fuelDoors = new();
 
         public VisitPhase Phase { get; private set; } = VisitPhase.None;
         public Car Car => _context.Car;
@@ -555,6 +555,12 @@ namespace _Works.CJW.Scripts.Customers.Visit
                 return;
             }
 
+            // 손님이 아직 내리는 중에 주유가 끝났다. Waiting에 들어서야 출발을 걸 수 있으니 그때까지 들고 있는다.
+            if (Phase is VisitPhase.Arriving or VisitPhase.Unloading)
+            {
+                return;
+            }
+
             _departAfterFuelTimer += dt;
             if (_departAfterFuelTimer < DepartAfterFuelDelay)
             {
@@ -609,18 +615,29 @@ namespace _Works.CJW.Scripts.Customers.Visit
         }
 
         /// <summary>차의 주유구를 갈아 끼운다. 차는 풀에서 재사용되므로 이전 방문의 구독을 반드시 푼다.</summary>
+        /// <remarks>주유구가 여럿인 차가 있다(Car5·6·8은 예전 주유구와 새 주유구 프리팹이 함께 붙어 있다). 플레이어는 그중 아무거나 겨눌 수 있으니
+        /// 하나만 들으면 다른 쪽에 주유했을 때 방문이 몰라, 주유를 받은 손님이 계속 기다리다 늦음을 받고 떠난다. 모두 듣는다.</remarks>
         private void ListenFuelDoor(Car car)
         {
-            if (_fuelDoor != null)
+            for (int i = 0; i < _fuelDoors.Count; i++)
             {
-                _fuelDoor.OnFuelingCompleted -= HandleCarFueled;
+                if (_fuelDoors[i] != null)
+                {
+                    _fuelDoors[i].OnFuelingCompleted -= HandleCarFueled;
+                }
             }
 
-            _fuelDoor = car != null ? car.GetComponentInChildren<FuelDoor>(true) : null;
+            _fuelDoors.Clear();
 
-            if (_fuelDoor != null)
+            if (car == null)
             {
-                _fuelDoor.OnFuelingCompleted += HandleCarFueled;
+                return;
+            }
+
+            car.GetComponentsInChildren(true, _fuelDoors);
+            for (int i = 0; i < _fuelDoors.Count; i++)
+            {
+                _fuelDoors[i].OnFuelingCompleted += HandleCarFueled;
             }
         }
 
