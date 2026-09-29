@@ -15,10 +15,11 @@ namespace _Works.JJH._02_Scripts.Agents.Players.FSM.States.LowerStates
 
         public override void Update()
         {
+            _playerMover.RecoverStamina();
+
             if (Player.PlayerInput.MoveDirection.sqrMagnitude <= 0.01f)
                 return;
 
-            _playerMover.RecoverStamina();
 
             if (Player.PlayerInput.IsSprinting)
             {
