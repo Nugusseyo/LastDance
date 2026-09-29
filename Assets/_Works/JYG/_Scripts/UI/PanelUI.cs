@@ -28,12 +28,29 @@ namespace _Works.JYG._Scripts.UI
         {
             Open.AddListener(HandleOpenUI);
             Close.AddListener(HandleCloseUI);
+
+            if(uiInputSO != null)
+                Open.AddListener(HandleEscapeKey);
+        }
+
+        private void HandleEscapeKey()
+        {
+            uiInputSO.OnEscapePressed += HandleEscapeKeyPressed;
+        }
+
+        private void HandleEscapeKeyPressed()
+        {
+            uiInputSO.OnEscapePressed -= HandleEscapeKeyPressed;
+            InvokeClose();
         }
 
         private void OnDestroy()
         {
             Open.RemoveListener(HandleOpenUI);
             Close.RemoveListener(HandleCloseUI);
+            
+            if(uiInputSO != null)
+                Open.RemoveListener(HandleEscapeKey);
         }
         protected virtual void HandleOpenUI()
         {
