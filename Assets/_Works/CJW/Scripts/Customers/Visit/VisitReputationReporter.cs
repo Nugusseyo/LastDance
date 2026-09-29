@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using _Works.CJW.Scripts.Customers.Data;
 using _Works.CJW.Scripts.Customers.Health;
@@ -36,6 +36,10 @@ namespace _Works.CJW.Scripts.Customers.Visit
 
             /// <summary>이 방문에서 진상 짓을 알려 이미 깎았는지. 그랬으면 방문 끝에 '진상을 놓침'으로 한 번 더 깎지 않는다.</summary>
             public bool MisconductReported;
+
+            /// <summary>이 방문에서 주유를 받은 손님. 네고 손님처럼 진상이면서 주유를 받으러 온 손님은 주유해 주면 할 일을 한 것이라
+            /// 방문 끝에 '진상을 놓침'으로 깎지 않는다.</summary>
+            public readonly HashSet<AbstractCustomer> Fueled = new();
         }
 
         [Header("참조")]
@@ -93,7 +97,11 @@ namespace _Works.CJW.Scripts.Customers.Visit
         private void OnVisitStarted(VisitSession session)
         {
             var hooks = new SessionHooks();
-            hooks.OnFueled = customer => Raise(reportFueled, ReviewType.Good, customer, "주유 받음");
+            hooks.OnFueled = customer =>
+            {
+                hooks.Fueled.Add(customer);
+                Raise(reportFueled, ReviewType.Good, customer, "주유 받음");
+            };
             hooks.OnFuelLate = customer => Raise(reportFuelLate, ReviewType.Late, customer, "주유 늦음");
             hooks.OnMisconduct = customer =>
             {
@@ -165,7 +173,7 @@ namespace _Works.CJW.Scripts.Customers.Visit
             for (int i = 0; i < hooks.Customers.Count; i++)
             {
                 Tracked tracked = hooks.Customers[i];
-                if (!hooks.MisconductReported && !tracked.Defeated && tracked.Customer != null && ActsBad(tracked.Customer))
+                if (!hooks.MisconductReported && !tracked.Defeated && tracked.Customer != null && !hooks.Fueled.Contains(tracked.Customer) && ActsBad(tracked.Customer))
                 {
                     Raise(reportBadMissed, ReviewType.Bad, tracked.Customer, "진상을 놓침");
                 }

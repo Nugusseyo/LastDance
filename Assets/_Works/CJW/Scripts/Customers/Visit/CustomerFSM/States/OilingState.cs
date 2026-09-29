@@ -22,6 +22,12 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         [Tooltip("주유기에 도착한 뒤 이 시간(초)이 지나도 주유가 안 끝나면 늦었다고 알린다(평판 감소). 계속 기다리는 건 fuelTimeout이 정한다. 0 이하면 알리지 않는다.")]
         [SerializeField] private float lateSeconds = 30f;
 
+        /// <summary>이번 방문에서 주유기 앞에서 기다리기 시작한 시각. 음수면 아직 기다린 적 없다. 방문이 시작될 때만 되돌린다.</summary>
+        private float _waitStart = -1f;
+
+        /// <summary>이번 방문에서 늦었다고 이미 알렸는지.</summary>
+        private bool _lateReported;
+
         public override async UniTask<VisitOutcome> Run(CancellationToken ct)
         {
             AbstractCustomer customer = Ctx.Customer;
@@ -118,30 +124,35 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
 
             fuelDoor.OnFuelingCompleted += OnEnded;
 
+            // 맞아서 이 상태가 처음부터 다시 돌아도 기다린 시간은 이어 간다. 새로 재면 늦음이 두 번 나간다.
+            if (_waitStart < 0f)
+            {
+                _waitStart = Time.time;
+            }
+
             // 인내심은 늦었다고 알리는 순간 바닥나게 맞춘다. 알리지 않는 손님은 떠나는 순간에 맞춘다.
-            Ctx.Customer.Patience?.Begin(lateSeconds > 0f ? lateSeconds : fuelTimeout);
+            float limit = lateSeconds > 0f && !_lateReported ? lateSeconds : fuelTimeout;
+            Ctx.Customer.Patience?.Begin(limit > 0f ? Mathf.Max(0.01f, limit - (Time.time - _waitStart)) : limit);
 
             try
             {
-                float start = Time.time;
-                bool lateReported = false;
-
                 // 세션이 먼저 들은 완료도 본다. 방문 컨텍스트가 없는 테스트에서는 주유구 신호만으로 끝난다.
                 while (!ended && !IsCarFueled)
                 {
-                    float waited = Time.time - start;
+                    float waited = Time.time - _waitStart;
 
-                    if (!lateReported && lateSeconds > 0f && waited >= lateSeconds)
+                    if (!_lateReported && lateSeconds > 0f && waited >= lateSeconds)
                     {
-                        lateReported = true;
+                        _lateReported = true;
                         Ctx.Visit?.ReportFuelLate(Ctx.Customer);
                     }
 
                     if (fuelTimeout > 0f && waited >= fuelTimeout)
                     {
                         // 기다리다 떠나는 것도 늦은 것이다. 이미 알렸으면 두 번 깎지 않는다.
-                        if (!lateReported)
+                        if (!_lateReported)
                         {
+                            _lateReported = true;
                             Ctx.Visit?.ReportFuelLate(Ctx.Customer);
                         }
 
@@ -175,6 +186,8 @@ namespace _Works.CJW.Scripts.Customers.Visit.CustomerFSM.States
         /// <summary>방문이 중단돼 Run이 다시 돌지 않는 경우에도 자리를 돌려주기 위해 여기서도 정리한다.</summary>
         public override void Reset()
         {
+            _waitStart = -1f;
+            _lateReported = false;
             ReleaseRented();
         }
 
