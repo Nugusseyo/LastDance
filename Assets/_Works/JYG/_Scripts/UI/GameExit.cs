@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using _Works.JYG._Scripts.Data_Container.Money;
 using UnityEngine;
 
 namespace _Works.JYG._Scripts.UI
@@ -8,6 +9,9 @@ namespace _Works.JYG._Scripts.UI
     {
         private const string SaveFilePath = "storeData.json";  //저장할 json데이터의 이름
         public string SavePath => Path.Combine(Application.persistentDataPath, SaveFilePath);  //저장 루트 (윈도우나 apk가 지정해주는 폴더임)
+
+        [SerializeField] private IntegerDataContainer review;
+        [SerializeField] private IntegerDataContainer money;
         
         public void ExitGame()
         {
@@ -24,6 +28,8 @@ namespace _Works.JYG._Scripts.UI
         {
             Debug.Log("Try clear file");
             PlayerPrefs.DeleteAll();
+            review.Value = 0;
+            money.Value = 0;
             try
             {
                 if (File.Exists(SavePath))
