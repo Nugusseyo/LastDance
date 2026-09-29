@@ -17,7 +17,7 @@ namespace _Works.JYG._Scripts.GameModule
                 SerializableInterface<ISavableData> serializableInterface = wrap.data;
                 ISavableData savable = serializableInterface.GetInterface();
                 
-                Debug.Log($"{wrap.key} : {DataSaveSystem.GetSaveData<IntegerDataForJson>(wrap.key).value}");
+                //Debug.Log($"{wrap.key} : {DataSaveSystem.GetSaveData<IntegerDataForJson>(wrap.key).value}");
 
                 savable.InitializeData(wrap.key);
             }

@@ -3255,6 +3255,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7871d228c12441f4881cc5a67ba1c398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.GameExit
+  review: {fileID: 11400000, guid: 15c969aeb15147e4b82d949cb0989643, type: 2}
+  money: {fileID: 11400000, guid: e2d9677edeb7e28419dd3296b34645f6, type: 2}
 --- !u!1 &5853530490647724820
 GameObject:
   m_ObjectHideFlags: 0
@@ -4373,6 +4375,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7871d228c12441f4881cc5a67ba1c398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.GameExit
+  review: {fileID: 0}
+  money: {fileID: 0}
 --- !u!1 &8439954969897539910
 GameObject:
   m_ObjectHideFlags: 0
