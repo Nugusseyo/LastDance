@@ -8,7 +8,7 @@ namespace _Works.CJW.Scripts.MapSystems
         /// <summary>대여 중인지 여부. 상태를 바꾸는 것은 MapDataSo뿐이다.</summary>
         public bool IsOccupied { get; private set; }
 
-        public override bool IsAvailable => !IsOccupied;
+        public override bool IsAvailable => base.IsAvailable && !IsOccupied;
 
         public void SetOccupied(bool value)
         {
