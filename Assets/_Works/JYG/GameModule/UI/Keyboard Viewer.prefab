@@ -205,6 +205,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 430c4d1ba180cdb47af7348064cec04c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.PanelUI
+  playerInputSO: {fileID: 0}
+  uiInputSO: {fileID: 0}
   fadeTime: 0.5
   Open:
     m_PersistentCalls:
