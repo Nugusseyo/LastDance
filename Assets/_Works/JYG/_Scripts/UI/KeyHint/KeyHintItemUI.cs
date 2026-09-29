@@ -17,7 +17,7 @@ namespace _Works.JYG._Scripts.UI.KeyHint
                     SetText("E", "아이템 사용");
                     break;
                 case KeyHintType.PickUpGun:
-                    SetText("F", "아이템,주유건 집기 / 주유하기");
+                    SetText("F", "집기, 주유");
                     break;
                 case KeyHintType.SellingCar:
                     SetText("E", "차량 처분(판매)");
@@ -29,7 +29,7 @@ namespace _Works.JYG._Scripts.UI.KeyHint
                     SetText("F", "바퀴 해체");
                     break;
                 case KeyHintType.GoToGarage:
-                    SetText("G", "폐차하기\n(자동차 보며 / 버려진 차만)");
+                    SetText("G", "버려진 차 폐차");
                     break;
             }
         }

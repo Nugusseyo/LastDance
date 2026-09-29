@@ -1403,8 +1403,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fc44d95e70193449bb0f500afc3ff0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Agents.Players.PlayerCamera
+  settingSO: {fileID: 11400000, guid: bfa1b9206afc84d4e98a76e46eefcb24, type: 2}
+  sensitivityMultiplier: 2
   <CameraTrans>k__BackingField: {fileID: 0}
-  sensitivity: 70
   minVertical: -80
   maxVertical: 80
   shakeSpeed: 10

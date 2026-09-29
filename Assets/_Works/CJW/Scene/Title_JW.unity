@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: ab8df8a0852eb8645aa1c542cf842dee, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -3271,7 +3271,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.CJW.Scripts.Title.TitleMenu
   startSceneName: Demo
-  settingsPanel: {fileID: 0}
+  settingsPanel: {fileID: 169379746635061750, guid: 8ad4943a74ed5e047901a51d7165cabd, type: 3}
 --- !u!114 &256299585
 MonoBehaviour:
   m_ObjectHideFlags: 0

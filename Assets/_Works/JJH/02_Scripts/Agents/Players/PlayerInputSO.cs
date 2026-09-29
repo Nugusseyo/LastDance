@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace _Works.JJH._02_Scripts.Agents.Players
 {
@@ -13,6 +14,7 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         public event Action OnThrowAttackKeyPressed;
         public event Action OnInteractKeyPressed;
         public event Action OnUseKeyPressed;
+        public event Action OnEscapePressed;
 
         public Vector2 MoveDirection { get; private set; }
         public Vector2 LookDirection { get; private set; }
@@ -29,7 +31,10 @@ namespace _Works.JJH._02_Scripts.Agents.Players
                 _control.Player.SetCallbacks(this);
             }
 
-            SetEnable(true);
+            // SO는 타이틀 씬에서도 로드되므로 여기서 커서를 잠그면 타이틀 클릭이 막힌다 → 씬 기준으로 결정
+            SetEnable(!IsTitleScene(SceneManager.GetActiveScene()));
+            SceneManager.sceneLoaded -= HandleSceneLoaded;
+            SceneManager.sceneLoaded += HandleSceneLoaded;
 
             if (uiInputSO != null)
                 uiInputSO.InitializeInput(_control);
@@ -37,6 +42,8 @@ namespace _Works.JJH._02_Scripts.Agents.Players
 
         private void OnDisable()
         {
+            SceneManager.sceneLoaded -= HandleSceneLoaded;
+
             if (_control != null)
                 _control.Player.Disable();
         }
@@ -54,6 +61,15 @@ namespace _Works.JJH._02_Scripts.Agents.Players
                 Cursor.visible = !enable;
             }
         }
+
+        private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (mode == LoadSceneMode.Single)
+                SetEnable(!IsTitleScene(scene));
+        }
+
+        private static bool IsTitleScene(Scene scene)
+            => scene.name.IndexOf("Title", StringComparison.OrdinalIgnoreCase) >= 0;
 
         public void OnLook(InputAction.CallbackContext context)
         {
@@ -100,6 +116,12 @@ namespace _Works.JJH._02_Scripts.Agents.Players
         {
             if (context.performed)
                 OnUseKeyPressed?.Invoke();
+        }
+
+        public void OnExit(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+                OnEscapePressed?.Invoke();
         }
     }
 }

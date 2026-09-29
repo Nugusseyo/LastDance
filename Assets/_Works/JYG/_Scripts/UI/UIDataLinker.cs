@@ -30,6 +30,15 @@ namespace _Works.JYG._Scripts.UI
             }
         }
 
+        private void Start()
+        {
+            foreach (DataLinkWrappers wrapper in dataLinkWrappers)
+            {
+                IDataContainer container = wrapper.targetData.GetInterface();
+                wrapper.targetTextField.text = TextConvert.Get((int)container.RawValue, wrapper.backString);
+            }
+        }
+
         private void OnDestroy()
         {
             if (dataContainersHandler == null) return;

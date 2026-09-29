@@ -90,5 +90,6 @@ namespace _Works.JYG._Scripts.UI.KeyHint
         Interact = 1 << 4,
         RemoveWheel = 1 << 5,
         GoToGarage = 1 << 6,
+        
     }
 }

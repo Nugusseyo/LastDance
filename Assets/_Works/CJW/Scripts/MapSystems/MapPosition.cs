@@ -24,8 +24,9 @@ namespace _Works.CJW.Scripts.MapSystems
         /// <summary>이 지점이 가리키는 방향. 오브젝트의 회전이 그대로 쓰인다.</summary>
         public Quaternion Rotation => transform.rotation;
 
-        /// <summary>지금 쓸 수 있는지. 대여 개념이 없는 지점은 항상 true다.</summary>
-        public virtual bool IsAvailable => true;
+        /// <summary>지금 쓸 수 있는지. 오브젝트가 꺼져 있으면(비활성) 등록돼 있어도 쓸 수 없다.
+        /// 다른 코드(DispenserInstaller 등)가 꺼진 지점을 직접 Register해도 고르지 않게 하려는 것.</summary>
+        public virtual bool IsAvailable => this != null && isActiveAndEnabled;
 
         /// <summary>에디터 검사용. 어느 맵에 등록하려는지 인스펙터가 물어본다.</summary>
         public MapDataSo MapData => mapData;

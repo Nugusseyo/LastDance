@@ -1,5 +1,8 @@
+using System;
+using _Works.JJH._02_Scripts.Agents.Players;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace _Works.JYG._Scripts.UI.Setting
@@ -21,6 +24,23 @@ namespace _Works.JYG._Scripts.UI.Setting
         private const string MASTER_PARAM = "Master";
         private const string BGM_PARAM = "BGM";
         private const string SFX_PARAM = "SFX";
+
+        [SerializeField] private PlayerInputSO playerInput;
+        public UnityEvent UIEvent;
+
+        private void Awake()
+        {
+            if (playerInput != null)
+                playerInput.OnEscapePressed += InvokeEvent;
+        }
+
+        private void OnDestroy()
+        {
+            if(playerInput != null)
+                playerInput.OnEscapePressed -= InvokeEvent;
+        }
+
+        private void InvokeEvent() => UIEvent?.Invoke();
 
         private void Start()
         {
