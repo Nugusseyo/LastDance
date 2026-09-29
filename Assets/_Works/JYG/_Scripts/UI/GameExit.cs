@@ -22,6 +22,8 @@ namespace _Works.JYG._Scripts.UI
         
         public void ClearSaveFile()
         {
+            Debug.Log("Try clear file");
+            PlayerPrefs.DeleteAll();
             try
             {
                 if (File.Exists(SavePath))
