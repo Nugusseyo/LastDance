@@ -26,6 +26,7 @@ namespace _Works.CJW.Scripts.Title
         private Button _exit;
         private bool _settingsOpen;
         private PanelUI[] _panels;
+        private bool _closeRequested;
 
         private void OnEnable()
         {
@@ -90,7 +91,17 @@ namespace _Works.CJW.Scripts.Title
             _panels = settingsPanel.GetComponentsInChildren<PanelUI>(true);
             foreach (PanelUI panel in _panels)
             {
-                panel.Close.AddListener(CloseSettings);
+                panel.Close.AddListener(RequestClose);
+            }
+        }
+
+        /// <summary>설정 창 닫기 버튼은 안쪽 패널을 닫은 뒤 같은 클릭에서 바깥 패널을 다시 연다(게임 안 일시정지 메뉴로 돌아가는 흐름).
+        /// 바깥 패널이 열리면 안쪽도 따라 열리므로, 클릭 처리가 다 끝난 프레임 끝(LateUpdate)에 전부 닫는다.</summary>
+        private void RequestClose()
+        {
+            if (_settingsOpen)
+            {
+                _closeRequested = true;
             }
         }
 
@@ -105,13 +116,19 @@ namespace _Works.CJW.Scripts.Title
             {
                 if (panel != null)
                 {
-                    panel.Close.RemoveListener(CloseSettings);
+                    panel.Close.RemoveListener(RequestClose);
                 }
             }
         }
 
         private void LateUpdate()
         {
+            if (_closeRequested)
+            {
+                _closeRequested = false;
+                CloseSettings();
+            }
+
             // 설정 창(PanelUI)은 숨을 때 플레이어 입력을 켜면서 커서를 잠그고 숨긴다(게임 플레이용).
             // 타이틀에선 마우스로 버튼을 눌러야 하므로 잠기면 바로 푼다.
             if (Cursor.lockState != CursorLockMode.None || !Cursor.visible)

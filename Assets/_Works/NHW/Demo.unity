@@ -720,7 +720,7 @@ Transform:
   m_GameObject: {fileID: 105404930}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.85, y: 0.1, z: -33.883}
+  m_LocalPosition: {x: -1.85, y: 0.1, z: -87.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14550,11 +14550,11 @@ MonoBehaviour:
   maxConcurrentVisits: 7
   autoDepartSeconds: 60
   passingTraffic: 1
-  passingInterval: {x: 1, y: 2}
+  passingInterval: {x: 3, y: 5}
   enterChance: 0.92
   passingLanes: 2
   passingLaneSpacing: 4
-  maxPassingCars: 20
+  maxPassingCars: 6
   passingExitRadius: 6
   passingMaxLifetime: 90
 --- !u!4 &1960849069
