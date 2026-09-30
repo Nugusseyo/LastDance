@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.ItemType.WalletEffect
   eventChannelSO: {fileID: 11400000, guid: 01ba2cac045ca0441ac68c1592a25d57, type: 2}
-  duration: 30
+  duration: 300
 --- !u!114 &7020518861364392201
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -382,7 +382,19 @@ MonoBehaviour:
         m_CallState: 2
   Close:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 11400000, guid: bfa1b9206afc84d4e98a76e46eefcb24, type: 2}
+        m_TargetAssemblyTypeName: _Works.JYG._Scripts.UI.Setting.SettingSO, Assembly-CSharp
+        m_MethodName: Save
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1289293668492134634
 GameObject:
   m_ObjectHideFlags: 0
@@ -912,7 +924,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 5857106855493047339}
         m_TargetAssemblyTypeName: _Works.JYG._Scripts.UI.PanelUI, Assembly-CSharp
-        m_MethodName: InvokeOpen
+        m_MethodName: InvokeClose
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4008,6 +4020,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7871d228c12441f4881cc5a67ba1c398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.UI.GameExit
+  review: {fileID: 0}
+  money: {fileID: 0}
 --- !u!1 &6731807221691237451
 GameObject:
   m_ObjectHideFlags: 0

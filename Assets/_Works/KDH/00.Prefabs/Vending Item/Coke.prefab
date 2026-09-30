@@ -52,6 +52,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Works.KDH._01.Scripts.ItemType.ColaEffect
   itemSO: {fileID: 11400000, guid: 9b7be8d02703ad8429c32f6929d6a5bf, type: 2}
   eventChannelSO: {fileID: 11400000, guid: 5ca454320a311264a830e271fd884517, type: 2}
+  duration: 180
 --- !u!114 &5025176050713597576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,12 +72,14 @@ MonoBehaviour:
   holdPositionOffset: {x: 0.014, y: 0, z: -0.92}
   holdRotationOffset: {x: 90, y: 0, z: 0}
   holdScale: {x: 4, y: 4, z: 4}
+  minIgnoreTime: 0.2
+  maxIgnoreTime: 2
+  maxDepenetrationVelocity: 1
   UseEvent:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4376762030019143622}
-        m_TargetAssemblyTypeName: _Works.KDH._01.Scripts.ItemType.ColaEffect,
-          Assembly-CSharp
+        m_TargetAssemblyTypeName: _Works.KDH._01.Scripts.ItemType.ColaEffect, Assembly-CSharp
         m_MethodName: Apply
         m_Mode: 1
         m_Arguments:

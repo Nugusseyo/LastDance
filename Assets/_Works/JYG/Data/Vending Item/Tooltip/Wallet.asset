@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 808deafadb24b85479e875148386824e, type: 3}
   m_Name: Wallet
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.Vending_Machine.VendingTooltipData
-  tip: "\uB3C8 2\uBC30 \uC774\uBCA4\uD2B8!\n[30\uCD08]"
+  tip: "\uB3C8 2\uBC30 \uC774\uBCA4\uD2B8!\n[5\uBD84]"
   itemName: "\uC9C0\uAC11!"

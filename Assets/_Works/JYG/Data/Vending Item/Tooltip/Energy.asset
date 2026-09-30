@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 808deafadb24b85479e875148386824e, type: 3}
   m_Name: Energy
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.Vending_Machine.VendingTooltipData
-  tip: "\uC774\uB3D9 \uC18D\uB3C4 \uC99D\uAC00!\n[30\uCD08]"
+  tip: "\uC774\uB3D9 \uC18D\uB3C4 \uC99D\uAC00!\n[4\uBD84]"
   itemName: "\uC5D0\uB108\uC9C0\uC74C\uB8CC!"
