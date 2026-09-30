@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Energy_Drink
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JJH._02_Scripts.Items.UseItemSO
   <Value>k__BackingField: 1.5
-  <Duration>k__BackingField: 5
+  <Duration>k__BackingField: 240

@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 808deafadb24b85479e875148386824e, type: 3}
   m_Name: Cola
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.Vending_Machine.VendingTooltipData
-  tip: "\uD68D\uB4DD \uD3C9\uC810\uC774 2\uBC30!\n[30\uCD08]"
+  tip: "\uD68D\uB4DD \uD3C9\uC810\uC774 2\uBC30!\n[3\uBD84]"
   itemName: "\uCF5C\uB77C!"

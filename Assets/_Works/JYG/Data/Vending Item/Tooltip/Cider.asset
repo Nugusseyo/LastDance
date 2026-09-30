@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 808deafadb24b85479e875148386824e, type: 3}
   m_Name: Cider
   m_EditorClassIdentifier: Assembly-CSharp::_Works.JYG._Scripts.Vending_Machine.VendingTooltipData
-  tip: "\uD3C9\uC810 \uD558\uB77D \uBB34\uC2DC!\n[20\uCD08]"
+  tip: "\uD3C9\uC810 \uD558\uB77D \uBB34\uC2DC!\n[2\uBD84 30\uCD08]"
   itemName: "\uC0AC\uC774\uB2E4!"
